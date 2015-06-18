@@ -9,12 +9,7 @@
 import UIKit
 import AVFoundation
 
-protocol CaptureManagerDelegate: NSObjectProtocol {
-
-}
-
 class CaptureManager: NSObject {
-    weak var delegate: CaptureManagerDelegate?
     let previewLayer: AVCaptureVideoPreviewLayer
     private let session = AVCaptureSession()
     private let captureQueue = dispatch_queue_create("no.finn.finjinon-captures", DISPATCH_QUEUE_SERIAL)
@@ -47,7 +42,7 @@ class CaptureManager: NSObject {
         }
     }
 
-    func captureImage(completion: (UIImage, NSDictionary) -> Void) {
+    func captureImage(completion: (UIImage, NSDictionary) -> Void) { // TODO: throws
         dispatch_async(captureQueue) {
             let connection = self.stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
             connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIDevice.currentDevice().orientation.rawValue)!

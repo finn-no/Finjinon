@@ -17,6 +17,8 @@ class PhotoCaptureViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.view.backgroundColor = UIColor.blackColor()
+
         captureButton = UIButton(frame: CGRect(x: (view.frame.width/2)-33, y: view.frame.height-66-10 , width: 66, height: 66))
         captureButton.backgroundColor = UIColor.whiteColor()
         captureButton.layer.cornerRadius = 33
@@ -34,13 +36,18 @@ class PhotoCaptureViewController: UIViewController {
 
         captureManager.prepare {
             NSLog("CaptureManager fully initialized")
+
             self.captureButton.enabled = true
         }
     }
 
     func capturePhotoTapped(sender: UIButton) {
+        sender.enabled = false
+        sender.backgroundColor = UIColor.lightGrayColor()
         captureManager.captureImage { (image, metadata) in
-            NSLog("captured image: \(image) meta: \(metadata)")
+            sender.enabled = true
+            sender.backgroundColor = UIColor.whiteColor()
+            NSLog("captured image: \(image)")
         }
     }
 }
