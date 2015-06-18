@@ -61,10 +61,15 @@ public class PhotoCaptureViewController: UIViewController {
         previewView.layer.addSublayer(previewLayer)
 
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .Horizontal
         collectionView = UICollectionView(frame: CGRect(x: 0, y: captureButton.frame.minY - (128+8), width: view.bounds.width, height: 128), collectionViewLayout: layout)
-        let pad = layout.minimumInteritemSpacing + layout.minimumLineSpacing
-        layout.itemSize = CGSize(width: collectionView.frame.height - pad, height: collectionView.frame.height - pad)
+
+        layout.scrollDirection = .Horizontal
+        let inset: CGFloat = 8
+        layout.itemSize = CGSize(width: collectionView.frame.height - (inset*2), height: collectionView.frame.height - (inset*2))
+        layout.sectionInset = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
+        layout.minimumInteritemSpacing = inset
+        layout.minimumLineSpacing = inset
+
         collectionView.layer.borderColor = UIColor.orangeColor().CGColor
         collectionView.layer.borderWidth = 1.0
         collectionView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.7)
