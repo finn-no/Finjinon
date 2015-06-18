@@ -18,6 +18,6 @@ class ViewController: UITableViewController {
     @IBAction func addPhotosTapped(sender: AnyObject) {
         // TODO: push the camera view controller
         let controller = PhotoCaptureViewController()
-        navigationController?.pushViewController(controller, animated: true)
+        presentViewController(controller, animated: true, completion: nil)
     }
 }
