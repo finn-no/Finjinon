@@ -31,6 +31,7 @@ public class PhotoCaptureViewController: UIViewController {
             self.collectionView.reloadData() // TODO: insert item with animation
         }
     }
+    public var completionHandler: ([UIImage] -> Void)?
 
     private let captureManager = CaptureManager()
     private var previewView: UIView!
@@ -38,9 +39,10 @@ public class PhotoCaptureViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var containerView: UIVisualEffectView!
 
-    convenience init(images: [UIImage]) {
+    convenience init(images: [UIImage], completion: ([UIImage] -> Void)?) {
         self.init()
         self.images.extend(images)
+        self.completionHandler = completion
     }
 
     override public func viewDidLoad() {
@@ -107,6 +109,7 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func doneButtonTapped(sender: UIButton) {
+        completionHandler?(images)
         dismissViewControllerAnimated(true, completion: nil)
     }
 

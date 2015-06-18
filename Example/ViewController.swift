@@ -9,15 +9,33 @@
 import UIKit
 
 class ViewController: UITableViewController {
+    var images: [UIImage] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        images = [UIImage(named: "hoff.jpeg")!]
     }
 
     @IBAction func addPhotosTapped(sender: AnyObject) {
-        let image = UIImage(named: "hoff.jpeg")!
-        let controller = PhotoCaptureViewController(images: [image])
+        let controller = PhotoCaptureViewController(images: self.images) { images in
+            NSLog("Done with \(images.count) images")
+            self.images = images
+            self.tableView.reloadData()
+        }
         presentViewController(controller, animated: true, completion: nil)
+    }
+
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return images.count
+    }
+
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("ItemCell", forIndexPath: indexPath) as! UITableViewCell
+        let image = images[indexPath.row]
+        cell.imageView?.image = image
+        cell.textLabel?.text = NSStringFromCGSize(image.size)
+
+        return cell
     }
 }
