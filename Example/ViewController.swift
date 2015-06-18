@@ -16,8 +16,8 @@ class ViewController: UITableViewController {
     }
 
     @IBAction func addPhotosTapped(sender: AnyObject) {
-        // TODO: push the camera view controller
-        let controller = PhotoCaptureViewController()
+        let image = UIImage(named: "hoff.jpeg")!
+        let controller = PhotoCaptureViewController(images: [image])
         presentViewController(controller, animated: true, completion: nil)
     }
 }

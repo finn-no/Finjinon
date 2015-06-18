@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		764A24431B32ABFD0080E832 /* TriggerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24421B32ABFD0080E832 /* TriggerButton.swift */; };
+		764A24471B32DCD50080E832 /* hoff.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 764A24461B32DCD50080E832 /* hoff.jpeg */; };
 		7670E4DC1B217F2C00544E09 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E4DB1B217F2C00544E09 /* FinjinonTests.swift */; };
 		7670E4EA1B217FAF00544E09 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E4E51B217FAF00544E09 /* AppDelegate.swift */; };
 		7670E4EC1B217FAF00544E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7670E4E71B217FAF00544E09 /* Images.xcassets */; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		764A24421B32ABFD0080E832 /* TriggerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TriggerButton.swift; path = Finjinon/TriggerButton.swift; sourceTree = "<group>"; };
+		764A24461B32DCD50080E832 /* hoff.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hoff.jpeg; sourceTree = "<group>"; };
 		7670E4C01B217F2B00544E09 /* Finjinon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finjinon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7670E4D51B217F2C00544E09 /* FinjinonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinjinonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7670E4DA1B217F2C00544E09 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			children = (
 				7670E4E51B217FAF00544E09 /* AppDelegate.swift */,
 				7670E4E91B217FAF00544E09 /* ViewController.swift */,
+				764A24461B32DCD50080E832 /* hoff.jpeg */,
 				7670E4EF1B217FB500544E09 /* Supprting Files */,
 			);
 			name = Example;
@@ -212,6 +215,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				764A24471B32DCD50080E832 /* hoff.jpeg in Resources */,
 				7670E51E1B21824000544E09 /* Main.storyboard in Resources */,
 				7670E51D1B21824000544E09 /* LaunchScreen.xib in Resources */,
 				7670E4EC1B217FAF00544E09 /* Images.xcassets in Resources */,

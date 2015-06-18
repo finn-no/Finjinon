@@ -38,6 +38,11 @@ public class PhotoCaptureViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var containerView: UIVisualEffectView!
 
+    convenience init(images: [UIImage]) {
+        self.init()
+        self.images.extend(images)
+    }
+
     override public func viewDidLoad() {
         super.viewDidLoad()
 
@@ -79,8 +84,8 @@ public class PhotoCaptureViewController: UIViewController {
         captureButton.enabled = false
 
         let closeButton = UIButton(frame: CGRect(x: 0, y: captureButton.frame.midY - 22, width: captureButton.frame.minX, height: 44))
-        closeButton.addTarget(self, action: Selector("cancelButtonTapped:"), forControlEvents: .TouchUpInside)
-        closeButton.setTitle(NSLocalizedString("Cancel", comment: ""), forState: .Normal)
+        closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
+        closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
         containerView.contentView.addSubview(closeButton)
 
@@ -101,7 +106,7 @@ public class PhotoCaptureViewController: UIViewController {
         }
     }
 
-    func cancelButtonTapped(sender: UIButton) {
+    func doneButtonTapped(sender: UIButton) {
         dismissViewControllerAnimated(true, completion: nil)
     }
 
