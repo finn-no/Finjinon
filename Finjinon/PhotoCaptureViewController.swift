@@ -9,12 +9,35 @@
 import UIKit
 import AVFoundation
 
-class PhotoCaptureViewController: UIViewController {
+private class PhotoCollectionViewCell: UICollectionViewCell {
+    let imageView = UIImageView(frame: CGRect.zeroRect)
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        imageView.frame = bounds
+        imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+        contentView.addSubview(imageView)
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+public class PhotoCaptureViewController: UIViewController {
+    private(set) public var images: [UIImage] = [] {
+        didSet {
+            self.collectionView.reloadData() // TODO: insert item with animation
+        }
+    }
+
     private let captureManager = CaptureManager()
     private var previewView: UIView!
     private var captureButton: TriggerButton!
+    private var collectionView: UICollectionView!
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor.blackColor()
@@ -37,6 +60,18 @@ class PhotoCaptureViewController: UIViewController {
         previewLayer.frame = previewView.bounds
         previewView.layer.addSublayer(previewLayer)
 
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .Horizontal
+        collectionView = UICollectionView(frame: CGRect(x: 0, y: captureButton.frame.minY - (128+8), width: view.bounds.width, height: 128), collectionViewLayout: layout)
+        let pad = layout.minimumInteritemSpacing + layout.minimumLineSpacing
+        layout.itemSize = CGSize(width: collectionView.frame.height - pad, height: collectionView.frame.height - pad)
+        collectionView.layer.borderColor = UIColor.orangeColor().CGColor
+        collectionView.layer.borderWidth = 1.0
+        collectionView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.7)
+        view.addSubview(collectionView)
+        collectionView.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "PhotoCell")
+        collectionView.dataSource = self
+
         captureManager.prepare {
             NSLog("CaptureManager fully initialized")
 
@@ -50,10 +85,25 @@ class PhotoCaptureViewController: UIViewController {
             sender.enabled = true
             NSLog("captured image: \(image)")
             // TODO: shutter effect
+            self.images.insert(image, atIndex: 0)
         }
     }
 
     func cancelButtonTapped(sender: UIButton) {
         dismissViewControllerAnimated(true, completion: nil)
+    }
+}
+
+
+extension PhotoCaptureViewController: UICollectionViewDataSource {
+    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return images.count
+    }
+
+    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
+        let image = images[indexPath.row]
+        cell.imageView.image = image // TODO: resize on bg queue to cell size
+        return cell
     }
 }
