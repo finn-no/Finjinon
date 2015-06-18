@@ -19,6 +19,7 @@ class CaptureManager: NSObject {
     override init() {
         session.sessionPreset = AVCaptureSessionPresetPhoto
         previewLayer = AVCaptureVideoPreviewLayer.layerWithSession(session) as! AVCaptureVideoPreviewLayer
+        previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
     }
 
     // MARK: - API

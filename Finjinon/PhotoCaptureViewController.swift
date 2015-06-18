@@ -36,32 +36,28 @@ public class PhotoCaptureViewController: UIViewController {
     private var previewView: UIView!
     private var captureButton: TriggerButton!
     private var collectionView: UICollectionView!
+    private var containerView: UIVisualEffectView!
 
     override public func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor.blackColor()
 
-        captureButton = TriggerButton(frame: CGRect(x: (view.frame.width/2)-33, y: view.frame.height-66-10 , width: 66, height: 66))
-        captureButton.layer.cornerRadius = 33
-        captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
-        view.addSubview(captureButton)
-        captureButton.enabled = false
-
-        let closeButton = UIButton(frame: CGRect(x: 0, y: captureButton.frame.midY - 22, width: captureButton.frame.minX, height: 44))
-        closeButton.addTarget(self, action: Selector("cancelButtonTapped:"), forControlEvents: .TouchUpInside)
-        closeButton.setTitle(NSLocalizedString("Cancel", comment: ""), forState: .Normal)
-        closeButton.tintColor = UIColor.whiteColor()
-        view.addSubview(closeButton)
-
-        previewView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: captureButton.frame.minY - 10))
+        previewView = UIView(frame: view.bounds)
+        previewView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
         view.addSubview(previewView)
         let previewLayer = captureManager.previewLayer
-        previewLayer.frame = previewView.bounds
+        previewLayer.frame = previewView.layer.bounds
         previewView.layer.addSublayer(previewLayer)
 
+        let collectionViewHeight: CGFloat = 102
+
+        containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
+        containerView.frame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
+        view.addSubview(containerView)
+
         let layout = UICollectionViewFlowLayout()
-        collectionView = UICollectionView(frame: CGRect(x: 0, y: captureButton.frame.minY - (128+8), width: view.bounds.width, height: 128), collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight), collectionViewLayout: layout)
 
         layout.scrollDirection = .Horizontal
         let inset: CGFloat = 8
@@ -70,12 +66,23 @@ public class PhotoCaptureViewController: UIViewController {
         layout.minimumInteritemSpacing = inset
         layout.minimumLineSpacing = inset
 
-        collectionView.layer.borderColor = UIColor.orangeColor().CGColor
-        collectionView.layer.borderWidth = 1.0
-        collectionView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.7)
-        view.addSubview(collectionView)
+        collectionView.backgroundColor = UIColor.clearColor()
+        collectionView.alwaysBounceHorizontal = true
+        containerView.contentView.addSubview(collectionView)
         collectionView.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "PhotoCell")
         collectionView.dataSource = self
+
+        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-33, y: containerView.frame.height - 66 - 4, width: 66, height: 66))
+        captureButton.layer.cornerRadius = 33
+        captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
+        containerView.contentView.addSubview(captureButton)
+        captureButton.enabled = false
+
+        let closeButton = UIButton(frame: CGRect(x: 0, y: captureButton.frame.midY - 22, width: captureButton.frame.minX, height: 44))
+        closeButton.addTarget(self, action: Selector("cancelButtonTapped:"), forControlEvents: .TouchUpInside)
+        closeButton.setTitle(NSLocalizedString("Cancel", comment: ""), forState: .Normal)
+        closeButton.tintColor = UIColor.whiteColor()
+        containerView.contentView.addSubview(closeButton)
 
         captureManager.prepare {
             NSLog("CaptureManager fully initialized")
