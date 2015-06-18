@@ -104,6 +104,14 @@ public class PhotoCaptureViewController: UIViewController {
     func cancelButtonTapped(sender: UIButton) {
         dismissViewControllerAnimated(true, completion: nil)
     }
+
+    public override func shouldAutorotate() -> Bool {
+        return false
+    }
+
+    public override func supportedInterfaceOrientations() -> Int {
+        return UIInterfaceOrientation.Portrait.rawValue
+    }
 }
 
 
