@@ -69,8 +69,10 @@ class CaptureManager: NSObject {
 
     private func presentAccessDeniedAlert() {
         // TODO: present alert
-        let alert = UIAlertView(title: nil, message: "denied", delegate: nil, cancelButtonTitle: "OK")
-        alert.show()
+        dispatch_async(dispatch_get_main_queue()) {
+            let alert = UIAlertView(title: nil, message: "denied", delegate: nil, cancelButtonTitle: "OK")
+            alert.show()
+        }
     }
 
     private func configure(completion: Void -> Void) {
@@ -104,7 +106,7 @@ class CaptureManager: NSObject {
 
             self.session.startRunning()
 
-            completion()
+            dispatch_async(dispatch_get_main_queue(), completion)
         }
     }
 
