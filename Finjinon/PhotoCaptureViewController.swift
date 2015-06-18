@@ -9,22 +9,6 @@
 import UIKit
 import AVFoundation
 
-private class PhotoCollectionViewCell: UICollectionViewCell {
-    let imageView = UIImageView(frame: CGRect.zeroRect)
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-
-        imageView.frame = bounds
-        imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
-        contentView.addSubview(imageView)
-    }
-
-    required init(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
 public class PhotoCaptureViewController: UIViewController {
     private(set) public var images: [UIImage] = [] {
         didSet {
@@ -41,7 +25,7 @@ public class PhotoCaptureViewController: UIViewController {
 
     convenience init(images: [UIImage], completion: ([UIImage] -> Void)?) {
         self.init()
-        self.images.extend(images)
+        self.images = images
         self.completionHandler = completion
     }
 
@@ -133,5 +117,22 @@ extension PhotoCaptureViewController: UICollectionViewDataSource {
         let image = images[indexPath.row]
         cell.imageView.image = image // TODO: resize on bg queue to cell size
         return cell
+    }
+}
+
+
+private class PhotoCollectionViewCell: UICollectionViewCell {
+    let imageView = UIImageView(frame: CGRect.zeroRect)
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        imageView.frame = bounds
+        imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+        contentView.addSubview(imageView)
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
