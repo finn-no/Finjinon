@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		764A24431B32ABFD0080E832 /* TriggerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24421B32ABFD0080E832 /* TriggerButton.swift */; };
 		7670E4DC1B217F2C00544E09 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E4DB1B217F2C00544E09 /* FinjinonTests.swift */; };
 		7670E4EA1B217FAF00544E09 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E4E51B217FAF00544E09 /* AppDelegate.swift */; };
 		7670E4EC1B217FAF00544E09 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7670E4E71B217FAF00544E09 /* Images.xcassets */; };
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		764A24421B32ABFD0080E832 /* TriggerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TriggerButton.swift; path = Finjinon/TriggerButton.swift; sourceTree = "<group>"; };
 		7670E4C01B217F2B00544E09 /* Finjinon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finjinon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7670E4D51B217F2C00544E09 /* FinjinonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinjinonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7670E4DA1B217F2C00544E09 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 			children = (
 				7670E5171B21806200544E09 /* PhotoCaptureViewController.swift */,
 				7670E51F1B21B42600544E09 /* CaptureManager.swift */,
+				764A24421B32ABFD0080E832 /* TriggerButton.swift */,
 			);
 			name = Finjinon;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 			files = (
 				7670E4EE1B217FAF00544E09 /* ViewController.swift in Sources */,
 				7670E5201B21B42600544E09 /* CaptureManager.swift in Sources */,
+				764A24431B32ABFD0080E832 /* TriggerButton.swift in Sources */,
 				7670E4EA1B217FAF00544E09 /* AppDelegate.swift in Sources */,
 				7670E5181B21806200544E09 /* PhotoCaptureViewController.swift in Sources */,
 			);
@@ -432,6 +436,7 @@
 				7670E4E11B217F2C00544E09 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7670E4E21B217F2C00544E09 /* Build configuration list for PBXNativeTarget "FinjinonTests" */ = {
 			isa = XCConfigurationList;
@@ -440,6 +445,7 @@
 				7670E4E41B217F2C00544E09 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

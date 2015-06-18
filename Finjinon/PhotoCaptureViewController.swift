@@ -12,15 +12,14 @@ import AVFoundation
 class PhotoCaptureViewController: UIViewController {
     private let captureManager = CaptureManager()
     private var previewView: UIView!
-    private var captureButton: UIButton!
+    private var captureButton: TriggerButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.backgroundColor = UIColor.blackColor()
 
-        captureButton = UIButton(frame: CGRect(x: (view.frame.width/2)-33, y: view.frame.height-66-10 , width: 66, height: 66))
-        captureButton.backgroundColor = UIColor.whiteColor()
+        captureButton = TriggerButton(frame: CGRect(x: (view.frame.width/2)-33, y: view.frame.height-66-10 , width: 66, height: 66))
         captureButton.layer.cornerRadius = 33
         captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
         view.addSubview(captureButton)
@@ -28,8 +27,6 @@ class PhotoCaptureViewController: UIViewController {
 
         previewView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: captureButton.frame.minY - 10))
         view.addSubview(previewView)
-        previewView.layer.borderColor = UIColor.redColor().CGColor
-        previewView.layer.borderWidth = 1.0
         let previewLayer = captureManager.previewLayer
         previewLayer.frame = previewView.bounds
         previewView.layer.addSublayer(previewLayer)
@@ -43,11 +40,10 @@ class PhotoCaptureViewController: UIViewController {
 
     func capturePhotoTapped(sender: UIButton) {
         sender.enabled = false
-        sender.backgroundColor = UIColor.lightGrayColor()
         captureManager.captureImage { (image, metadata) in
             sender.enabled = true
-            sender.backgroundColor = UIColor.whiteColor()
             NSLog("captured image: \(image)")
+            // TODO: shutter effect
         }
     }
 }
