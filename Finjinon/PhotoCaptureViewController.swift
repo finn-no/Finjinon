@@ -98,10 +98,10 @@ public class PhotoCaptureViewController: UIViewController {
             UIView.animateWithDuration(0.1, animations: {self.previewView.alpha = 1.0})
         })
 
-        captureManager.captureImage { (image, metadata) in
+        captureManager.captureImage { (data, metadata) in
             sender.enabled = true
 
-            self.storage.createAssetFromImage(image) { asset in
+            self.storage.createAssetFromImageData(data) { asset in
                 self.collectionView.performBatchUpdates({
                     self.assets.insert(asset, atIndex: 0)
                     self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])

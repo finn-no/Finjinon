@@ -34,8 +34,13 @@ public struct Asset {
 public class PhotoStorage {
     let storage = PhotoDiskCache()
 
+    func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
+        storage.createAssetFromImageData(data, completion: completion)
+    }
+
     func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
-        storage.createAssetFromImage(image, completion: completion)
+        let data = UIImageJPEGRepresentation(image, 1.0)
+        createAssetFromImageData(data, completion: completion)
     }
 }
 
@@ -67,10 +72,9 @@ internal class PhotoDiskCache {
 
     // MARK: - API
 
-    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+    func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
         dispatch_async(queue) {
             let asset = Asset(storage: self)
-            let data = UIImageJPEGRepresentation(image, 1.0)
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
             if !data.writeToFile(cacheURL.path!, options: .DataWritingAtomic, error: &error) {

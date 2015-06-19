@@ -43,7 +43,7 @@ class CaptureManager: NSObject {
         }
     }
 
-    func captureImage(completion: (UIImage, NSDictionary) -> Void) { // TODO: throws
+    func captureImage(completion: (NSData, NSDictionary) -> Void) { // TODO: throws
         dispatch_async(captureQueue) {
             let connection = self.stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
             connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIDevice.currentDevice().orientation.rawValue)!
@@ -53,10 +53,8 @@ class CaptureManager: NSObject {
                     let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
                     let metadata: NSDictionary = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)).takeUnretainedValue()
 
-                    if let image = UIImage(data: data) {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            completion(image, metadata)
-                        }
+                    dispatch_async(dispatch_get_main_queue()) {
+                        completion(data, metadata)
                     }
                 } else {
                     NSLog("Failed capturing still imagE: \(error)")
