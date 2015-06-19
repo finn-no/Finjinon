@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import MobileCoreServices
 
 public class PhotoCaptureViewController: UIViewController {
     private(set) public var assets: [Asset] = []
@@ -81,6 +82,13 @@ public class PhotoCaptureViewController: UIViewController {
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
         containerView.contentView.addSubview(closeButton)
+
+        let pickerButton = UIButton(frame: CGRect(x: (view.bounds.width/2)-(124/2), y: 20, width: 142, height: 44))
+        pickerButton.setTitle(NSLocalizedString("Add image…", comment: ""), forState: .Normal)
+        pickerButton.addTarget(self, action: Selector("presentImagePicker:"), forControlEvents: .TouchUpInside)
+        pickerButton.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.6)
+        pickerButton.layer.cornerRadius = 4
+        view.addSubview(pickerButton)
 
         captureManager.prepare {
             NSLog("CaptureManager fully initialized")
@@ -167,6 +175,32 @@ extension PhotoCaptureViewController: UICollectionViewDataSource {
             cell.imageView.image = image
         }
         return cell
+    }
+}
+
+
+extension PhotoCaptureViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func presentImagePicker(sender: AnyObject) {
+        // TODO: implement some kind of adapter so we can use other kinds of image pickers (like one that supports multiple selections)
+        let picker = UIImagePickerController()
+        picker.mediaTypes = [kUTTypeImage]
+        picker.delegate = self
+        presentViewController(picker, animated: true, completion: nil)
+    }
+
+    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
+        let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+        self.storage.createAssetFromImage(image) { asset in
+            self.collectionView.performBatchUpdates({
+                self.assets.insert(asset, atIndex: 0)
+                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
+                }, completion: nil)
+        }
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+
+    public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        dismissViewControllerAnimated(true, completion: nil)
     }
 }
 
