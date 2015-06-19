@@ -17,7 +17,7 @@ public class PhotoCaptureViewController: UIViewController {
     }
     public var completionHandler: ([Asset] -> Void)?
 
-    private let cache = PhotoDiskCache()
+    private let storage = PhotoStorage()
     private let captureManager = CaptureManager()
     private var previewView: UIView!
     private var captureButton: TriggerButton!
@@ -87,7 +87,7 @@ public class PhotoCaptureViewController: UIViewController {
     // Add the initial set of images asynchronously
     public func addInitialImages(images: [UIImage]) {
         for image in images {
-            cache.createAssetFromImage(image) { asset in
+            storage.createAssetFromImage(image) { asset in
                 self.assets.append(asset)
             }
         }
@@ -101,7 +101,7 @@ public class PhotoCaptureViewController: UIViewController {
             sender.enabled = true
             NSLog("captured image: \(image)")
             // TODO: shutter effect
-            self.cache.createAssetFromImage(image) { asset in
+            self.storage.createAssetFromImage(image) { asset in
                 self.assets.insert(asset, atIndex: 0)
             }
         }
@@ -132,7 +132,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource {
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
         let asset = assets[indexPath.row]
-        cache.thumbnailForAsset(asset, forWidth: cell.imageView.bounds.width) { image in
+        asset.retrieveImageWithWidth(cell.imageView.bounds.width) { image in
             cell.imageView.image = image
         }
         return cell

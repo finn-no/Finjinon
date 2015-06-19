@@ -13,8 +13,30 @@ import ImageIO
 
 public struct Asset {
     let UUID = NSUUID().UUIDString
+    let storage: PhotoDiskCache
     // TODO: connect each asset with the/a cache and have method for retriving images on Asset itself? (alá ALAsset)
     // that way we only have to expose the asset as API
+
+    internal init(storage: PhotoDiskCache) {
+        self.storage = storage
+    }
+
+    public func retrieveOriginalImage(completion: UIImage -> Void) {
+        storage.imageForAsset(self, completion: completion)
+    }
+
+    public func retrieveImageWithWidth(width: CGFloat, completion: UIImage -> Void) {
+        storage.thumbnailForAsset(self, forWidth: width, completion: completion)
+    }
+}
+
+// Public API for creating Asset's
+public class PhotoStorage {
+    let storage = PhotoDiskCache()
+
+    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+        storage.createAssetFromImage(image, completion: completion)
+    }
 }
 
 // Stores images on disk to save memory, provides thumbnails, access is done in a serialized manner
@@ -29,7 +51,6 @@ internal class PhotoDiskCache {
         let cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last as! NSURL
         self.baseURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
         if !fileManager.fileExistsAtPath(self.baseURL.path!) {
-            NSLog("Note: creating cache dir at \(baseURL)")
             var error: NSError?
             if !fileManager.createDirectoryAtURL(self.baseURL, withIntermediateDirectories: true, attributes: nil, error: &error) {
                 NSLog("Failed to create cache directory at \(baseURL): \(error)")
@@ -43,6 +64,28 @@ internal class PhotoDiskCache {
             NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(error)")
         }
     }
+
+    // MARK: - API
+
+    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+        dispatch_async(queue) {
+            let asset = Asset(storage: self)
+            let data = UIImageJPEGRepresentation(image, 1.0)
+            let cacheURL = self.cacheURLForAsset(asset)
+            var error: NSError?
+            if !data.writeToFile(cacheURL.path!, options: .DataWritingAtomic, error: &error) {
+                NSLog("Failed to write image to \(cacheURL): \(error)")
+                // TODO: throw
+            }
+            dispatch_async(dispatch_get_main_queue()) {
+                completion(asset)
+            }
+        }
+    }
+
+    //func createAssetFromALAsset(asset: ALAsset) -> Asset {
+
+    // MARK: - Internal
 
     func imageForAsset(asset: Asset, completion: UIImage -> Void) {
         dispatch_async(queue) {
@@ -71,24 +114,6 @@ internal class PhotoDiskCache {
             } // TODO else throws
         }
     }
-
-    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
-        dispatch_async(queue) {
-            let asset = Asset()
-            let data = UIImageJPEGRepresentation(image, 1.0)
-            let cacheURL = self.cacheURLForAsset(asset)
-            var error: NSError?
-            if !data.writeToFile(cacheURL.path!, options: .DataWritingAtomic, error: &error) {
-                NSLog("Failed to write image to \(cacheURL): \(error)")
-                // TODO: throw
-            }
-            dispatch_async(dispatch_get_main_queue()) {
-                completion(asset)
-            }
-        }
-    }
-
-    //func createAssetFromALAsset(asset: ALAsset) -> Asset {
 
     func deleteAsset(asset: Asset, completion: () -> Void) {
         dispatch_async(queue) {

@@ -19,9 +19,13 @@ class ViewController: UITableViewController {
 
     @IBAction func addPhotosTapped(sender: AnyObject) {
         let controller = PhotoCaptureViewController() { assets in
-//            NSLog("Done with \(images.count) images")
-//            self.images = images
-//            self.tableView.reloadData()
+            self.images.removeAll(keepCapacity: false)
+            for asset in assets {
+                asset.retrieveImageWithWidth(100) { image in
+                    self.images.append(image)
+                    self.tableView.reloadData()
+                }
+            }
         }
         controller.addInitialImages(self.images)
         presentViewController(controller, animated: true, completion: nil)
