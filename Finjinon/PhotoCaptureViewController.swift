@@ -10,22 +10,22 @@ import UIKit
 import AVFoundation
 
 public class PhotoCaptureViewController: UIViewController {
-    private(set) public var images: [UIImage] = [] {
+    private(set) public var assets: [Asset] = [] {
         didSet {
             self.collectionView.reloadData() // TODO: insert item with animation
         }
     }
-    public var completionHandler: ([UIImage] -> Void)?
+    public var completionHandler: ([Asset] -> Void)?
 
+    private let cache = PhotoDiskCache()
     private let captureManager = CaptureManager()
     private var previewView: UIView!
     private var captureButton: TriggerButton!
     private var collectionView: UICollectionView!
     private var containerView: UIVisualEffectView!
 
-    convenience init(images: [UIImage], completion: ([UIImage] -> Void)?) {
+    convenience init(completion: ([Asset] -> Void)?) {
         self.init()
-        self.images = images
         self.completionHandler = completion
     }
 
@@ -82,20 +82,37 @@ public class PhotoCaptureViewController: UIViewController {
         }
     }
 
+    // MARK: - API
+
+    // Add the initial set of images asynchronously
+    public func addInitialImages(images: [UIImage]) {
+        for image in images {
+            cache.createAssetFromImage(image) { asset in
+                self.assets.append(asset)
+            }
+        }
+    }
+
+    // MARK: - Actions
+
     func capturePhotoTapped(sender: UIButton) {
         sender.enabled = false
         captureManager.captureImage { (image, metadata) in
             sender.enabled = true
             NSLog("captured image: \(image)")
             // TODO: shutter effect
-            self.images.insert(image, atIndex: 0)
+            self.cache.createAssetFromImage(image) { asset in
+                self.assets.insert(asset, atIndex: 0)
+            }
         }
     }
 
     func doneButtonTapped(sender: UIButton) {
-        completionHandler?(images)
+        completionHandler?(assets)
         dismissViewControllerAnimated(true, completion: nil)
     }
+
+    // MARK: - UIViewController
 
     public override func shouldAutorotate() -> Bool {
         return false
@@ -109,13 +126,15 @@ public class PhotoCaptureViewController: UIViewController {
 
 extension PhotoCaptureViewController: UICollectionViewDataSource {
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count
+        return assets.count
     }
 
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
-        let image = images[indexPath.row]
-        cell.imageView.image = image // TODO: resize on bg queue to cell size
+        let asset = assets[indexPath.row]
+        cache.thumbnailForAsset(asset, forWidth: cell.imageView.bounds.width) { image in
+            cell.imageView.image = image
+        }
         return cell
     }
 }
