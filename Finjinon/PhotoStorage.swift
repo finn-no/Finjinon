@@ -13,11 +13,11 @@ import ImageIO
 
 public struct Asset {
     let UUID = NSUUID().UUIDString
-    let storage: PhotoDiskCache
+    let storage: PhotoStorage
     // TODO: connect each asset with the/a cache and have method for retriving images on Asset itself? (alá ALAsset)
     // that way we only have to expose the asset as API
 
-    internal init(storage: PhotoDiskCache) {
+    internal init(storage: PhotoStorage) {
         self.storage = storage
     }
 
@@ -32,20 +32,6 @@ public struct Asset {
 
 // Public API for creating Asset's
 public class PhotoStorage {
-    let storage = PhotoDiskCache()
-
-    func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
-        storage.createAssetFromImageData(data, completion: completion)
-    }
-
-    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
-        let data = UIImageJPEGRepresentation(image, 1.0)
-        createAssetFromImageData(data, completion: completion)
-    }
-}
-
-// Stores images on disk to save memory, provides thumbnails, access is done in a serialized manner
-internal class PhotoDiskCache {
     private let baseURL: NSURL
     private let queue = dispatch_queue_create("no.finn.finjonon.disk-cache-writes", DISPATCH_QUEUE_SERIAL)
     private let resizeQueue = dispatch_queue_create("no.finn.finjonon.disk-cache-resizes", DISPATCH_QUEUE_CONCURRENT)
@@ -89,7 +75,14 @@ internal class PhotoDiskCache {
 
     //func createAssetFromALAsset(asset: ALAsset) -> Asset {
 
-    // MARK: - Internal
+    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+        let data = UIImageJPEGRepresentation(image, 1.0)
+        createAssetFromImageData(data, completion: completion)
+    }
+}
+
+
+internal extension PhotoStorage {
 
     func imageForAsset(asset: Asset, completion: UIImage -> Void) {
         dispatch_async(queue) {
