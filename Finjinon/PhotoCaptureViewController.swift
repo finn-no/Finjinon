@@ -10,11 +10,7 @@ import UIKit
 import AVFoundation
 
 public class PhotoCaptureViewController: UIViewController {
-    private(set) public var assets: [Asset] = [] {
-        didSet {
-            self.collectionView.reloadData() // TODO: insert item with animation
-        }
-    }
+    private(set) public var assets: [Asset] = []
     public var completionHandler: ([Asset] -> Void)?
 
     private let storage = PhotoStorage()
@@ -89,6 +85,7 @@ public class PhotoCaptureViewController: UIViewController {
         for image in images {
             storage.createAssetFromImage(image) { asset in
                 self.assets.append(asset)
+                self.collectionView.reloadData()
             }
         }
     }
@@ -102,7 +99,10 @@ public class PhotoCaptureViewController: UIViewController {
             NSLog("captured image: \(image)")
             // TODO: shutter effect
             self.storage.createAssetFromImage(image) { asset in
-                self.assets.insert(asset, atIndex: 0)
+                self.collectionView.performBatchUpdates({
+                    self.assets.insert(asset, atIndex: 0)
+                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
+                }, completion: nil)
             }
         }
     }
