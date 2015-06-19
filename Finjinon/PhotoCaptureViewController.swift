@@ -83,12 +83,11 @@ public class PhotoCaptureViewController: UIViewController {
         closeButton.tintColor = UIColor.whiteColor()
         containerView.contentView.addSubview(closeButton)
 
-        let pickerButton = UIButton(frame: CGRect(x: (view.bounds.width/2)-(124/2), y: 20, width: 142, height: 44))
-        pickerButton.setTitle(NSLocalizedString("Add image…", comment: ""), forState: .Normal)
+        let pickerButtonWidth = containerView.bounds.width - captureButton.frame.maxX
+        let pickerButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: pickerButtonWidth, height: 44))
+        pickerButton.setTitle(NSLocalizedString("Add…", comment: ""), forState: .Normal)
         pickerButton.addTarget(self, action: Selector("presentImagePicker:"), forControlEvents: .TouchUpInside)
-        pickerButton.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.6)
-        pickerButton.layer.cornerRadius = 4
-        view.addSubview(pickerButton)
+        containerView.contentView.addSubview(pickerButton)
 
         captureManager.prepare {
             NSLog("CaptureManager fully initialized")
