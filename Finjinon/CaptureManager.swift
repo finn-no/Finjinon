@@ -64,7 +64,30 @@ class CaptureManager: NSObject {
         }
     }
 
+    func lockFocusAtPointOfInterest(pointInLayer: CGPoint) {
+        let pointInCamera = previewLayer.captureDevicePointOfInterestForPoint(pointInLayer)
+        self.lockCurrentCameraDeviceForConfiguration { cameraDevice in
+            if cameraDevice.focusPointOfInterestSupported {
+                cameraDevice.focusPointOfInterest = pointInCamera
+                cameraDevice.focusMode = .AutoFocus
+            }
+        }
+    }
+
     // MARK: - Private methods
+
+    private func lockCurrentCameraDeviceForConfiguration(configurator: AVCaptureDevice -> Void) {
+        dispatch_async(captureQueue) {
+            var error: NSError?
+            if !self.cameraDevice.lockForConfiguration(&error) {
+                NSLog("Failed to lock camera device for configuration: \(error)")
+            }
+
+            configurator(self.cameraDevice)
+
+            self.cameraDevice.unlockForConfiguration()
+        }
+    }
 
     private func presentAccessDeniedAlert() {
         // TODO: present alert

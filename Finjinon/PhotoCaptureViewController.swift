@@ -19,6 +19,7 @@ public class PhotoCaptureViewController: UIViewController {
     private var captureButton: TriggerButton!
     private var collectionView: UICollectionView!
     private var containerView: UIVisualEffectView!
+    private var focusIndicatorView: UIView!
 
     convenience init(completion: ([Asset] -> Void)?) {
         self.init()
@@ -36,6 +37,16 @@ public class PhotoCaptureViewController: UIViewController {
         let previewLayer = captureManager.previewLayer
         previewLayer.frame = previewView.layer.bounds
         previewView.layer.addSublayer(previewLayer)
+
+        focusIndicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 64, height: 64))
+        focusIndicatorView.backgroundColor = UIColor.clearColor()
+        focusIndicatorView.layer.borderColor = UIColor.orangeColor().CGColor
+        focusIndicatorView.layer.borderWidth = 1.0
+        focusIndicatorView.alpha = 0.0
+        previewView.addSubview(focusIndicatorView)
+
+        let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
+        previewView.addGestureRecognizer(tapper)
 
         let collectionViewHeight: CGFloat = 102
 
@@ -113,6 +124,23 @@ public class PhotoCaptureViewController: UIViewController {
     func doneButtonTapped(sender: UIButton) {
         completionHandler?(assets)
         dismissViewControllerAnimated(true, completion: nil)
+    }
+
+    func focusTapGestureRecognized(gestureRecognizer: UITapGestureRecognizer) {
+        if gestureRecognizer.state == .Ended {
+            let point = gestureRecognizer.locationInView(gestureRecognizer.view)
+
+            focusIndicatorView.center = point
+            UIView.animateWithDuration(0.3, delay: 0.0, options: .BeginFromCurrentState, animations: {
+                self.focusIndicatorView.alpha = 1.0
+            }, completion: { finished in
+                UIView.animateWithDuration(0.2, delay: 1.6, options: .BeginFromCurrentState, animations: {
+                    self.focusIndicatorView.alpha = 0.0
+                }, completion: nil)
+            })
+
+            captureManager.lockFocusAtPointOfInterest(point)
+        }
     }
 
     // MARK: - UIViewController
