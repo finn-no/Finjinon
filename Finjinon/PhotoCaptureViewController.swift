@@ -94,10 +94,13 @@ public class PhotoCaptureViewController: UIViewController {
 
     func capturePhotoTapped(sender: UIButton) {
         sender.enabled = false
+        UIView.animateWithDuration(0.1, animations: { self.previewView.alpha = 0.0 }, completion: { finished in
+            UIView.animateWithDuration(0.1, animations: {self.previewView.alpha = 1.0})
+        })
+
         captureManager.captureImage { (image, metadata) in
             sender.enabled = true
-            NSLog("captured image: \(image)")
-            // TODO: shutter effect
+
             self.storage.createAssetFromImage(image) { asset in
                 self.collectionView.performBatchUpdates({
                     self.assets.insert(asset, atIndex: 0)
