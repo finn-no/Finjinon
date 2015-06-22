@@ -250,6 +250,8 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
 
         imageView.frame = bounds
         imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+        imageView.layer.shouldRasterize = true // to avoid jaggies while we wiggle
+        imageView.layer.rasterizationScale = UIScreen.mainScreen().scale
         contentView.addSubview(imageView)
 
         closeButton.addTarget(self, action: Selector("closeButtonTapped:"), forControlEvents: .TouchUpInside)
@@ -279,7 +281,7 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
             closeButton.hidden = false
             UIView.animateWithDuration(0.23, delay: 0, options: .BeginFromCurrentState, animations: {
                 self.closeButton.alpha = 1.0
-                let offset = self.closeButton.bounds.height/2
+                let offset = self.closeButton.bounds.height/3
                 self.imageView.frame.origin.x = offset
                 self.imageView.frame.origin.y = offset
                 self.imageView.frame.size.height -= offset*2
@@ -310,12 +312,12 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
 
     private func buildJiggleAnimation() -> CABasicAnimation {
         let animation  = CABasicAnimation(keyPath: "transform.rotation")
-        let startAngle = (-2) * M_PI/180.0;
+        let startAngle = (-1) * M_PI/180.0;
         animation.fromValue = startAngle
-        animation.toValue = 3 * -startAngle
+        animation.toValue = 2 * -startAngle
         animation.autoreverses = true
         animation.repeatCount = Float.infinity
-        let duration = 0.16
+        let duration = 0.1
         animation.duration = duration
         animation.timeOffset = Double((arc4random() % 100) / 100) - duration
         return animation
