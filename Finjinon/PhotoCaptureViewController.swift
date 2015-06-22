@@ -117,6 +117,8 @@ public class PhotoCaptureViewController: UIViewController {
     // MARK: - Actions
 
     func capturePhotoTapped(sender: UIButton) {
+        editing = false
+
         sender.enabled = false
         UIView.animateWithDuration(0.1, animations: { self.previewView.alpha = 0.0 }, completion: { finished in
             UIView.animateWithDuration(0.1, animations: {self.previewView.alpha = 1.0})
@@ -140,6 +142,8 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func focusTapGestureRecognized(gestureRecognizer: UITapGestureRecognizer) {
+        editing = false
+
         if gestureRecognizer.state == .Ended {
             let point = gestureRecognizer.locationInView(gestureRecognizer.view)
 
