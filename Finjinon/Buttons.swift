@@ -61,7 +61,7 @@ class CloseButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        backgroundColor = UIColor.lightGrayColor().colorWithAlphaComponent(0.8)
+        backgroundColor = UIColor.lightGrayColor().colorWithAlphaComponent(0.9)
     }
 
     required init(coder aDecoder: NSCoder) {
