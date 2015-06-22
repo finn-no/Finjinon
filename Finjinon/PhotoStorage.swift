@@ -98,7 +98,7 @@ internal extension PhotoStorage {
         dispatch_async(self.resizeQueue) {
             let imageURL = self.cacheURLForAsset(asset)
             if let imageSource = CGImageSourceCreateWithURL(imageURL, nil) {
-                let options = [ kCGImageSourceThumbnailMaxPixelSize as NSString: width,
+                let options = [ kCGImageSourceThumbnailMaxPixelSize as NSString: width * UIScreen.mainScreen().scale,
                     kCGImageSourceCreateThumbnailWithTransform as NSString: kCFBooleanTrue,
                     kCGImageSourceCreateThumbnailFromImageIfAbsent as NSString: kCFBooleanTrue,
                 ]
