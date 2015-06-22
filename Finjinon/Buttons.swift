@@ -54,7 +54,7 @@ class TriggerButton: UIButton {
 
 
 class CloseButton: UIButton {
-    var strokeColor = UIColor.darkGrayColor() {
+    var strokeColor = UIColor.blackColor() {
         didSet { setNeedsDisplay() }
     }
 
