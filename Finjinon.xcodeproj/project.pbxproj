@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		764A24431B32ABFD0080E832 /* TriggerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24421B32ABFD0080E832 /* TriggerButton.swift */; };
+		764A24431B32ABFD0080E832 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24421B32ABFD0080E832 /* Buttons.swift */; };
 		764A24471B32DCD50080E832 /* hoff.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 764A24461B32DCD50080E832 /* hoff.jpeg */; };
 		764A24491B32E6830080E832 /* PhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24481B32E6830080E832 /* PhotoStorage.swift */; };
 		7670E4DC1B217F2C00544E09 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E4DB1B217F2C00544E09 /* FinjinonTests.swift */; };
@@ -31,7 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		764A24421B32ABFD0080E832 /* TriggerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TriggerButton.swift; path = Finjinon/TriggerButton.swift; sourceTree = "<group>"; };
+		764A24421B32ABFD0080E832 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Buttons.swift; path = Finjinon/Buttons.swift; sourceTree = "<group>"; };
 		764A24461B32DCD50080E832 /* hoff.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hoff.jpeg; sourceTree = "<group>"; };
 		764A24481B32E6830080E832 /* PhotoStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoStorage.swift; path = Finjinon/PhotoStorage.swift; sourceTree = "<group>"; };
 		7670E4C01B217F2B00544E09 /* Finjinon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finjinon.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,7 +131,7 @@
 				7670E5171B21806200544E09 /* PhotoCaptureViewController.swift */,
 				764A24481B32E6830080E832 /* PhotoStorage.swift */,
 				7670E51F1B21B42600544E09 /* CaptureManager.swift */,
-				764A24421B32ABFD0080E832 /* TriggerButton.swift */,
+				764A24421B32ABFD0080E832 /* Buttons.swift */,
 			);
 			name = Finjinon;
 			sourceTree = "<group>";
@@ -241,7 +241,7 @@
 			files = (
 				7670E4EE1B217FAF00544E09 /* ViewController.swift in Sources */,
 				7670E5201B21B42600544E09 /* CaptureManager.swift in Sources */,
-				764A24431B32ABFD0080E832 /* TriggerButton.swift in Sources */,
+				764A24431B32ABFD0080E832 /* Buttons.swift in Sources */,
 				7670E4EA1B217FAF00544E09 /* AppDelegate.swift in Sources */,
 				7670E5181B21806200544E09 /* PhotoCaptureViewController.swift in Sources */,
 				764A24491B32E6830080E832 /* PhotoStorage.swift in Sources */,

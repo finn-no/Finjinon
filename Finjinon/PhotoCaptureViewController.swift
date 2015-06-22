@@ -14,6 +14,12 @@ public class PhotoCaptureViewController: UIViewController {
     private(set) public var assets: [Asset] = []
     public var completionHandler: ([Asset] -> Void)?
 
+    override public var editing: Bool {
+        didSet {
+            updateEditingState()
+        }
+    }
+
     private let storage = PhotoStorage()
     private let captureManager = CaptureManager()
     private var previewView: UIView!
@@ -31,6 +37,8 @@ public class PhotoCaptureViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor.blackColor()
+
+        // TODO: Move all the boring view setup to a storyboard/xib
 
         previewView = UIView(frame: view.bounds)
         previewView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
@@ -159,10 +167,18 @@ public class PhotoCaptureViewController: UIViewController {
     public override func supportedInterfaceOrientations() -> Int {
         return UIInterfaceOrientation.Portrait.rawValue
     }
+
+    // MARK: - Private methods
+
+    private func updateEditingState() {
+        for cell in collectionView.visibleCells() as! [PhotoCollectionViewCell] {
+            cell.jiggleAndShowDeleteIcon(self.editing)
+        }
+    }
 }
 
 
-extension PhotoCaptureViewController: UICollectionViewDataSource {
+extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectionViewCellDelegate {
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return assets.count
     }
@@ -173,7 +189,12 @@ extension PhotoCaptureViewController: UICollectionViewDataSource {
         asset.retrieveImageWithWidth(cell.imageView.bounds.width) { image in
             cell.imageView.image = image
         }
+        cell.delegate = self
         return cell
+    }
+
+    func collectionViewCellDidLongPress(cell: PhotoCollectionViewCell) {
+        editing = !editing
     }
 }
 
@@ -204,8 +225,15 @@ extension PhotoCaptureViewController: UIImagePickerControllerDelegate, UINavigat
 }
 
 
-private class PhotoCollectionViewCell: UICollectionViewCell {
+internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
+    func collectionViewCellDidLongPress(cell: PhotoCollectionViewCell)
+}
+
+
+internal class PhotoCollectionViewCell: UICollectionViewCell {
+    weak var delegate: PhotoCollectionViewCellDelegate?
     let imageView = UIImageView(frame: CGRect.zeroRect)
+    let closeButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -213,15 +241,70 @@ private class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.frame = bounds
         imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
         contentView.addSubview(imageView)
+
+        closeButton.hidden = true
+        contentView.addSubview(closeButton)
+
+        let presser = UILongPressGestureRecognizer(target: self, action: Selector("longTapGestureRecognized:"))
+        self.contentView.addGestureRecognizer(presser)
     }
 
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    internal override func prepareForReuse() {
+        super.prepareForReuse()
+        delegate = nil
+    }
+
+    func jiggleAndShowDeleteIcon(editing: Bool) {
+        if editing {
+            closeButton.alpha = 0.0
+            closeButton.hidden = false
+            UIView.animateWithDuration(0.23, delay: 0, options: .BeginFromCurrentState, animations: {
+                self.closeButton.alpha = 1.0
+                let offset = self.closeButton.bounds.height/2
+                self.imageView.frame.origin.x = offset
+                self.imageView.frame.origin.y = offset
+                self.imageView.frame.size.height -= offset*2
+                self.imageView.frame.size.width -= offset*2
+            }, completion: { finished in
+                self.imageView.layer.addAnimation(self.buildJiggleAnimation(), forKey: "jiggle")
+            })
+        } else {
+            self.imageView.layer.removeAnimationForKey("jiggle")
+            UIView.animateWithDuration(0.23, delay: 0, options: .BeginFromCurrentState, animations: {
+                self.imageView.frame = self.contentView.bounds
+                self.closeButton.alpha = 0.0
+                }, completion: { finished in
+                    self.closeButton.hidden = true
+            })
+        }
+    }
+
+    func longTapGestureRecognized(recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state == .Began {
+            delegate?.collectionViewCellDidLongPress(self)
+        }
+    }
+
+    func buildJiggleAnimation() -> CABasicAnimation {
+        let animation  = CABasicAnimation(keyPath: "transform.rotation")
+        let startAngle = (-2) * M_PI/180.0;
+        animation.fromValue = startAngle
+        animation.toValue = 3 * -startAngle
+        animation.autoreverses = true
+        animation.repeatCount = Float.infinity
+        let duration = 0.16
+        animation.duration = duration
+        animation.timeOffset = Double((arc4random() % 100) / 100) - duration
+        return animation
+    }
 }
 
 
-private class PhotoCollectionViewLayout: UICollectionViewFlowLayout {
+internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout {
     var insertedIndexPaths: [NSIndexPath] = []
 
     override func prepareForCollectionViewUpdates(updateItems: [AnyObject]!) {
