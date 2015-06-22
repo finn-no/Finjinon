@@ -129,10 +129,10 @@ public class PhotoCaptureViewController: UIViewController {
         let controller = imagePickerAdapter.viewControllerForImageSelection({ info in
             if let imageURL = info[UIImagePickerControllerMediaURL] as? NSURL, let data = NSData(contentsOfURL: imageURL) {
                 self.storage.createAssetFromImageData(data, completion: updateHandler)
+            } else if let assetURL = info[UIImagePickerControllerReferenceURL] as? NSURL {
+                self.storage.createAssetFromAssetLibraryURL(assetURL, completion: updateHandler)
             } else if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
                 self.storage.createAssetFromImage(image, completion: updateHandler)
-            } else if let imageURL = info[UIImagePickerControllerReferenceURL] as? NSURL {
-                // TODO: fetch from AssetLib
             }
         }, completion: { cancelled in
             self.dismissViewControllerAnimated(true, completion: nil)

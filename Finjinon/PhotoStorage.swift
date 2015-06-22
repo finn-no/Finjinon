@@ -8,6 +8,7 @@
 
 import UIKit
 import ImageIO
+import AssetsLibrary
 
 // TODO also support ALAsset/PHPhoto
 
@@ -37,6 +38,7 @@ public class PhotoStorage {
     private let resizeQueue = dispatch_queue_create("no.finn.finjonon.disk-cache-resizes", DISPATCH_QUEUE_CONCURRENT)
     private let fileManager = NSFileManager()
     private var cache: [String: Asset] = [:]
+    private let assetLibrary = ALAssetsLibrary()
 
     init() {
         let cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last as! NSURL
@@ -73,11 +75,28 @@ public class PhotoStorage {
         }
     }
 
-    //func createAssetFromALAsset(asset: ALAsset) -> Asset {
-
     func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
         let data = UIImageJPEGRepresentation(image, 1.0)
         createAssetFromImageData(data, completion: completion)
+    }
+
+    func createAssetFromAssetLibraryURL(assetURL: NSURL, completion: Asset -> Void) {
+        assetLibrary.assetForURL(assetURL, resultBlock: { asset in
+            let representation = asset.defaultRepresentation()
+            let bufferLength = Int(representation.size())
+            let data = NSMutableData(length: bufferLength)!
+            var buffer = UnsafeMutablePointer<UInt8>(data.mutableBytes)
+
+            var error: NSError?
+            let bytesWritten = representation.getBytes(buffer, fromOffset: 0, length: bufferLength, error: &error)
+            if bytesWritten != bufferLength {
+                NSLog("failed to get all bytes (wrote \(bytesWritten)/\(bufferLength)): \(error)")
+            }
+            self.createAssetFromImageData(data, completion: completion)
+
+        }, failureBlock: { error in
+            NSLog("failed to retrive ALAsset: \(error)")
+        })
     }
 }
 
