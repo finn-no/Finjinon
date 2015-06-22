@@ -13,6 +13,7 @@ import MobileCoreServices
 public class PhotoCaptureViewController: UIViewController {
     private(set) public var assets: [Asset] = []
     public var completionHandler: ([Asset] -> Void)?
+    public var imagePickerAdapter = ImagePickerControllerAdapter()
 
     override public var editing: Bool {
         didSet {
@@ -94,7 +95,7 @@ public class PhotoCaptureViewController: UIViewController {
         let pickerButtonWidth = containerView.bounds.width - captureButton.frame.maxX
         let pickerButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: pickerButtonWidth, height: 44))
         pickerButton.setTitle(NSLocalizedString("Add…", comment: ""), forState: .Normal)
-        pickerButton.addTarget(self, action: Selector("presentImagePicker:"), forControlEvents: .TouchUpInside)
+        pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
         containerView.contentView.addSubview(pickerButton)
 
         captureManager.prepare {
@@ -115,6 +116,29 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     // MARK: - Actions
+
+    func presentImagePickerTapped(sender: AnyObject) {
+        let updateHandler: Asset -> Void = { asset in
+            self.collectionView.performBatchUpdates({
+                self.assets.insert(asset, atIndex: 0)
+                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
+                }, completion: nil)
+        }
+
+        let controller = imagePickerAdapter.viewControllerForImageSelection({ info in
+            if let imageURL = info[UIImagePickerControllerMediaURL] as? NSURL, let data = NSData(contentsOfURL: imageURL) {
+                self.storage.createAssetFromImageData(data, completion: updateHandler)
+            } else if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+                self.storage.createAssetFromImage(image, completion: updateHandler)
+            } else if let imageURL = info[UIImagePickerControllerReferenceURL] as? NSURL {
+                // TODO: fetch from AssetLib
+            }
+        }, completion: { cancelled in
+            self.dismissViewControllerAnimated(true, completion: nil)
+        })
+
+        presentViewController(controller, animated: true, completion: nil)
+    }
 
     func capturePhotoTapped(sender: UIButton) {
         editing = false
@@ -206,32 +230,6 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             self.assets.removeAtIndex(indexPath.row)
             self.collectionView.deleteItemsAtIndexPaths([indexPath])
         }, completion: nil)
-    }
-}
-
-
-extension PhotoCaptureViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    func presentImagePicker(sender: AnyObject) {
-        // TODO: implement some kind of adapter so we can use other kinds of image pickers (like one that supports multiple selections)
-        let picker = UIImagePickerController()
-        picker.mediaTypes = [kUTTypeImage]
-        picker.delegate = self
-        presentViewController(picker, animated: true, completion: nil)
-    }
-
-    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
-        let image = info[UIImagePickerControllerOriginalImage] as! UIImage
-        self.storage.createAssetFromImage(image) { asset in
-            self.collectionView.performBatchUpdates({
-                self.assets.insert(asset, atIndex: 0)
-                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
-                }, completion: nil)
-        }
-        dismissViewControllerAnimated(true, completion: nil)
-    }
-
-    public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        dismissViewControllerAnimated(true, completion: nil)
     }
 }
 

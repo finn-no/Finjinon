@@ -18,6 +18,7 @@
 		7670E51D1B21824000544E09 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7670E5191B21824000544E09 /* LaunchScreen.xib */; };
 		7670E51E1B21824000544E09 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7670E51B1B21824000544E09 /* Main.storyboard */; };
 		7670E5201B21B42600544E09 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E51F1B21B42600544E09 /* CaptureManager.swift */; };
+		76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		7670E51A1B21824000544E09 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Example/Base.lproj/LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		7670E51C1B21824000544E09 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Example/Base.lproj/Main.storyboard; sourceTree = SOURCE_ROOT; };
 		7670E51F1B21B42600544E09 /* CaptureManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CaptureManager.swift; path = Finjinon/CaptureManager.swift; sourceTree = "<group>"; };
+		76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImagePickerAdapter.swift; path = Finjinon/ImagePickerAdapter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				7670E5171B21806200544E09 /* PhotoCaptureViewController.swift */,
+				76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */,
 				764A24481B32E6830080E832 /* PhotoStorage.swift */,
 				7670E51F1B21B42600544E09 /* CaptureManager.swift */,
 				764A24421B32ABFD0080E832 /* Buttons.swift */,
@@ -245,6 +248,7 @@
 				7670E4EA1B217FAF00544E09 /* AppDelegate.swift in Sources */,
 				7670E5181B21806200544E09 /* PhotoCaptureViewController.swift in Sources */,
 				764A24491B32E6830080E832 /* PhotoStorage.swift in Sources */,
+				76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
