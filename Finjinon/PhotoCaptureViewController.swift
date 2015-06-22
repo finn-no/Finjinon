@@ -79,6 +79,7 @@ public class PhotoCaptureViewController: UIViewController {
         containerView.contentView.addSubview(collectionView)
         collectionView.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "PhotoCell")
         collectionView.dataSource = self
+        collectionView.delegate = self
 
         captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-33, y: containerView.frame.height - 66 - 4, width: 66, height: 66))
         captureButton.layer.cornerRadius = 33
@@ -230,6 +231,13 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             self.assets.removeAtIndex(indexPath.row)
             self.collectionView.deleteItemsAtIndexPaths([indexPath])
         }, completion: nil)
+    }
+}
+
+
+extension PhotoCaptureViewController: UICollectionViewDelegate {
+    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        editing = false
     }
 }
 
