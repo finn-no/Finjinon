@@ -98,8 +98,6 @@ public class PhotoCaptureViewController: UIViewController {
         containerView.contentView.addSubview(pickerButton)
 
         captureManager.prepare {
-            NSLog("CaptureManager fully initialized")
-
             self.captureButton.enabled = true
         }
     }
@@ -190,6 +188,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             cell.imageView.image = image
         }
         cell.delegate = self
+        cell.jiggleAndShowDeleteIcon(editing)
         return cell
     }
 
@@ -199,8 +198,10 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
     func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
         let indexPath = collectionView.indexPathForCell(cell)!
-        NSLog("delete cell at #\(indexPath.row)")
-        editing = !editing
+        collectionView.performBatchUpdates({
+            self.assets.removeAtIndex(indexPath.row)
+            self.collectionView.deleteItemsAtIndexPaths([indexPath])
+        }, completion: nil)
     }
 }
 
@@ -263,7 +264,11 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
 
     internal override func prepareForReuse() {
         super.prepareForReuse()
+
         delegate = nil
+        self.imageView.layer.removeAnimationForKey("jiggle")
+        self.imageView.frame = bounds
+        self.closeButton.hidden = true
     }
 
     func jiggleAndShowDeleteIcon(editing: Bool) {
