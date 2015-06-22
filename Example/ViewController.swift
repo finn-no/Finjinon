@@ -22,7 +22,7 @@ class ViewController: UITableViewController {
             self.images.removeAll(keepCapacity: false)
             for asset in assets {
                 asset.retrieveImageWithWidth(100) { image in
-                    self.images.append(image)
+                    self.images.insert(image, atIndex: 0)
                     self.tableView.reloadData()
                 }
             }
