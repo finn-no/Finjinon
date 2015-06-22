@@ -196,6 +196,12 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
     func collectionViewCellDidLongPress(cell: PhotoCollectionViewCell) {
         editing = !editing
     }
+
+    func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
+        let indexPath = collectionView.indexPathForCell(cell)!
+        NSLog("delete cell at #\(indexPath.row)")
+        editing = !editing
+    }
 }
 
 
@@ -227,6 +233,7 @@ extension PhotoCaptureViewController: UIImagePickerControllerDelegate, UINavigat
 
 internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
     func collectionViewCellDidLongPress(cell: PhotoCollectionViewCell)
+    func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell)
 }
 
 
@@ -242,6 +249,7 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
         contentView.addSubview(imageView)
 
+        closeButton.addTarget(self, action: Selector("closeButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.hidden = true
         contentView.addSubview(closeButton)
 
@@ -289,7 +297,11 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
         }
     }
 
-    func buildJiggleAnimation() -> CABasicAnimation {
+    func closeButtonTapped(sender: UIButton) {
+        delegate?.collectionViewCellDidTapDelete(self)
+    }
+
+    private func buildJiggleAnimation() -> CABasicAnimation {
         let animation  = CABasicAnimation(keyPath: "transform.rotation")
         let startAngle = (-2) * M_PI/180.0;
         animation.fromValue = startAngle
