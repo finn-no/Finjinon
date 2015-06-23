@@ -44,9 +44,9 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
 
         delegate = nil
-        self.imageView.layer.removeAnimationForKey("jiggle")
-        self.imageView.frame = bounds
-        self.closeButton.hidden = true
+        imageView.layer.removeAnimationForKey("jiggle")
+        imageView.frame = bounds
+        closeButton.hidden = true
     }
 
     override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
