@@ -15,12 +15,6 @@ public class PhotoCaptureViewController: UIViewController {
     public var completionHandler: ([Asset] -> Void)?
     public var imagePickerAdapter = ImagePickerControllerAdapter()
 
-    override public var editing: Bool {
-        didSet {
-            updateEditingState()
-        }
-    }
-
     private let storage = PhotoStorage()
     private let captureManager = CaptureManager()
     private var previewView: UIView!
@@ -142,8 +136,6 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func capturePhotoTapped(sender: UIButton) {
-        editing = false
-
         sender.enabled = false
         UIView.animateWithDuration(0.1, animations: { self.previewView.alpha = 0.0 }, completion: { finished in
             UIView.animateWithDuration(0.1, animations: {self.previewView.alpha = 1.0})
@@ -167,8 +159,6 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func focusTapGestureRecognized(gestureRecognizer: UITapGestureRecognizer) {
-        editing = false
-
         if gestureRecognizer.state == .Ended {
             let point = gestureRecognizer.locationInView(gestureRecognizer.view)
 
@@ -194,14 +184,6 @@ public class PhotoCaptureViewController: UIViewController {
     public override func supportedInterfaceOrientations() -> Int {
         return UIInterfaceOrientation.Portrait.rawValue
     }
-
-    // MARK: - Private methods
-
-    private func updateEditingState() {
-        for cell in collectionView.visibleCells() as! [PhotoCollectionViewCell] {
-            cell.jiggleAndShowDeleteIcon(self.editing)
-        }
-    }
 }
 
 
@@ -217,12 +199,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             cell.imageView.image = image
         }
         cell.delegate = self
-        cell.jiggleAndShowDeleteIcon(editing)
         return cell
-    }
-
-    func collectionViewCellDidLongPress(cell: PhotoCollectionViewCell) {
-        editing = !editing
     }
 
     func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
@@ -238,6 +215,6 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
 extension PhotoCaptureViewController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        editing = false
+
     }
 }
