@@ -98,12 +98,21 @@ public class PhotoStorage {
             NSLog("failed to retrive ALAsset: \(error)")
         })
     }
-}
 
+    func deleteAsset(asset: Asset, completion: () -> Void) {
+        dispatch_async(queue) {
+            let cacheURL = self.cacheURLForAsset(asset)
+            var error: NSError?
+            if self.fileManager.removeItemAtPath(cacheURL.path!, error: &error) {
+                NSLog("failed failed to remove asset at \(cacheURL): \(error)")
+            }
+            dispatch_async(dispatch_get_main_queue(), completion)
+        }
+    }
 
-internal extension PhotoStorage {
+    // MARK: - Private
 
-    func imageForAsset(asset: Asset, completion: UIImage -> Void) {
+    private func imageForAsset(asset: Asset, completion: UIImage -> Void) {
         dispatch_async(queue) {
             let path = self.cacheURLForAsset(asset).path!
             let image = UIImage(contentsOfFile: path)!
@@ -113,7 +122,7 @@ internal extension PhotoStorage {
         }
     }
 
-    func thumbnailForAsset(asset: Asset, forWidth width: CGFloat, completion: UIImage -> Void) {
+    private func thumbnailForAsset(asset: Asset, forWidth width: CGFloat, completion: UIImage -> Void) {
         dispatch_async(self.resizeQueue) {
             let imageURL = self.cacheURLForAsset(asset)
             if let imageSource = CGImageSourceCreateWithURL(imageURL, nil) {
@@ -128,17 +137,6 @@ internal extension PhotoStorage {
                     completion(thumbnailImage!)
                 }
             } // TODO else throws
-        }
-    }
-
-    func deleteAsset(asset: Asset, completion: () -> Void) {
-        dispatch_async(queue) {
-            let cacheURL = self.cacheURLForAsset(asset)
-            var error: NSError?
-            if self.fileManager.removeItemAtPath(cacheURL.path!, error: &error) {
-                NSLog("failed failed to remove asset at \(cacheURL): \(error)")
-            }
-            dispatch_async(dispatch_get_main_queue(), completion)
         }
     }
 
