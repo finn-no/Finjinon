@@ -199,11 +199,13 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             cell.imageView.image = image
         }
         cell.delegate = self
+        cell.asset =  asset
         return cell
     }
 
     func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
-        if let indexPath = collectionView.indexPathForCell(cell) {
+        if let asset = cell.asset, let itemIndex = find(self.assets, asset) {
+            let indexPath = NSIndexPath(forItem: itemIndex, inSection: 0)
             collectionView.performBatchUpdates({
                 self.assets.removeAtIndex(indexPath.row)
                 self.collectionView.deleteItemsAtIndexPaths([indexPath])

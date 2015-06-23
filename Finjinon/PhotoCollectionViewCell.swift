@@ -17,6 +17,7 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
     weak var delegate: PhotoCollectionViewCellDelegate?
     let imageView = UIImageView(frame: CGRect.zeroRect)
     let closeButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
+    var asset: Asset?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -40,6 +41,7 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
 
         delegate = nil
+        asset = nil
     }
 
     override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
