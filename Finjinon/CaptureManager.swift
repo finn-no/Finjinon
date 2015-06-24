@@ -11,6 +11,24 @@ import AVFoundation
 
 class CaptureManager: NSObject {
     let previewLayer: AVCaptureVideoPreviewLayer
+    var flashMode: AVCaptureFlashMode {
+        get {
+            return cameraDevice.flashMode
+        }
+    }
+    var hasFlash: Bool {
+        return cameraDevice.hasFlash && cameraDevice.flashAvailable
+    }
+    var supportedFlashModes: [AVCaptureFlashMode] {
+        var modes: [AVCaptureFlashMode] = []
+        for mode in [AVCaptureFlashMode.Off, AVCaptureFlashMode.On, AVCaptureFlashMode.Auto] {
+            if cameraDevice.isFlashModeSupported(mode) {
+                modes.append(mode)
+            }
+        }
+        return modes
+    }
+
     private let session = AVCaptureSession()
     private let captureQueue = dispatch_queue_create("no.finn.finjinon-captures", DISPATCH_QUEUE_SERIAL)
     private var cameraDevice: AVCaptureDevice!
@@ -72,6 +90,30 @@ class CaptureManager: NSObject {
                 cameraDevice.focusMode = .AutoFocus
             }
         }
+    }
+
+    func changeFlashMode(newMode: AVCaptureFlashMode, completion: () -> Void) {
+        lockCurrentCameraDeviceForConfiguration { device in
+            device.flashMode = newMode
+            dispatch_async(dispatch_get_main_queue(), completion)
+        }
+    }
+
+    // Next available flash mode, or nil if flash is unsupported
+    func nextAvailableFlashMode() -> AVCaptureFlashMode? {
+        if !hasFlash {
+            return nil
+        }
+
+        // Find the next available mode, or wrap around
+        var nextIndex = 0
+        if let idx = find(supportedFlashModes, flashMode) {
+            nextIndex = idx + 1
+        }
+        let startIndex = min(nextIndex, supportedFlashModes.count)
+        let next = supportedFlashModes[startIndex..<supportedFlashModes.count].first ?? supportedFlashModes.first
+
+        return next
     }
 
     // MARK: - Private methods

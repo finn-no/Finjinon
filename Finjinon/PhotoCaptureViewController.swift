@@ -28,6 +28,7 @@ public class PhotoCaptureViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var containerView: UIVisualEffectView!
     private var focusIndicatorView: UIView!
+    private var flashButton: UIButton!
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +50,14 @@ public class PhotoCaptureViewController: UIViewController {
         focusIndicatorView.layer.borderWidth = 1.0
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
+
+        flashButton = UIButton(frame: CGRect(x: 0, y: 12, width: 80, height: 44))
+        flashButton.showsTouchWhenHighlighted = true
+        flashButton.backgroundColor = UIColor.clearColor()
+        flashButton.setImage(UIImage(named: "LightningIcon"), forState: .Normal)
+        flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), forState: .Normal)
+        flashButton.addTarget(self, action: Selector("flashButtonTapped:"), forControlEvents: .TouchUpInside)
+        flashButton.tintColor = UIColor.whiteColor()
 
         let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
         previewView.addGestureRecognizer(tapper)
@@ -96,6 +105,10 @@ public class PhotoCaptureViewController: UIViewController {
 
         previewView.alpha = 0.0
         captureManager.prepare {
+            if self.captureManager.hasFlash {
+                self.view.addSubview(self.flashButton)
+            }
+
             UIView.animateWithDuration(0.2) {
                 self.captureButton.enabled = true
                 self.previewView.alpha = 1.0
@@ -137,6 +150,20 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     // MARK: - Actions
+
+    func flashButtonTapped(sender: UIButton) {
+        let mode = captureManager.nextAvailableFlashMode() ?? .Off
+        captureManager.changeFlashMode(mode) {
+            switch mode {
+            case .Off:
+                self.flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), forState: .Normal)
+            case .On:
+                self.flashButton.setTitle(NSLocalizedString("On", comment:"flash on"), forState: .Normal)
+            case .Auto:
+                self.flashButton.setTitle(NSLocalizedString("Auto", comment:"flash Auto"), forState: .Normal)
+            }
+        }
+    }
 
     func presentImagePickerTapped(sender: AnyObject) {
         let updateHandler: Asset -> Void = { asset in
