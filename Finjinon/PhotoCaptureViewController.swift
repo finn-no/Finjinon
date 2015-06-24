@@ -93,8 +93,12 @@ public class PhotoCaptureViewController: UIViewController {
         pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
         containerView.contentView.addSubview(pickerButton)
 
+        previewView.alpha = 0.0
         captureManager.prepare {
-            self.captureButton.enabled = true
+            UIView.animateWithDuration(0.2) {
+                self.captureButton.enabled = true
+                self.previewView.alpha = 1.0
+            }
         }
     }
 
