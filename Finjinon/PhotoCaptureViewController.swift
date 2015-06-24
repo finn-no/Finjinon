@@ -102,6 +102,27 @@ public class PhotoCaptureViewController: UIViewController {
         }
     }
 
+    public override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+
+        // In case the application uses the old style for managing status bar appearance
+        UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .Slide)
+    }
+
+    public override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: .Slide)
+    }
+
+    public override func preferredStatusBarUpdateAnimation() -> UIStatusBarAnimation {
+        return .Slide
+    }
+
+    public override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+
     // MARK: - API
 
     // Add the initial set of images asynchronously
