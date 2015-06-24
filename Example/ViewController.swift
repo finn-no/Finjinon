@@ -18,15 +18,8 @@ class ViewController: UITableViewController {
     }
 
     @IBAction func addPhotosTapped(sender: AnyObject) {
-        let controller = PhotoCaptureViewController() { assets in
-            self.images.removeAll(keepCapacity: false)
-            for asset in assets {
-                asset.retrieveImageWithWidth(100) { image in
-                    self.images.insert(image, atIndex: 0)
-                    self.tableView.reloadData()
-                }
-            }
-        }
+        let controller = PhotoCaptureViewController()
+        controller.delegate = self
         controller.addInitialImages(self.images)
         presentViewController(controller, animated: true, completion: nil)
     }
@@ -42,5 +35,27 @@ class ViewController: UITableViewController {
         cell.textLabel?.text = NSStringFromCGSize(image.size)
 
         return cell
+    }
+}
+
+
+extension ViewController: PhotoCaptureViewControllerDelegate {
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset]) {
+        NSLog("didFinishEditingAssets: \(assets)")
+        self.images.removeAll(keepCapacity: false)
+        for asset in assets {
+            asset.retrieveImageWithWidth(100) { image in
+                self.images.insert(image, atIndex: 0)
+                self.tableView.reloadData()
+            }
+        }
+    }
+
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset) {
+        NSLog("did select asset \(asset)")
+    }
+
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError) {
+        NSLog("photoCaptureViewController:didFailWithError: \(error)")
     }
 }

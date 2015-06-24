@@ -10,9 +10,15 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 
+public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset])
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
+}
+
 public class PhotoCaptureViewController: UIViewController {
+    public weak var delegate: PhotoCaptureViewControllerDelegate?
     private(set) public var assets: [Asset] = []
-    public var completionHandler: ([Asset] -> Void)?
     public var imagePickerAdapter = ImagePickerControllerAdapter()
 
     private let storage = PhotoStorage()
@@ -22,11 +28,6 @@ public class PhotoCaptureViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var containerView: UIVisualEffectView!
     private var focusIndicatorView: UIView!
-
-    convenience init(completion: ([Asset] -> Void)?) {
-        self.init()
-        self.completionHandler = completion
-    }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -179,7 +180,7 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func doneButtonTapped(sender: UIButton) {
-        completionHandler?(assets)
+        delegate?.photoCaptureViewController(self, didFinishEditingAssets: assets)
         dismissViewControllerAnimated(true, completion: nil)
     }
 
@@ -242,6 +243,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
 extension PhotoCaptureViewController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-
+        let asset = assets[indexPath.row]
+        delegate?.photoCaptureViewController(self, didSelectAsset: asset)
     }
 }

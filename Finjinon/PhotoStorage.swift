@@ -12,7 +12,7 @@ import AssetsLibrary
 
 // TODO also support ALAsset/PHPhoto
 
-public struct Asset: Equatable {
+public struct Asset: Equatable, Printable {
     let UUID = NSUUID().UUIDString
     let storage: PhotoStorage
     // TODO: connect each asset with the/a cache and have method for retriving images on Asset itself? (alá ALAsset)
@@ -28,6 +28,10 @@ public struct Asset: Equatable {
 
     public func retrieveImageWithWidth(width: CGFloat, completion: UIImage -> Void) {
         storage.thumbnailForAsset(self, forWidth: width, completion: completion)
+    }
+
+    public var description: String {
+        return "<\(self.dynamicType) UUID: \(UUID)>"
     }
 }
 
