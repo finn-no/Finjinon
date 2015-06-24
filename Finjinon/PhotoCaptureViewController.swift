@@ -51,13 +51,13 @@ public class PhotoCaptureViewController: UIViewController {
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton = UIButton(frame: CGRect(x: 0, y: 12, width: 80, height: 44))
-        flashButton.showsTouchWhenHighlighted = true
-        flashButton.backgroundColor = UIColor.clearColor()
+        flashButton = UIButton(frame: CGRect(x: 12, y: 12, width: 70, height: 38))
         flashButton.setImage(UIImage(named: "LightningIcon"), forState: .Normal)
         flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), forState: .Normal)
         flashButton.addTarget(self, action: Selector("flashButtonTapped:"), forControlEvents: .TouchUpInside)
+        flashButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
         flashButton.tintColor = UIColor.whiteColor()
+        roundifyButton(flashButton, inset: 14)
 
         let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
         previewView.addGestureRecognizer(tapper)
@@ -97,11 +97,14 @@ public class PhotoCaptureViewController: UIViewController {
         closeButton.tintColor = UIColor.whiteColor()
         containerView.contentView.addSubview(closeButton)
 
-        let pickerButtonWidth = containerView.bounds.width - captureButton.frame.maxX
-        let pickerButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: pickerButtonWidth, height: 44))
-        pickerButton.setTitle(NSLocalizedString("Add…", comment: ""), forState: .Normal)
+        let pickerButtonWidth: CGFloat = 114
+        let pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
+        pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
+        pickerButton.setImage(UIImage(named: "PhotosIcon"), forState: .Normal)
         pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
-        containerView.contentView.addSubview(pickerButton)
+        pickerButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
+        roundifyButton(pickerButton)
+        view.addSubview(pickerButton)
 
         previewView.alpha = 0.0
         captureManager.prepare {
@@ -236,6 +239,21 @@ public class PhotoCaptureViewController: UIViewController {
 
     public override func supportedInterfaceOrientations() -> Int {
         return UIInterfaceOrientation.Portrait.rawValue
+    }
+
+    // MARK: - Private methods
+
+    func roundifyButton(button: UIButton, inset: CGFloat = 16) {
+        button.tintColor = UIColor.whiteColor()
+
+        button.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.3)
+        button.layer.borderColor = button.tintColor!.CGColor
+        button.layer.borderWidth = 1.0
+        button.layer.cornerRadius = button.bounds.height/2
+
+        var insets = button.imageEdgeInsets
+        insets.left -= inset
+        button.imageEdgeInsets = insets
     }
 }
 
