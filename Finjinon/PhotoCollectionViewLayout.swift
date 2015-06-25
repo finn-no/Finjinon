@@ -11,6 +11,7 @@ import UIKit
 private class DraggingProxy: UIImageView {
     var fromIndexPath: NSIndexPath?
     var fromCenter = CGPoint.zeroPoint
+    var initialCenter = CGPoint.zeroPoint
 
     init(cell: UICollectionViewCell) {
         super.init(frame: CGRect.zeroRect)
@@ -139,6 +140,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 let proxy = DraggingProxy(cell: cell)
                 proxy.fromIndexPath = indexPath
                 proxy.frame = cell.bounds
+                proxy.initialCenter = cell.center
                 proxy.fromCenter = cell.center
                 proxy.center = proxy.fromCenter
 
@@ -175,9 +177,19 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         switch recognizer.state {
         case .Changed:
             if let proxy = dragProxy {
-                proxy.center.x = proxy.fromCenter.x + translation.x
+                proxy.center.x = proxy.initialCenter.x + translation.x
                 //TODO: Constrain to be within collectionView.frame:
-                // proxy.center.y = proxy.fromCenter.y + translation.y
+                // proxy.center.y = proxy.originalCenter.y + translation.y
+
+                if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center) {
+                    let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath)
+                    proxy.fromIndexPath = toIndexPath
+                    proxy.fromCenter = targetLayoutAttributes.center
+                    proxy.bounds = targetLayoutAttributes.bounds
+                    collectionView?.performBatchUpdates({
+                        self.collectionView?.moveItemAtIndexPath(fromIndexPath, toIndexPath: toIndexPath)
+                    }, completion: nil)
+                }
             }
         default:
             break
