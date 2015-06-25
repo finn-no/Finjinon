@@ -108,20 +108,21 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     // MARK: - UIGestureRecognizerDelegate
 
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer == longPressGestureRecognizer {
-            if otherGestureRecognizer == panGestureRecgonizer {
-                return true
-            }
+        if gestureRecognizer == longPressGestureRecognizer && otherGestureRecognizer == panGestureRecgonizer {
+            return true
         } else if gestureRecognizer == panGestureRecgonizer {
-            if otherGestureRecognizer == longPressGestureRecognizer {
-                return true
-            } else {
-                return false
-            }
-        } else if gestureRecognizer == self.collectionView?.panGestureRecognizer {
-            if (longPressGestureRecognizer.state != .Possible || longPressGestureRecognizer.state != .Failed) {
-                return false
-            }
+            return otherGestureRecognizer == longPressGestureRecognizer
+        }
+
+        return true
+    }
+
+    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let states: [UIGestureRecognizerState] = [.Possible, .Failed]
+        if gestureRecognizer == longPressGestureRecognizer && !contains(states, collectionView!.panGestureRecognizer.state) {
+            return false
+        } else if gestureRecognizer == panGestureRecgonizer && contains(states, longPressGestureRecognizer.state) {
+            return false
         }
 
         return true
@@ -173,7 +174,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         let translation = recognizer.translationInView(collectionView!)
         switch recognizer.state {
         case .Changed:
-            NSLog("[DRAGGING] pangesture .Changed translation=\(translation)")
             if let proxy = dragProxy {
                 proxy.center.x = proxy.fromCenter.x + translation.x
                 //TODO: Constrain to be within collectionView.frame:
@@ -193,8 +193,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             panGestureRecgonizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
             panGestureRecgonizer.delegate = self
             panGestureRecgonizer.maximumNumberOfTouches = 1
-
-            collectionView.panGestureRecognizer.requireGestureRecognizerToFail(longPressGestureRecognizer)
 
             collectionView.addGestureRecognizer(longPressGestureRecognizer)
             collectionView.addGestureRecognizer(panGestureRecgonizer)
