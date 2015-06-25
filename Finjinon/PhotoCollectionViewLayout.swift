@@ -8,8 +8,50 @@
 
 import UIKit
 
-internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout {
-    var insertedIndexPaths: [NSIndexPath] = []
+private class DraggingProxy: UIImageView {
+    var fromIndexPath: NSIndexPath?
+    var fromCenter = CGPoint.zeroPoint
+
+    init(cell: UICollectionViewCell) {
+        super.init(frame: CGRect.zeroRect)
+
+        frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
+    private var insertedIndexPaths: [NSIndexPath] = []
+    private var longPressGestureRecognizer: UILongPressGestureRecognizer!
+    private var panGestureRecgonizer: UIPanGestureRecognizer!
+    private var dragProxy: DraggingProxy?
+
+    override init() {
+        super.init()
+        self.addObserver(self, forKeyPath: "collectionView", options: nil, context: nil)
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.addObserver(self, forKeyPath: "collectionView", options: nil, context: nil)
+    }
+
+    deinit {
+        self.removeObserver(self, forKeyPath: "collectionView", context: nil)
+    }
+
+    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+        if keyPath == "collectionView" {
+            setupGestureRecognizers()
+        } else {
+            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+        }
+    }
+
+    // MARK: - UICollectionView
 
     override func prepareForCollectionViewUpdates(updateItems: [AnyObject]!) {
         super.prepareForCollectionViewUpdates(updateItems)
@@ -37,5 +79,118 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout {
         }
         
         return attrs
+    }
+
+
+
+    override func layoutAttributesForElementsInRect(rect: CGRect) -> [AnyObject]? {
+        if let attributes = super.layoutAttributesForElementsInRect(rect) as? [UICollectionViewLayoutAttributes] {
+            for layoutAttribute in attributes {
+                if layoutAttribute.representedElementCategory != .Cell {
+                    continue
+                }
+
+                if layoutAttribute.indexPath == dragProxy?.fromIndexPath {
+                    layoutAttribute.alpha = 0.0 // hide the sourceCell, the drag proxy now represents it
+                }
+            }
+
+            return attributes
+        }
+        return nil
+    }
+
+    // MARK: - UIGestureRecognizerDelegate
+
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == longPressGestureRecognizer {
+            if otherGestureRecognizer == panGestureRecgonizer {
+                return true
+            }
+        } else if gestureRecognizer == panGestureRecgonizer {
+            if otherGestureRecognizer == longPressGestureRecognizer {
+                return true
+            } else {
+                return false
+            }
+        } else if gestureRecognizer == self.collectionView?.panGestureRecognizer {
+            if (longPressGestureRecognizer.state != .Possible || longPressGestureRecognizer.state != .Failed) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    // MARK: -  Private methods
+
+    func handleLongPressGestureRecognized(recognizer: UILongPressGestureRecognizer) {
+        switch recognizer.state {
+        case .Began:
+            NSLog("[DRAGGING] longpress .Began")
+            let location = recognizer.locationInView(collectionView)
+            if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
+                let proxy = DraggingProxy(cell: cell)
+                proxy.layer.borderColor = UIColor.redColor().CGColor
+                proxy.layer.borderWidth = 1.0
+                proxy.fromIndexPath = indexPath
+                if let cell = collectionView?.cellForItemAtIndexPath(indexPath) {
+                    proxy.frame = cell.bounds
+                    proxy.fromCenter = cell.center
+                } else {
+                    proxy.fromCenter = location
+                }
+                proxy.center = proxy.fromCenter
+                dragProxy = proxy
+                collectionView?.addSubview(proxy)
+
+                invalidateLayout()
+
+                // TODO: animate the proxy
+            } else {
+                NSLog("[DRAGGING] no indexPath for loc \(location)")
+            }
+        case .Ended:
+            // TODO: all done! figure out wehre it was dropped
+            NSLog("[DRAGGING] longpress .Ended, removing proxy view")
+            dragProxy?.removeFromSuperview()
+            dragProxy = nil
+
+            invalidateLayout()
+        default:
+            break
+        }
+    }
+
+    func handlePanGestureRecognized(recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translationInView(collectionView!)
+        switch recognizer.state {
+        case .Changed:
+            NSLog("[DRAGGING] pangesture .Changed translation=\(translation)")
+            if let proxy = dragProxy {
+                proxy.center.x = proxy.fromCenter.x + translation.x
+                //TODO: Constrain to be within collectionView.frame:
+                // proxy.center.y = proxy.fromCenter.y + translation.y
+            }
+        default:
+            break
+        }
+    }
+
+    private func setupGestureRecognizers() {
+        if let collectionView = self.collectionView {
+            NSLog("[DRAGGING] Adding gesture recognizers")
+            longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPressGestureRecognized:"))
+            longPressGestureRecognizer.delegate = self
+
+            panGestureRecgonizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
+            panGestureRecgonizer.delegate = self
+            panGestureRecgonizer.maximumNumberOfTouches = 1
+
+            collectionView.panGestureRecognizer.requireGestureRecognizerToFail(longPressGestureRecognizer)
+
+            collectionView.addGestureRecognizer(longPressGestureRecognizer)
+            collectionView.addGestureRecognizer(panGestureRecgonizer)
+        }
     }
 }

@@ -14,7 +14,7 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        images = [UIImage(named: "hoff.jpeg")!]
+        images = (0..<6).map({ _ in UIImage(named: "hoff.jpeg")! })
     }
 
     @IBAction func addPhotosTapped(sender: AnyObject) {
