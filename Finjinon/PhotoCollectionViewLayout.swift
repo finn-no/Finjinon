@@ -136,22 +136,19 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             let location = recognizer.locationInView(collectionView)
             if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
                 let proxy = DraggingProxy(cell: cell)
-                proxy.layer.borderColor = UIColor.redColor().CGColor
-                proxy.layer.borderWidth = 1.0
                 proxy.fromIndexPath = indexPath
-                if let cell = collectionView?.cellForItemAtIndexPath(indexPath) {
-                    proxy.frame = cell.bounds
-                    proxy.fromCenter = cell.center
-                } else {
-                    proxy.fromCenter = location
-                }
+                proxy.frame = cell.bounds
+                proxy.fromCenter = cell.center
                 proxy.center = proxy.fromCenter
+
                 dragProxy = proxy
                 collectionView?.addSubview(proxy)
 
                 invalidateLayout()
 
-                // TODO: animate the proxy
+                UIView.animateWithDuration(0.16, animations: {
+                    self.dragProxy?.transform = CGAffineTransformMakeScale(1.1, 1.1)
+                })
             } else {
                 NSLog("[DRAGGING] no indexPath for loc \(location)")
             }
@@ -159,6 +156,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             if let proxy = self.dragProxy {
                 UIView.animateWithDuration(0.2, delay: 0.0, options: .BeginFromCurrentState | .CurveEaseIn, animations: {
                     proxy.center = proxy.fromCenter
+                    proxy.transform = CGAffineTransformIdentity
                 }, completion: { finished in
                     proxy.removeFromSuperview()
                     self.dragProxy = nil
