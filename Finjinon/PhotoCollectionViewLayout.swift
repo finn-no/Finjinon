@@ -15,6 +15,11 @@ private class DraggingProxy: UIImageView {
     init(cell: UICollectionViewCell) {
         super.init(frame: CGRect.zeroRect)
 
+        UIGraphicsBeginImageContextWithOptions(cell.bounds.size, false, 0)
+        cell.drawViewHierarchyInRect(cell.bounds, afterScreenUpdates: true)
+        let cellImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        image = cellImage
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
     }
 
