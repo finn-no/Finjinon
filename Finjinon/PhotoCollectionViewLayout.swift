@@ -156,12 +156,16 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 NSLog("[DRAGGING] no indexPath for loc \(location)")
             }
         case .Ended:
-            // TODO: all done! figure out wehre it was dropped
-            NSLog("[DRAGGING] longpress .Ended, removing proxy view")
-            dragProxy?.removeFromSuperview()
-            dragProxy = nil
+            if let proxy = self.dragProxy {
+                UIView.animateWithDuration(0.2, delay: 0.0, options: .BeginFromCurrentState | .CurveEaseIn, animations: {
+                    proxy.center = proxy.fromCenter
+                }, completion: { finished in
+                    proxy.removeFromSuperview()
+                    self.dragProxy = nil
 
-            invalidateLayout()
+                    self.invalidateLayout()
+                })
+            }
         default:
             break
         }
