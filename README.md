@@ -4,6 +4,15 @@ Finjinon is a custom AVFoundation based camera UI, focused on quickly adding sev
 
 Captured images are provided as an `Asset` which can retrieve image data asynchrously in order to keep memory usage low.
 
+* Quickly capture multiple photos (not bursted though)
+* Remove photos
+* Adapter based photo picking from photo library
+* Drag to reorder captured photos (longpress on thumbnail to initiate)
+
+## Requirements
+
+* iOS7+
+* Swift 1.2
 
 ## Code Example
 
@@ -22,6 +31,14 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
                 }
             }
         }
+
+See the included Example project for full API
+
+## TODO
+
+- [ ] Localization (Norwegian)
+- [ ] iPad support
+- [ ] Autoscrolling when reordering near edges (like Springboard)
 
 
 ## License
