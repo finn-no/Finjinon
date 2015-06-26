@@ -10,6 +10,8 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 
+let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
+
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset])
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
@@ -107,7 +109,12 @@ public class PhotoCaptureViewController: UIViewController {
         view.addSubview(pickerButton)
 
         previewView.alpha = 0.0
-        captureManager.prepare {
+        captureManager.prepare { error in
+            if let error = error {
+                self.delegate?.photoCaptureViewController(self, didFailWithError: error)
+                return
+            }
+
             if self.captureManager.hasFlash {
                 self.view.addSubview(self.flashButton)
             }

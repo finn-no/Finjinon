@@ -56,6 +56,11 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
     }
 
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError) {
-        NSLog("photoCaptureViewController:didFailWithError: \(error)")
+        if error.domain == FinjinonCameraAccessErrorDomain {
+            let alert = UIAlertView(title: nil, message: error.localizedDescription, delegate: nil, cancelButtonTitle: NSLocalizedString("OK", comment: ""))
+            alert.show()
+        } else {
+            NSLog("photoCaptureViewController:didFailWithError: \(error)")
+        }
     }
 }

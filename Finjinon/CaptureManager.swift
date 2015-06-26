@@ -43,7 +43,7 @@ class CaptureManager: NSObject {
     // MARK: - API
 
     // Prepares the capture session, possibly asking the user for camera access.
-    func prepare(completion: Void -> Void) {
+    func prepare(completion: NSError? -> Void) {
         let authorizationStatus = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
         switch authorizationStatus {
         case .Authorized:
@@ -53,11 +53,11 @@ class CaptureManager: NSObject {
                 if granted {
                     self.configure(completion)
                 } else {
-                    self.presentAccessDeniedAlert()
+                    completion(self.accessDeniedError())
                 }
             })
         case .Denied, .Restricted:
-            presentAccessDeniedAlert()
+            completion(self.accessDeniedError())
         }
     }
 
@@ -118,6 +118,11 @@ class CaptureManager: NSObject {
 
     // MARK: - Private methods
 
+    private func accessDeniedError() -> NSError {
+        let info = [NSLocalizedDescriptionKey: NSLocalizedString("Camera access denied, please enable it in the Settings app to continue", comment: "")]
+        return NSError(domain: FinjinonCameraAccessErrorDomain, code: 0, userInfo: info)
+    }
+
     private func lockCurrentCameraDeviceForConfiguration(configurator: AVCaptureDevice -> Void) {
         dispatch_async(captureQueue) {
             var error: NSError?
@@ -131,15 +136,7 @@ class CaptureManager: NSObject {
         }
     }
 
-    private func presentAccessDeniedAlert() {
-        // TODO: present alert
-        dispatch_async(dispatch_get_main_queue()) {
-            let alert = UIAlertView(title: nil, message: "denied", delegate: nil, cancelButtonTitle: "OK")
-            alert.show()
-        }
-    }
-
-    private func configure(completion: Void -> Void) {
+    private func configure(completion: NSError? -> Void) {
         dispatch_async(captureQueue) {
             self.cameraDevice = self.cameraDeviceWithPosition(.Back)
 
@@ -170,7 +167,9 @@ class CaptureManager: NSObject {
 
             self.session.startRunning()
 
-            dispatch_async(dispatch_get_main_queue(), completion)
+            dispatch_async(dispatch_get_main_queue()) {
+                completion(error)
+            }
         }
     }
 
