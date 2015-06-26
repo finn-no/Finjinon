@@ -147,6 +147,17 @@ public class PhotoCaptureViewController: UIViewController {
         return true
     }
 
+    public override func shouldAutorotate() -> Bool {
+        return UIDevice.currentDevice().userInterfaceIdiom != .Pad
+    }
+
+    public override func supportedInterfaceOrientations() -> Int {
+        if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+            return Int(UIInterfaceOrientationMask.All.rawValue)
+        }
+        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    }
+
     // MARK: - API
 
     // Add the initial set of images asynchronously
@@ -236,16 +247,6 @@ public class PhotoCaptureViewController: UIViewController {
 
             captureManager.lockFocusAtPointOfInterest(point)
         }
-    }
-
-    // MARK: - UIViewController
-
-    public override func shouldAutorotate() -> Bool {
-        return false
-    }
-
-    public override func supportedInterfaceOrientations() -> Int {
-        return UIInterfaceOrientation.Portrait.rawValue
     }
 
     // MARK: - Private methods

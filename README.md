@@ -39,7 +39,7 @@ See the included Example project for full API
 ## TODO
 
 - [ ] Localization (Norwegian)
-- [ ] iPad support
+- [x] iPad support
 - [ ] Autoscrolling when reordering near edges (like Springboard)
 
 
