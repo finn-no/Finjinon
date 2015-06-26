@@ -32,9 +32,6 @@ testoutput/
 # Version information helper header
 InfoPlist.h
 
-# Calabash
-screenshot*.png
-
 # XcodeCoverage
 XcodeCoverage/env.sh
 
