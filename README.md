@@ -9,6 +9,8 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 * Adapter based photo picking from photo library
 * Drag to reorder captured photos (longpress on thumbnail to initiate)
 
+![screenshot](Screenshots/screenshot.png)
+
 ## Requirements
 
 * iOS7+
