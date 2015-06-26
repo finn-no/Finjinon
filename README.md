@@ -16,6 +16,10 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 * iOS7+
 * Swift 1.2
 
+## Installation
+
+If you need to support iOS7 you have to copy the sources in `Finjinon` into your project. Otherwise there's a Finjinon.podspec available in the repo.
+
 ## Code Example
 
         let controller = PhotoCaptureViewController()
