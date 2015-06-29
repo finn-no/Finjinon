@@ -40,6 +40,10 @@ class ViewController: UITableViewController {
 
 
 extension ViewController: PhotoCaptureViewControllerDelegate {
+    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell) {
+        // Customization point. Do it as quickly as possible.
+    }
+
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset]) {
         NSLog("didFinishEditingAssets: \(assets)")
         self.images.removeAll(keepCapacity: false)

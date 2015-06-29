@@ -13,6 +13,7 @@ import MobileCoreServices
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
+    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset])
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
@@ -274,6 +275,9 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
         let asset = assets[indexPath.row]
+
+        delegate?.photoCaptureViewController(self, customizeCell: cell)
+
         asset.retrieveImageWithWidth(cell.imageView.bounds.width) { image in
             cell.imageView.image = image
         }

@@ -13,11 +13,12 @@ internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
 }
 
 
-internal class PhotoCollectionViewCell: UICollectionViewCell {
-    weak var delegate: PhotoCollectionViewCellDelegate?
-    let imageView = UIImageView(frame: CGRect.zeroRect)
-    let closeButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
-    var asset: Asset?
+public class PhotoCollectionViewCell: UICollectionViewCell {
+    public let imageView = UIImageView(frame: CGRect.zeroRect)
+    public internal(set) var asset: Asset?
+
+    internal weak var delegate: PhotoCollectionViewCellDelegate?
+    private let closeButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,18 +34,18 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(closeButton)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required public init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    internal override func prepareForReuse() {
+    public override func prepareForReuse() {
         super.prepareForReuse()
 
         delegate = nil
         asset = nil
     }
 
-    override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
+    override public func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
         let delta = (44 - closeButton.bounds.width) / 2
         let expandedRect = closeButton.frame.rectByInsetting(dx: -delta, dy: -delta)
         let viewIsVisible = !closeButton.hidden && closeButton.alpha > 0.01
@@ -55,7 +56,7 @@ internal class PhotoCollectionViewCell: UICollectionViewCell {
         return super.hitTest(point, withEvent: event)
     }
 
-    func closeButtonTapped(sender: UIButton) {
+    internal func closeButtonTapped(sender: UIButton) {
         delegate?.collectionViewCellDidTapDelete(self)
     }
 }
