@@ -61,6 +61,10 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
         }
     }
 
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset) {
+        NSLog("did ADD asset \(asset)")
+    }
+
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset) {
         NSLog("did select asset \(asset)")
     }

@@ -15,6 +15,7 @@ let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell, asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset])
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
 }
@@ -181,6 +182,13 @@ public class PhotoCaptureViewController: UIViewController {
         return Int(UIInterfaceOrientationMask.Portrait.rawValue)
     }
 
+    // MARK: - API
+
+    func reloadPreviewItemsAtIndexes(indexes: [Int]) {
+        let indexPaths = indexes.map { NSIndexPath(forItem: $0, inSection: 0) }
+        collectionView.reloadItemsAtIndexPaths(indexPaths)
+    }
+
     // MARK: - Actions
 
     func flashButtonTapped(sender: UIButton) {
@@ -234,6 +242,8 @@ public class PhotoCaptureViewController: UIViewController {
                     self.assets.insert(asset, atIndex: 0)
                     self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
                 }, completion: nil)
+
+                self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
             }
         }
     }
