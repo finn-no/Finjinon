@@ -18,7 +18,6 @@
 		76BEC38A1B3D6C3400B8D671 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3821B3D6C3400B8D671 /* LaunchScreen.xib */; };
 		76BEC38B1B3D6C3400B8D671 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3841B3D6C3400B8D671 /* Main.storyboard */; };
 		76BEC38C1B3D6C3400B8D671 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3861B3D6C3400B8D671 /* Images.xcassets */; };
-		76BEC38D1B3D6C3400B8D671 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3871B3D6C3400B8D671 /* Info.plist */; };
 		76BEC38E1B3D6C3400B8D671 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BEC3881B3D6C3400B8D671 /* ViewController.swift */; };
 		76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3961B3D6D3200B8D671 /* Localizable.strings */; };
 		76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */; };
@@ -240,7 +239,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */,
-				76BEC38D1B3D6C3400B8D671 /* Info.plist in Resources */,
 				76BEC38C1B3D6C3400B8D671 /* Images.xcassets in Resources */,
 				76BEC38A1B3D6C3400B8D671 /* LaunchScreen.xib in Resources */,
 				76BEC38B1B3D6C3400B8D671 /* Main.storyboard in Resources */,

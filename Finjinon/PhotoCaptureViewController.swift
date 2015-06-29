@@ -13,7 +13,7 @@ import MobileCoreServices
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
-    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell)
+    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell, asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset])
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
@@ -32,6 +32,28 @@ public class PhotoCaptureViewController: UIViewController {
     private var containerView: UIVisualEffectView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
+
+    convenience init(images: [UIImage]) {
+        self.init()
+
+        for image in images {
+            storage.createAssetFromImage(image) { asset in
+                self.assets.append(asset)
+                self.collectionView.reloadData()
+            }
+        }
+    }
+
+    convenience init(imageURLs: [NSURL]) {
+        self.init()
+
+        for url in imageURLs {
+            storage.createAssetFromImageURL(url) { asset in
+                self.assets.append(asset)
+                self.collectionView.reloadData()
+            }
+        }
+    }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -159,18 +181,6 @@ public class PhotoCaptureViewController: UIViewController {
         return Int(UIInterfaceOrientationMask.Portrait.rawValue)
     }
 
-    // MARK: - API
-
-    // Add the initial set of images asynchronously
-    public func addInitialImages(images: [UIImage]) {
-        for image in images {
-            storage.createAssetFromImage(image) { asset in
-                self.assets.append(asset)
-                self.collectionView.reloadData()
-            }
-        }
-    }
-
     // MARK: - Actions
 
     func flashButtonTapped(sender: UIButton) {
@@ -276,11 +286,8 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
         let asset = assets[indexPath.row]
 
-        delegate?.photoCaptureViewController(self, customizeCell: cell)
+        delegate?.photoCaptureViewController(self, customizeCell: cell, asset: asset)
 
-        asset.retrieveImageWithWidth(cell.imageView.bounds.width) { image in
-            cell.imageView.image = image
-        }
         cell.delegate = self
         cell.asset =  asset
         return cell

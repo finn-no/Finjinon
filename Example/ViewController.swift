@@ -18,9 +18,8 @@ class ViewController: UITableViewController {
     }
 
     @IBAction func addPhotosTapped(sender: AnyObject) {
-        let controller = PhotoCaptureViewController()
+        let controller = PhotoCaptureViewController(images: self.images)
         controller.delegate = self
-        controller.addInitialImages(self.images)
         presentViewController(controller, animated: true, completion: nil)
     }
 
@@ -40,15 +39,22 @@ class ViewController: UITableViewController {
 
 
 extension ViewController: PhotoCaptureViewControllerDelegate {
-    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell) {
-        // Customization point. Do it as quickly as possible.
+    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell, asset: Asset) {
+        // Set a thumbnail form the source image, or add your own network fetch code etc
+        if let assetURL = asset.imageURL {
+
+        } else {
+            asset.imageWithWidth(cell.imageView.bounds.width) { image in
+                cell.imageView.image = image
+            }
+        }
     }
 
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset]) {
         NSLog("didFinishEditingAssets: \(assets)")
         self.images.removeAll(keepCapacity: false)
         for asset in assets {
-            asset.retrieveImageWithWidth(100) { image in
+            asset.imageWithWidth(100) { image in
                 self.images.insert(image, atIndex: 0)
                 self.tableView.reloadData()
             }

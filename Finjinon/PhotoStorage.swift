@@ -15,19 +15,25 @@ import AssetsLibrary
 public struct Asset: Equatable, Printable {
     let UUID = NSUUID().UUIDString
     let storage: PhotoStorage
-    // TODO: connect each asset with the/a cache and have method for retriving images on Asset itself? (alá ALAsset)
-    // that way we only have to expose the asset as API
+    // TODO: `Asset` as a protocol and two different LocalAsset/RemoteAsset structs? Or pluggable resolver...
+    public let imageURL: NSURL? // if nil, this asset is backed by a local resource.
+
+    internal init(storage: PhotoStorage, imageURL: NSURL) {
+        self.storage = storage
+        self.imageURL = imageURL
+    }
 
     internal init(storage: PhotoStorage) {
         self.storage = storage
+        self.imageURL = nil
     }
 
-    public func retrieveOriginalImage(completion: UIImage -> Void) {
-        storage.imageForAsset(self, completion: completion)
+    public func originalImage(result: UIImage -> Void) {
+        storage.imageForAsset(self, completion: result)
     }
 
-    public func retrieveImageWithWidth(width: CGFloat, completion: UIImage -> Void) {
-        storage.thumbnailForAsset(self, forWidth: width, completion: completion)
+    public func imageWithWidth(width: CGFloat, result: UIImage -> Void) {
+        storage.thumbnailForAsset(self, forWidth: width, completion: result)
     }
 
     public var description: String {
@@ -78,6 +84,16 @@ public class PhotoStorage {
                 NSLog("Failed to write image to \(cacheURL): \(error)")
                 // TODO: throw
             }
+            dispatch_async(dispatch_get_main_queue()) {
+                completion(asset)
+            }
+        }
+    }
+
+    func createAssetFromImageURL(imageURL: NSURL, completion: Asset -> Void) {
+        dispatch_async(queue) {
+            let asset = Asset(storage: self, imageURL: imageURL)
+
             dispatch_async(dispatch_get_main_queue()) {
                 completion(asset)
             }
