@@ -20,6 +20,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
 
     func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath)
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didDeleteItemAtIndexPath indexPath: NSIndexPath)
 }
 
 public class PhotoCaptureViewController: UIViewController {
@@ -316,6 +317,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             collectionView.performBatchUpdates({
                 self.assets.removeAtIndex(indexPath.row)
                 self.collectionView.deleteItemsAtIndexPaths([indexPath])
+                self.delegate?.photoCaptureViewController(self, didDeleteItemAtIndexPath: indexPath)
                 }, completion: nil)
         }
     }

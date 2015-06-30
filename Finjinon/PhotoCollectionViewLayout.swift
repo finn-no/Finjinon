@@ -137,7 +137,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     func handleLongPressGestureRecognized(recognizer: UILongPressGestureRecognizer) {
         switch recognizer.state {
         case .Began:
-            NSLog("[DRAGGING] longpress .Began")
             let location = recognizer.locationInView(collectionView)
             if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
                 let proxy = DraggingProxy(cell: cell)
@@ -157,8 +156,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 UIView.animateWithDuration(0.16, animations: {
                     self.dragProxy?.transform = CGAffineTransformMakeScale(1.1, 1.1)
                 })
-            } else {
-                NSLog("[DRAGGING] no indexPath for loc \(location)")
             }
         case .Ended:
             if let proxy = self.dragProxy {
@@ -210,7 +207,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
     private func setupGestureRecognizers() {
         if let collectionView = self.collectionView {
-            NSLog("[DRAGGING] Adding gesture recognizers")
             longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPressGestureRecognized:"))
             longPressGestureRecognizer.delegate = self
 

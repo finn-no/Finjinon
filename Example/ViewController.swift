@@ -81,4 +81,8 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
     func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
         NSLog("moved from #\(fromIndexPath.item) to #\(toIndexPath.item)")
     }
+
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didDeleteItemAtIndexPath indexPath: NSIndexPath) {
+        NSLog("deleted \(indexPath)")
+    }
 }
