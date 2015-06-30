@@ -9,8 +9,10 @@
 import UIKit
 
 private class DraggingProxy: UIImageView {
-    var fromIndexPath: NSIndexPath?
-    var fromCenter = CGPoint.zeroPoint
+    var dragIndexPath: NSIndexPath? // Current indexPath
+    var dragCenter = CGPoint.zeroPoint // point being dragged from
+    var fromIndexPath: NSIndexPath? // Original index path
+    var toIndexPath: NSIndexPath? // index path the proxy was dragged to
     var initialCenter = CGPoint.zeroPoint
 
     init(cell: UICollectionViewCell) {
@@ -30,6 +32,7 @@ private class DraggingProxy: UIImageView {
 }
 
 internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
+    internal var didReorderHandler: (fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) -> Void = { (_,_) in }
     private var insertedIndexPaths: [NSIndexPath] = []
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var panGestureRecgonizer: UIPanGestureRecognizer!
@@ -96,7 +99,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                     continue
                 }
 
-                if layoutAttribute.indexPath == dragProxy?.fromIndexPath {
+                if layoutAttribute.indexPath == dragProxy?.dragIndexPath {
                     layoutAttribute.alpha = 0.0 // hide the sourceCell, the drag proxy now represents it
                 }
             }
@@ -138,11 +141,13 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             let location = recognizer.locationInView(collectionView)
             if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
                 let proxy = DraggingProxy(cell: cell)
-                proxy.fromIndexPath = indexPath
+                proxy.dragIndexPath = indexPath
                 proxy.frame = cell.bounds
                 proxy.initialCenter = cell.center
-                proxy.fromCenter = cell.center
-                proxy.center = proxy.fromCenter
+                proxy.dragCenter = cell.center
+                proxy.center = proxy.dragCenter
+
+                proxy.fromIndexPath = indexPath
 
                 dragProxy = proxy
                 collectionView?.addSubview(proxy)
@@ -158,10 +163,15 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         case .Ended:
             if let proxy = self.dragProxy {
                 UIView.animateWithDuration(0.2, delay: 0.0, options: .BeginFromCurrentState | .CurveEaseIn, animations: {
-                    proxy.center = proxy.fromCenter
+                    proxy.center = proxy.dragCenter
                     proxy.transform = CGAffineTransformIdentity
                 }, completion: { finished in
                     proxy.removeFromSuperview()
+
+                    if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = proxy.toIndexPath {
+                        self.didReorderHandler(fromIndexPath: fromIndexPath, toIndexPath: toIndexPath)
+                    }
+
                     self.dragProxy = nil
 
                     self.invalidateLayout()
@@ -181,11 +191,13 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 //TODO: Constrain to be within collectionView.frame:
                 // proxy.center.y = proxy.originalCenter.y + translation.y
 
-                if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center) {
+                if let fromIndexPath = proxy.dragIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center) {
                     let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath)
-                    proxy.fromIndexPath = toIndexPath
-                    proxy.fromCenter = targetLayoutAttributes.center
+                    proxy.dragIndexPath = toIndexPath
+                    proxy.dragCenter = targetLayoutAttributes.center
                     proxy.bounds = targetLayoutAttributes.bounds
+                    proxy.toIndexPath = toIndexPath
+
                     collectionView?.performBatchUpdates({
                         self.collectionView?.moveItemAtIndexPath(fromIndexPath, toIndexPath: toIndexPath)
                     }, completion: nil)

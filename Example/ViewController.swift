@@ -77,4 +77,8 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
             NSLog("photoCaptureViewController:didFailWithError: \(error)")
         }
     }
+
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+        NSLog("moved from #\(fromIndexPath.item) to #\(toIndexPath.item)")
+    }
 }

@@ -18,6 +18,8 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
+
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath)
 }
 
 public class PhotoCaptureViewController: UIViewController {
@@ -103,6 +105,11 @@ public class PhotoCaptureViewController: UIViewController {
         layout.sectionInset = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
         layout.minimumInteritemSpacing = inset
         layout.minimumLineSpacing = inset
+        layout.didReorderHandler = { [weak self] (fromIndexPath, toIndexPath) in
+            if let welf = self {
+                welf.delegate?.photoCaptureViewController(welf, didMoveItemFromIndexPath: fromIndexPath, toIndexPath: toIndexPath)
+            }
+        }
 
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.alwaysBounceHorizontal = true
