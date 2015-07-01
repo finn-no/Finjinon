@@ -14,18 +14,22 @@ let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell, asset: Asset)
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset])
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset)
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAsset asset: Asset)
+    func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController)
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: NSIndexPath)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
 
     func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath)
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didDeleteItemAtIndexPath indexPath: NSIndexPath)
+
+    func photoCaptureViewControllerNumberOfAssets(controller: PhotoCaptureViewController) -> Int
+    func photoCaptureViewController(controller: PhotoCaptureViewController, assetForIndexPath indexPath: NSIndexPath) -> Asset
+    // delegate is responsible for updating own data structure to include new asset at the tip when one is added,
+    // eg photoCaptureViewControllerNumberOfAssets should be +1 after didAddAsset is called
+    func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset)
+    func photoCaptureViewController(controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: NSIndexPath)
 }
 
 public class PhotoCaptureViewController: UIViewController {
     public weak var delegate: PhotoCaptureViewControllerDelegate?
-    private(set) public var assets: [Asset] = []
     public var imagePickerAdapter = ImagePickerControllerAdapter()
 
     private let storage = PhotoStorage()
@@ -36,28 +40,6 @@ public class PhotoCaptureViewController: UIViewController {
     private var containerView: UIVisualEffectView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
-
-    convenience init(images: [UIImage]) {
-        self.init()
-
-        for image in images {
-            storage.createAssetFromImage(image) { asset in
-                self.assets.append(asset)
-                self.collectionView.reloadData()
-            }
-        }
-    }
-
-    convenience init(imageURLs: [NSURL]) {
-        self.init()
-
-        for url in imageURLs {
-            storage.createAssetFromImageURL(url) { asset in
-                self.assets.append(asset)
-                self.collectionView.reloadData()
-            }
-        }
-    }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
@@ -161,6 +143,8 @@ public class PhotoCaptureViewController: UIViewController {
     public override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
 
+        collectionView.reloadData()
+
         // In case the application uses the old style for managing status bar appearance
         UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .Slide)
     }
@@ -197,6 +181,29 @@ public class PhotoCaptureViewController: UIViewController {
         collectionView.reloadItemsAtIndexPaths(indexPaths)
     }
 
+    func addAsset(asset: Asset, update: () -> Void) {
+        if let collectionView = self.collectionView {
+            collectionView.performBatchUpdates({
+                update()
+                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
+            }, completion: nil)
+        } else {
+            update()
+        }
+    }
+
+    func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
+        storage.createAssetFromImageData(data, completion: completion)
+    }
+
+    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+        storage.createAssetFromImage(image, completion: completion)
+    }
+
+    func createAssetFromImageURL(imageURL: NSURL, completion: Asset -> Void) {
+        storage.createAssetFromImageURL(imageURL, completion: completion)
+    }
+
     // MARK: - Actions
 
     func flashButtonTapped(sender: UIButton) {
@@ -216,21 +223,21 @@ public class PhotoCaptureViewController: UIViewController {
     func presentImagePickerTapped(sender: AnyObject) {
         let updateHandler: Asset -> Void = { asset in
             self.collectionView.performBatchUpdates({
-                self.assets.insert(asset, atIndex: 0)
+                self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
                 self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
                 }, completion: nil)
         }
 
         let controller = imagePickerAdapter.viewControllerForImageSelection({ info in
             if let imageURL = info[UIImagePickerControllerMediaURL] as? NSURL, let data = NSData(contentsOfURL: imageURL) {
-                self.storage.createAssetFromImageData(data, completion: updateHandler)
+                self.createAssetFromImageData(data, completion: updateHandler)
             } else if let assetURL = info[UIImagePickerControllerReferenceURL] as? NSURL {
                 self.storage.createAssetFromAssetLibraryURL(assetURL, completion: updateHandler)
             } else if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-                self.storage.createAssetFromImage(image, completion: updateHandler)
+                self.createAssetFromImage(image, completion: updateHandler)
             }
-        }, completion: { cancelled in
-            self.dismissViewControllerAnimated(true, completion: nil)
+            }, completion: { cancelled in
+                self.dismissViewControllerAnimated(true, completion: nil)
         })
 
         presentViewController(controller, animated: true, completion: nil)
@@ -245,19 +252,17 @@ public class PhotoCaptureViewController: UIViewController {
         captureManager.captureImage { (data, metadata) in
             sender.enabled = true
 
-            self.storage.createAssetFromImageData(data) { asset in
+            self.createAssetFromImageData(data) { asset in
                 self.collectionView.performBatchUpdates({
-                    self.assets.insert(asset, atIndex: 0)
+                    self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
                     self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
-                }, completion: nil)
-
-                self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
+                    }, completion: nil)
             }
         }
     }
 
     func doneButtonTapped(sender: UIButton) {
-        delegate?.photoCaptureViewController(self, didFinishEditingAssets: assets)
+        delegate?.photoCaptureViewControllerDidFinish(self)
         dismissViewControllerAnimated(true, completion: nil)
     }
 
@@ -268,10 +273,10 @@ public class PhotoCaptureViewController: UIViewController {
             focusIndicatorView.center = point
             UIView.animateWithDuration(0.3, delay: 0.0, options: .BeginFromCurrentState, animations: {
                 self.focusIndicatorView.alpha = 1.0
-            }, completion: { finished in
-                UIView.animateWithDuration(0.2, delay: 1.6, options: .BeginFromCurrentState, animations: {
-                    self.focusIndicatorView.alpha = 0.0
-                }, completion: nil)
+                }, completion: { finished in
+                    UIView.animateWithDuration(0.2, delay: 1.6, options: .BeginFromCurrentState, animations: {
+                        self.focusIndicatorView.alpha = 0.0
+                        }, completion: nil)
             })
 
             captureManager.lockFocusAtPointOfInterest(point)
@@ -297,27 +302,26 @@ public class PhotoCaptureViewController: UIViewController {
 
 extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectionViewCellDelegate {
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return assets.count
+        return delegate?.photoCaptureViewControllerNumberOfAssets(self) ?? 0
     }
 
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
-        let asset = assets[indexPath.row]
 
-        delegate?.photoCaptureViewController(self, customizeCell: cell, asset: asset)
+        if let asset = delegate?.photoCaptureViewController(self, assetForIndexPath: indexPath) {
+            cell.asset =  asset
+            delegate?.photoCaptureViewController(self, customizeCell: cell, asset: asset)
+        }
 
         cell.delegate = self
-        cell.asset =  asset
         return cell
     }
 
     func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
-        if let asset = cell.asset, let itemIndex = find(self.assets, asset) {
-            let indexPath = NSIndexPath(forItem: itemIndex, inSection: 0)
+        if let indexPath = collectionView.indexPathForCell(cell) {
             collectionView.performBatchUpdates({
-                self.assets.removeAtIndex(indexPath.row)
+                self.delegate?.photoCaptureViewController(self, deleteAssetAtIndexPath: indexPath)
                 self.collectionView.deleteItemsAtIndexPaths([indexPath])
-                self.delegate?.photoCaptureViewController(self, didDeleteItemAtIndexPath: indexPath)
                 }, completion: nil)
         }
     }
@@ -326,7 +330,6 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
 extension PhotoCaptureViewController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let asset = assets[indexPath.row]
-        delegate?.photoCaptureViewController(self, didSelectAsset: asset)
+        delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
     }
 }
