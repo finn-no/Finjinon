@@ -14,7 +14,7 @@ internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
 
 
 public class PhotoCollectionViewCell: UICollectionViewCell {
-    public static var cellIdentifier = "PhotoCell"
+    class func cellIdentifier() -> String { return "PhotoCell" }
 
     public let imageView = UIImageView(frame: CGRect.zeroRect)
     public internal(set) var asset: Asset?

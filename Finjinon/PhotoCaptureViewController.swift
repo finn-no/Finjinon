@@ -181,8 +181,10 @@ public class PhotoCaptureViewController: UIViewController {
         collectionView.registerClass(cellClass, forCellWithReuseIdentifier: identifier)
     }
 
-    func dequeueReusableCellWithReuseIdentifier(identifier: String, forIndexPath indexPath: NSIndexPath!) -> PhotoCollectionViewCell {
-        return collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
+    func dequeuedReusableCellForClass<T : PhotoCollectionViewCell>(clazz: T.Type, indexPath: NSIndexPath, config: (T -> Void)) -> T {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(clazz.cellIdentifier(), forIndexPath: indexPath) as! T
+        config(cell)
+        return cell
     }
 
     func reloadPreviewItemsAtIndexes(indexes: [Int]) {
@@ -319,7 +321,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
         if let delegateCell = delegate?.photoCaptureViewControllerDidFinish(self, cellForItemAtIndexPath: indexPath) {
             cell = delegateCell
         } else {
-            cell = dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier, forIndexPath: indexPath)
+            cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
         }
 
         cell.delegate = self
