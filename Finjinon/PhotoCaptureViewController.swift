@@ -200,8 +200,8 @@ public class PhotoCaptureViewController: UIViewController {
         storage.createAssetFromImage(image, completion: completion)
     }
 
-    func createAssetFromImageURL(imageURL: NSURL, completion: Asset -> Void) {
-        storage.createAssetFromImageURL(imageURL, completion: completion)
+    func createAssetFromImageURL(imageURL: NSURL, dimensions: CGSize, completion: Asset -> Void) {
+        storage.createAssetFromImageURL(imageURL, dimensions: dimensions, completion: completion)
     }
 
     // MARK: - Actions

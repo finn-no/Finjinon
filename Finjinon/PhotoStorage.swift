@@ -15,17 +15,23 @@ import AssetsLibrary
 public struct Asset: Equatable, Printable {
     let UUID = NSUUID().UUIDString
     let storage: PhotoStorage
-    // TODO: `Asset` as a protocol and two different LocalAsset/RemoteAsset structs? Or pluggable resolver...
-    public let imageURL: NSURL? // if nil, this asset is backed by a local resource.
+    struct Remote {
+        let url: NSURL
+        let originalDimensions: CGSize
+    }
+    private let remoteReference: Remote?
+    public var imageURL: NSURL? {
+        return remoteReference?.url
+    }
 
-    internal init(storage: PhotoStorage, imageURL: NSURL) {
+    internal init(storage: PhotoStorage, imageURL: NSURL, originalDimensions: CGSize) {
         self.storage = storage
-        self.imageURL = imageURL
+        self.remoteReference = Remote(url: imageURL, originalDimensions: originalDimensions)
     }
 
     internal init(storage: PhotoStorage) {
         self.storage = storage
-        self.imageURL = nil
+        self.remoteReference = nil
     }
 
     public func originalImage(result: UIImage -> Void) {
@@ -34,6 +40,14 @@ public struct Asset: Equatable, Printable {
 
     public func imageWithWidth(width: CGFloat, result: UIImage -> Void) {
         storage.thumbnailForAsset(self, forWidth: width, completion: result)
+    }
+
+    public func dimensions() -> CGSize {
+        if let remote = self.remoteReference {
+            return remote.originalDimensions
+        } else {
+            return storage.dimensionsforAsset(self)
+        }
     }
 
     public var description: String {
@@ -90,9 +104,9 @@ public class PhotoStorage {
         }
     }
 
-    func createAssetFromImageURL(imageURL: NSURL, completion: Asset -> Void) {
+    func createAssetFromImageURL(imageURL: NSURL, dimensions: CGSize, completion: Asset -> Void) {
         dispatch_async(queue) {
-            let asset = Asset(storage: self, imageURL: imageURL)
+            let asset = Asset(storage: self, imageURL: imageURL, originalDimensions: dimensions)
 
             dispatch_async(dispatch_get_main_queue()) {
                 completion(asset)
@@ -119,8 +133,8 @@ public class PhotoStorage {
             }
             self.createAssetFromImageData(data, completion: completion)
 
-        }, failureBlock: { error in
-            NSLog("failed to retrive ALAsset: \(error)")
+            }, failureBlock: { error in
+                NSLog("failed to retrive ALAsset: \(error)")
         })
     }
 
@@ -132,6 +146,19 @@ public class PhotoStorage {
                 NSLog("failed failed to remove asset at \(cacheURL): \(error)")
             }
             dispatch_async(dispatch_get_main_queue(), completion)
+        }
+    }
+
+    func dimensionsforAsset(asset: Asset) -> CGSize {
+        let cacheFileURL = self.cacheURLForAsset(asset)
+        let source = CGImageSourceCreateWithURL(cacheFileURL, nil)
+        let imageProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as NSDictionary
+        if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
+            let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
+                return CGSize(width: width, height: height)
+        } else {
+            NSLog("*** Warning: failed to get CGImagePropertyPixel{Width,Height} from \(cacheFileURL)")
+            return CGSize.zeroSize
         }
     }
 
