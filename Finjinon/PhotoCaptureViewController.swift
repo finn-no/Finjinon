@@ -42,6 +42,10 @@ public class PhotoCaptureViewController: UIViewController {
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
 
+    deinit {
+        captureManager.stop(nil)
+    }
+
     override public func viewDidLoad() {
         super.viewDidLoad()
 
@@ -270,7 +274,8 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func doneButtonTapped(sender: UIButton) {
-        delegate?.photoCaptureViewControllerDidFinish(self)
+        self.delegate?.photoCaptureViewControllerDidFinish(self)
+
         dismissViewControllerAnimated(true, completion: nil)
     }
 

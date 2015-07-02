@@ -61,6 +61,15 @@ class CaptureManager: NSObject {
         }
     }
 
+    func stop(completion: (() -> Void)?) {
+        dispatch_async(captureQueue) {
+            if self.session.running {
+                self.session.stopRunning()
+            }
+            completion?()
+        }
+    }
+
     func captureImage(completion: (NSData, NSDictionary) -> Void) { // TODO: throws
         dispatch_async(captureQueue) {
             let connection = self.stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
