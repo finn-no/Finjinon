@@ -37,7 +37,7 @@ public class PhotoCaptureViewController: UIViewController {
     private let captureManager = CaptureManager()
     private var previewView: UIView!
     private var captureButton: TriggerButton!
-    private var collectionView: UICollectionView!
+    private let collectionView = UICollectionView(frame: CGRect.zeroRect, collectionViewLayout: UICollectionViewFlowLayout())
     private var containerView: UIVisualEffectView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
@@ -80,8 +80,9 @@ public class PhotoCaptureViewController: UIViewController {
         containerView.frame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
         view.addSubview(containerView)
 
+        collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
         let layout = PhotoCollectionViewLayout()
-        collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight), collectionViewLayout: layout)
+        collectionView.collectionViewLayout = layout
 
         layout.scrollDirection = .Horizontal
         let inset: CGFloat = 8
@@ -193,14 +194,10 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func addAsset(asset: Asset, update: () -> Void) {
-        if let collectionView = self.collectionView {
-            collectionView.performBatchUpdates({
-                update()
-                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
-            }, completion: nil)
-        } else {
+        collectionView.performBatchUpdates({
             update()
-        }
+            self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
+            }, completion: nil)
     }
 
     func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
