@@ -13,7 +13,8 @@ import MobileCoreServices
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
-    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell, asset: Asset)
+    func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell?
+
     func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: NSIndexPath)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
@@ -176,6 +177,14 @@ public class PhotoCaptureViewController: UIViewController {
 
     // MARK: - API
 
+    func registerClass(cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
+        collectionView.registerClass(cellClass, forCellWithReuseIdentifier: identifier)
+    }
+
+    func dequeueReusableCellWithReuseIdentifier(identifier: String, forIndexPath indexPath: NSIndexPath!) -> PhotoCollectionViewCell {
+        return collectionView.dequeueReusableCellWithReuseIdentifier(identifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
+    }
+
     func reloadPreviewItemsAtIndexes(indexes: [Int]) {
         let indexPaths = indexes.map { NSIndexPath(forItem: $0, inSection: 0) }
         collectionView.reloadItemsAtIndexPaths(indexPaths)
@@ -306,11 +315,11 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
     }
 
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
-
-        if let asset = delegate?.photoCaptureViewController(self, assetForIndexPath: indexPath) {
-            cell.asset =  asset
-            delegate?.photoCaptureViewController(self, customizeCell: cell, asset: asset)
+        let cell: PhotoCollectionViewCell
+        if let delegateCell = delegate?.photoCaptureViewControllerDidFinish(self, cellForItemAtIndexPath: indexPath) {
+            cell = delegateCell
+        } else {
+            cell = dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier, forIndexPath: indexPath)
         }
 
         cell.delegate = self

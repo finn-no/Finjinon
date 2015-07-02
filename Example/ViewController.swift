@@ -49,7 +49,10 @@ class ViewController: UITableViewController {
 
 
 extension ViewController: PhotoCaptureViewControllerDelegate {
-    func photoCaptureViewController(controller: PhotoCaptureViewController, customizeCell cell: PhotoCollectionViewCell, asset: Asset) {
+    func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell? {
+        let cell = controller.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier, forIndexPath: indexPath)
+
+        let asset = assets[indexPath.item]
         // Set a thumbnail form the source image, or add your own network fetch code etc
         if let assetURL = asset.imageURL {
 
@@ -58,6 +61,8 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
                 cell.imageView.image = image
             }
         }
+
+        return cell
     }
 
     func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController) {
