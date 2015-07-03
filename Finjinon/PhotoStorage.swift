@@ -174,7 +174,7 @@ public class PhotoStorage {
             if let imageSource = CGImageSourceCreateWithURL(imageURL, nil) {
                 let options = [ kCGImageSourceThumbnailMaxPixelSize as NSString: width * UIScreen.mainScreen().scale,
                     kCGImageSourceCreateThumbnailWithTransform as NSString: kCFBooleanTrue,
-                    kCGImageSourceCreateThumbnailFromImageIfAbsent as NSString: kCFBooleanTrue,
+                    kCGImageSourceCreateThumbnailFromImageAlways as NSString: kCFBooleanTrue,
                 ]
 
                 let thumbnailImage = UIImage(CGImage: CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options))
