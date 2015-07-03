@@ -72,12 +72,6 @@ public class PhotoStorage {
     init() {
         let cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last as! NSURL
         self.baseURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
-        if !fileManager.fileExistsAtPath(self.baseURL.path!) {
-            var error: NSError?
-            if !fileManager.createDirectoryAtURL(self.baseURL, withIntermediateDirectories: true, attributes: nil, error: &error) {
-                NSLog("Failed to create cache directory at \(baseURL): \(error)")
-            }
-        }
     }
 
     deinit {
@@ -193,6 +187,16 @@ public class PhotoStorage {
     }
 
     private func cacheURLForAsset(asset: Asset) -> NSURL {
+        ensureCacheDirectoryExists()
         return baseURL.URLByAppendingPathComponent(asset.UUID)
+    }
+
+    private func ensureCacheDirectoryExists() {
+        if !fileManager.fileExistsAtPath(self.baseURL.path!) {
+            var error: NSError?
+            if !fileManager.createDirectoryAtURL(self.baseURL, withIntermediateDirectories: true, attributes: nil, error: &error) {
+                NSLog("Failed to create cache directory at \(baseURL): \(error)")
+            }
+        }
     }
 }
