@@ -34,6 +34,7 @@ private class DraggingProxy: UIImageView {
 internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
     internal var didReorderHandler: (fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) -> Void = { (_,_) in }
     private var insertedIndexPaths: [NSIndexPath] = []
+    private var deletedIndexPaths: [NSIndexPath] = []
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var panGestureRecgonizer: UIPanGestureRecognizer!
     private var dragProxy: DraggingProxy?
@@ -65,12 +66,15 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     override func prepareForCollectionViewUpdates(updateItems: [AnyObject]!) {
         super.prepareForCollectionViewUpdates(updateItems)
 
-        insertedIndexPaths.removeAll(keepCapacity: true)
+        insertedIndexPaths.removeAll(keepCapacity: false)
+        deletedIndexPaths.removeAll(keepCapacity: false)
 
         for update in updateItems as! [UICollectionViewUpdateItem] {
             switch update.updateAction {
             case .Insert:
                 insertedIndexPaths.append(update.indexPathAfterUpdate!)
+            case .Delete:
+                deletedIndexPaths.append(update.indexPathBeforeUpdate!)
             default:
                 return
             }
@@ -82,8 +86,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
         if contains(insertedIndexPaths, itemIndexPath) {
             if let attrs = attrs {
-                let transform = CATransform3DTranslate(attrs.transform3D, attrs.frame.midX - self.collectionView!.frame.midX, attrs.frame.midY - self.collectionView!.frame.midY, 0)
-                attrs.transform3D = CATransform3DScale(transform, 0.001, 0.001, 1)
+                attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
             }
         }
         
@@ -91,6 +94,22 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     }
 
 
+    override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        let attrs = super.finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath)
+
+        if contains(deletedIndexPaths, itemIndexPath) {
+            if let attrs = attrs {
+                attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
+            }
+        }
+
+        return attrs
+    }
+
+    private func scaledTransform3DForLayoutAttribute(attributes: UICollectionViewLayoutAttributes,scale: CGFloat) -> CATransform3D {
+        let transform = CATransform3DTranslate(attributes.transform3D, attributes.frame.midX - self.collectionView!.frame.midX, attributes.frame.midY - self.collectionView!.frame.midY, 0)
+        return CATransform3DScale(transform, scale, scale, 1)
+    }
 
     override func layoutAttributesForElementsInRect(rect: CGRect) -> [AnyObject]? {
         if let attributes = super.layoutAttributesForElementsInRect(rect) as? [UICollectionViewLayoutAttributes] {
