@@ -31,7 +31,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 public class PhotoCaptureViewController: UIViewController {
     public weak var delegate: PhotoCaptureViewControllerDelegate?
-    public var imagePickerAdapter = ImagePickerControllerAdapter()
+    public var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
 
     private let storage = PhotoStorage()
     private let captureManager = CaptureManager()
