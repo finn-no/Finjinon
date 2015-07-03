@@ -197,11 +197,8 @@ public class PhotoCaptureViewController: UIViewController {
         collectionView.reloadItemsAtIndexPaths(indexPaths)
     }
 
-    func addAsset(asset: Asset, update: () -> Void) {
-        collectionView.performBatchUpdates({
-            update()
-            self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
-            }, completion: nil)
+    func reloadPreviews() {
+        collectionView.reloadData()
     }
 
     func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
