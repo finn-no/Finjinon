@@ -42,10 +42,13 @@ class CaptureManager: NSObject {
 
     // MARK: - API
 
+    func authorizationStatus() -> AVAuthorizationStatus {
+        return AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+    }
+
     // Prepares the capture session, possibly asking the user for camera access.
     func prepare(completion: NSError? -> Void) {
-        let authorizationStatus = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
-        switch authorizationStatus {
+        switch authorizationStatus() {
         case .Authorized:
             configure(completion)
         case .NotDetermined:
