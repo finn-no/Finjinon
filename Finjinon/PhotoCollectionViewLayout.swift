@@ -81,24 +81,37 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         }
     }
 
+    override func finalizeCollectionViewUpdates() {
+        super.finalizeCollectionViewUpdates()
+
+        insertedIndexPaths.removeAll(keepCapacity: false)
+        deletedIndexPaths.removeAll(keepCapacity: false)
+    }
+
     override func initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attrs = super.initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath)
 
         if contains(insertedIndexPaths, itemIndexPath) {
+            // only change attributes on inserted cells
             if let attrs = attrs {
+                attrs.alpha = 0.0
+                attrs.center.x = -(attrs.frame.width + minimumInteritemSpacing)
+                attrs.center.y = self.collectionView!.frame.height / 2
                 attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
             }
         }
-        
+
         return attrs
     }
-
 
     override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attrs = super.finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath)
 
         if contains(deletedIndexPaths, itemIndexPath) {
             if let attrs = attrs {
+                attrs.alpha = 0.0
+                attrs.center.x = self.collectionView!.frame.width / 2
+                attrs.center.y = self.collectionView!.frame.height + minimumLineSpacing
                 attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
             }
         }

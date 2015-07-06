@@ -47,17 +47,6 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         asset = nil
     }
 
-    override public func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
-        let delta = (44 - closeButton.bounds.width) / 2
-        let expandedRect = closeButton.frame.rectByInsetting(dx: -delta, dy: -delta)
-        let viewIsVisible = !closeButton.hidden && closeButton.alpha > 0.01
-        if viewIsVisible && delta > 0 && expandedRect.contains(point) {
-            return closeButton
-        }
-
-        return super.hitTest(point, withEvent: event)
-    }
-
     internal func closeButtonTapped(sender: UIButton) {
         delegate?.collectionViewCellDidTapDelete(self)
     }
