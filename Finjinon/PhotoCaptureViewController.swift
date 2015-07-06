@@ -247,7 +247,7 @@ public class PhotoCaptureViewController: UIViewController {
                 }, completion: nil)
         }
 
-        if libraryAuthorizationStatus() != .Authorized || libraryAuthorizationStatus() != .NotDetermined {
+        if libraryAuthorizationStatus() == .Denied || libraryAuthorizationStatus() == .Restricted {
             let error = NSError(domain: FinjinonLibraryAccessErrorDomain, code: 0, userInfo: nil)
             delegate?.photoCaptureViewController(self, didFailWithError: error)
             return
