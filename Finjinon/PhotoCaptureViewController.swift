@@ -12,6 +12,7 @@ import MobileCoreServices
 import AssetsLibrary
 
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
+let FinjinonLibraryAccessErrorDomain = "FinjinonLibraryAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell?
@@ -244,6 +245,12 @@ public class PhotoCaptureViewController: UIViewController {
                 self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
                 self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
                 }, completion: nil)
+        }
+
+        if libraryAuthorizationStatus() != .Authorized || libraryAuthorizationStatus() != .NotDetermined {
+            let error = NSError(domain: FinjinonLibraryAccessErrorDomain, code: 0, userInfo: nil)
+            delegate?.photoCaptureViewController(self, didFailWithError: error)
+            return
         }
 
         let controller = imagePickerAdapter.viewControllerForImageSelection({ info in
