@@ -203,6 +203,14 @@ public class PhotoCaptureViewController: UIViewController {
         collectionView.reloadData()
     }
 
+    func selectedPreviewIndexPath() -> NSIndexPath? {
+        if let selection = collectionView.indexPathsForSelectedItems() as? [NSIndexPath] {
+            return selection.first
+        }
+
+        return nil
+    }
+
     func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
         storage.createAssetFromImageData(data, completion: completion)
     }
@@ -215,15 +223,15 @@ public class PhotoCaptureViewController: UIViewController {
         storage.createAssetFromImageURL(imageURL, dimensions: dimensions, completion: completion)
     }
 
-    func deleteAssetAtIndex(idx: Int, completion: (() -> Void)?) {
+    /// Deletes item at the given index. Perform any deletions from datamodel in the handler
+    func deleteAssetAtIndex(idx: Int, handler: () -> Void) {
         let indexPath = NSIndexPath(forItem: idx, inSection: 0)
         if let asset = delegate?.photoCaptureViewController(self, assetForIndexPath: indexPath) {
             self.collectionView.performBatchUpdates({
+                handler()
                 self.collectionView.deleteItemsAtIndexPaths([indexPath])
-                self.storage.deleteAsset(asset, completion: {
-                    completion?()
-                })
-            }, completion: nil)
+                self.storage.deleteAsset(asset, completion: {})
+                }, completion: nil)
         }
     }
 
@@ -357,10 +365,9 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
     func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
         if let indexPath = collectionView.indexPathForCell(cell) {
-            collectionView.performBatchUpdates({
-                self.deleteAssetAtIndex(indexPath.item, completion: nil)
+            self.deleteAssetAtIndex(indexPath.item, handler: {
                 self.delegate?.photoCaptureViewController(self, deleteAssetAtIndexPath: indexPath)
-            }, completion: nil)
+            })
         }
     }
 }
