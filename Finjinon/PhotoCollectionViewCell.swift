@@ -28,8 +28,6 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         let offset = self.closeButton.bounds.height/3
         imageView.frame = CGRect(x: offset, y: offset, width: contentView.bounds.width - (offset*2), height: contentView.bounds.height - (offset*2))
         imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
-        imageView.layer.shouldRasterize = true // to avoid jaggies while we wiggle
-        imageView.layer.rasterizationScale = UIScreen.mainScreen().scale
         contentView.addSubview(imageView)
 
         closeButton.addTarget(self, action: Selector("closeButtonTapped:"), forControlEvents: .TouchUpInside)
