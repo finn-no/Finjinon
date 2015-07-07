@@ -17,10 +17,10 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
     class func cellIdentifier() -> String { return "PhotoCell" }
 
     public let imageView = UIImageView(frame: CGRect.zeroRect)
+    public let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     public internal(set) var asset: Asset?
 
     internal weak var delegate: PhotoCollectionViewCellDelegate?
-    private let closeButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
 
     override init(frame: CGRect) {
         super.init(frame: frame)

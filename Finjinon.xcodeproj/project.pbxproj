@@ -21,6 +21,7 @@
 		76BEC38E1B3D6C3400B8D671 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BEC3881B3D6C3400B8D671 /* ViewController.swift */; };
 		76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3961B3D6D3200B8D671 /* Localizable.strings */; };
 		76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */; };
+		76F257321B4BBAC800666DFE /* hoff.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 76F257311B4BBAC800666DFE /* hoff.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		76BEC3951B3D6D3200B8D671 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		76BEC3971B3D6D4200B8D671 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Localizable.strings; sourceTree = "<group>"; };
 		76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImagePickerAdapter.swift; path = Finjinon/ImagePickerAdapter.swift; sourceTree = "<group>"; };
+		76F257311B4BBAC800666DFE /* hoff.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = hoff.jpeg; path = Finjinon/hoff.jpeg; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 		76BEC38F1B3D6C4C00B8D671 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				76F257311B4BBAC800666DFE /* hoff.jpeg */,
 				76BEC3821B3D6C3400B8D671 /* LaunchScreen.xib */,
 				76BEC3841B3D6C3400B8D671 /* Main.storyboard */,
 				76BEC3861B3D6C3400B8D671 /* Images.xcassets */,
@@ -241,6 +244,7 @@
 				76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */,
 				76BEC38C1B3D6C3400B8D671 /* Images.xcassets in Resources */,
 				76BEC38A1B3D6C3400B8D671 /* LaunchScreen.xib in Resources */,
+				76F257321B4BBAC800666DFE /* hoff.jpeg in Resources */,
 				76BEC38B1B3D6C3400B8D671 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

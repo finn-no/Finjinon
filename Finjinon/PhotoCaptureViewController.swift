@@ -215,6 +215,18 @@ public class PhotoCaptureViewController: UIViewController {
         storage.createAssetFromImageURL(imageURL, dimensions: dimensions, completion: completion)
     }
 
+    func deleteAssetAtIndex(idx: Int, completion: (() -> Void)?) {
+        let indexPath = NSIndexPath(forItem: idx, inSection: 0)
+        if let asset = delegate?.photoCaptureViewController(self, assetForIndexPath: indexPath) {
+            self.collectionView.performBatchUpdates({
+                self.collectionView.deleteItemsAtIndexPaths([indexPath])
+                self.storage.deleteAsset(asset, completion: {
+                    completion?()
+                })
+            }, completion: nil)
+        }
+    }
+
     func libraryAuthorizationStatus() -> ALAuthorizationStatus {
         return ALAssetsLibrary.authorizationStatus()
     }
@@ -346,9 +358,9 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
     func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
         if let indexPath = collectionView.indexPathForCell(cell) {
             collectionView.performBatchUpdates({
+                self.deleteAssetAtIndex(indexPath.item, completion: nil)
                 self.delegate?.photoCaptureViewController(self, deleteAssetAtIndexPath: indexPath)
-                self.collectionView.deleteItemsAtIndexPaths([indexPath])
-                }, completion: nil)
+            }, completion: nil)
         }
     }
 }
