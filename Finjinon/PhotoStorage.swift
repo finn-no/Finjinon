@@ -136,7 +136,7 @@ public class PhotoStorage {
         dispatch_async(queue) {
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
-            if self.fileManager.removeItemAtPath(cacheURL.path!, error: &error) {
+            if !self.fileManager.removeItemAtPath(cacheURL.path!, error: &error) {
                 NSLog("failed failed to remove asset at \(cacheURL): \(error)")
             }
             dispatch_async(dispatch_get_main_queue(), completion)
