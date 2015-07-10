@@ -70,13 +70,14 @@ public class PhotoStorage {
     private let assetLibrary = ALAssetsLibrary()
 
     init() {
-        let cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last as! NSURL
-        self.baseURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
+        var cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last as! NSURL
+        cacheURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
+        self.baseURL = cacheURL.URLByAppendingPathComponent(NSUUID().UUIDString)
     }
 
     deinit {
         var error: NSError?
-        if !fileManager.removeItemAtURL(baseURL, error: &error) {
+        if fileManager.fileExistsAtPath(baseURL.path!) && !fileManager.removeItemAtURL(baseURL, error: &error) {
             NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(error)")
         }
     }
