@@ -230,8 +230,11 @@ public class PhotoCaptureViewController: UIViewController {
             self.collectionView.performBatchUpdates({
                 handler()
                 self.collectionView.deleteItemsAtIndexPaths([indexPath])
-                self.storage.deleteAsset(asset, completion: {})
-                }, completion: nil)
+                }, completion: { finished in
+                    if asset.imageURL == nil {
+                        self.storage.deleteAsset(asset, completion: {})
+                    }
+            })
         }
     }
 
