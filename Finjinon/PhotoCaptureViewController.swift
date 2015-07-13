@@ -211,6 +211,10 @@ public class PhotoCaptureViewController: UIViewController {
         return nil
     }
 
+    func cellForpreviewAtIndexPath<T : PhotoCollectionViewCell>(indexPath: NSIndexPath) -> T? {
+        return collectionView.cellForItemAtIndexPath(indexPath) as? T
+    }
+
     func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
         storage.createAssetFromImageData(data, completion: completion)
     }
