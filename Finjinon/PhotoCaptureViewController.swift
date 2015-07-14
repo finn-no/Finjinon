@@ -219,6 +219,18 @@ public class PhotoCaptureViewController: UIViewController {
         return collectionView.cellForItemAtIndexPath(indexPath) as? T
     }
 
+    /// returns the rect in view (minus the scroll offset) of the thumbnail at the given indexPath.
+    /// Useful for presenting sheets etc from the thumbnail
+    func previewRectForIndexPath(indexPath: NSIndexPath) -> CGRect {
+        if let attributes = collectionView.layoutAttributesForItemAtIndexPath(indexPath) {
+            var rect = attributes.frame
+            rect.origin.x -= collectionView.contentOffset.x
+            rect.origin.y -= collectionView.contentOffset.y
+            return view.convertRect(rect, fromView: collectionView.superview)
+        }
+        return CGRect.zeroRect
+    }
+
     func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
         storage.createAssetFromImageData(data, completion: completion)
     }
