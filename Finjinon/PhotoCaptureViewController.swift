@@ -153,6 +153,10 @@ public class PhotoCaptureViewController: UIViewController {
 
         collectionView.reloadData()
 
+        if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
+            self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: count-1, inSection: 0), atScrollPosition: .Left, animated: false)
+        }
+
         // In case the application uses the old style for managing status bar appearance
         UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .Slide)
     }
@@ -267,13 +271,6 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     func presentImagePickerTapped(sender: AnyObject) {
-        let updateHandler: Asset -> Void = { asset in
-            self.collectionView.performBatchUpdates({
-                self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
-                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
-                }, completion: nil)
-        }
-
         if libraryAuthorizationStatus() == .Denied || libraryAuthorizationStatus() == .Restricted {
             let error = NSError(domain: FinjinonLibraryAccessErrorDomain, code: 0, userInfo: nil)
             delegate?.photoCaptureViewController(self, didFailWithError: error)
@@ -282,11 +279,11 @@ public class PhotoCaptureViewController: UIViewController {
 
         let controller = imagePickerAdapter.viewControllerForImageSelection({ info in
             if let imageURL = info[UIImagePickerControllerMediaURL] as? NSURL, let data = NSData(contentsOfURL: imageURL) {
-                self.createAssetFromImageData(data, completion: updateHandler)
+                self.createAssetFromImageData(data, completion: self.didAddAsset)
             } else if let assetURL = info[UIImagePickerControllerReferenceURL] as? NSURL {
-                self.storage.createAssetFromAssetLibraryURL(assetURL, completion: updateHandler)
+                self.storage.createAssetFromAssetLibraryURL(assetURL, completion: self.didAddAsset)
             } else if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-                self.createAssetFromImage(image, completion: updateHandler)
+                self.createAssetFromImage(image, completion: self.didAddAsset)
             }
             }, completion: { cancelled in
                 self.dismissViewControllerAnimated(true, completion: nil)
@@ -304,13 +301,25 @@ public class PhotoCaptureViewController: UIViewController {
         captureManager.captureImage { (data, metadata) in
             sender.enabled = true
 
-            self.createAssetFromImageData(data) { asset in
-                self.collectionView.performBatchUpdates({
-                    self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
-                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: 0, inSection: 0)])
-                    }, completion: nil)
-            }
+            self.createAssetFromImageData(data, completion: self.didAddAsset)
         }
+    }
+
+    private func didAddAsset(asset: Asset) {
+        collectionView.performBatchUpdates({
+            self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
+            let insertedIndexPath: NSIndexPath
+            if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
+                insertedIndexPath = NSIndexPath(forItem: count-1, inSection: 0)
+            } else {
+                insertedIndexPath = NSIndexPath(forItem: 0, inSection: 0)
+            }
+            self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
+        }, completion: { finished in
+                if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
+                    self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: count-1, inSection: 0), atScrollPosition: .Left, animated: true)
+                }
+        })
     }
 
     func doneButtonTapped(sender: UIButton) {
