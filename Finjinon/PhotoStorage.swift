@@ -116,18 +116,39 @@ public class PhotoStorage {
 
     func createAssetFromAssetLibraryURL(assetURL: NSURL, completion: Asset -> Void) {
         assetLibrary.assetForURL(assetURL, resultBlock: { asset in
-            let representation = asset.defaultRepresentation()
-            let bufferLength = Int(representation.size())
-            let data = NSMutableData(length: bufferLength)!
-            var buffer = UnsafeMutablePointer<UInt8>(data.mutableBytes)
+            let assetHandler: ALAsset -> Void = { asset in
+                let representation = asset.defaultRepresentation()
+                let bufferLength = Int(representation.size())
+                let data = NSMutableData(length: bufferLength)!
+                var buffer = UnsafeMutablePointer<UInt8>(data.mutableBytes)
 
-            var error: NSError?
-            let bytesWritten = representation.getBytes(buffer, fromOffset: 0, length: bufferLength, error: &error)
-            if bytesWritten != bufferLength {
-                NSLog("failed to get all bytes (wrote \(bytesWritten)/\(bufferLength)): \(error)")
+                var error: NSError?
+                let bytesWritten = representation.getBytes(buffer, fromOffset: 0, length: bufferLength, error: &error)
+                if bytesWritten != bufferLength {
+                    NSLog("failed to get all bytes (wrote \(bytesWritten)/\(bufferLength)): \(error)")
+                }
+                self.createAssetFromImageData(data, completion: completion)
             }
-            self.createAssetFromImageData(data, completion: completion)
 
+            if asset != nil {
+                assetHandler(asset)
+            } else {
+                // On iOS 8.1 [library assetForUrl] for Photo Streams always returns nil. Try to obtain it in an alternative way
+                // http://stackoverflow.com/questions/26480526/alassetslibrary-assetforurl-always-returning-nil-for-photos-in-my-photo-stream
+                self.assetLibrary.enumerateGroupsWithTypes(ALAssetsGroupType(ALAssetsGroupPhotoStream), usingBlock: { (group, stop: UnsafeMutablePointer<ObjCBool>) in
+                    if let group = group {
+                        group.enumerateAssetsWithOptions(.Reverse, usingBlock: { (result, index, innerStop) in
+                            if let result = result where result.defaultRepresentation().url() == assetURL {
+                                assetHandler(result)
+                                innerStop.initialize(true)
+                                stop.initialize(true)
+                            }
+                        })
+                    }
+                    }, failureBlock: { error in
+                        NSLog("failed to retrive ALAsset in 8.1 workaround: \(error)")
+                })
+            }
             }, failureBlock: { error in
                 NSLog("failed to retrive ALAsset: \(error)")
         })
