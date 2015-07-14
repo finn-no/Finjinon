@@ -176,13 +176,10 @@ public class PhotoCaptureViewController: UIViewController {
     }
 
     public override func shouldAutorotate() -> Bool {
-        return UIDevice.currentDevice().userInterfaceIdiom != .Pad
+        return false
     }
 
     public override func supportedInterfaceOrientations() -> Int {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
-            return Int(UIInterfaceOrientationMask.All.rawValue)
-        }
         return Int(UIInterfaceOrientationMask.Portrait.rawValue)
     }
 
