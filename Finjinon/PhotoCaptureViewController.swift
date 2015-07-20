@@ -153,9 +153,7 @@ public class PhotoCaptureViewController: UIViewController {
 
         collectionView.reloadData()
 
-        if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
-            self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: count-1, inSection: 0), atScrollPosition: .Left, animated: false)
-        }
+        scrollToLastAddedAssetAnimated(false)
 
         // In case the application uses the old style for managing status bar appearance
         UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .Slide)
@@ -325,10 +323,14 @@ public class PhotoCaptureViewController: UIViewController {
             }
             self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
         }, completion: { finished in
-                if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
-                    self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: count-1, inSection: 0), atScrollPosition: .Left, animated: true)
-                }
+            self.scrollToLastAddedAssetAnimated(true)
         })
+    }
+
+    private func scrollToLastAddedAssetAnimated(animated: Bool) {
+        if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) where count > 0 {
+            self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: count-1, inSection: 0), atScrollPosition: .Left, animated: animated)
+        }
     }
 
     func doneButtonTapped(sender: UIButton) {
