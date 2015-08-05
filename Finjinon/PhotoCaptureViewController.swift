@@ -82,9 +82,8 @@ public class PhotoCaptureViewController: UIViewController {
 
         let collectionViewHeight: CGFloat = 102
 
-        let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
-
         var containerContentView : UIView!
+        let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
         let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
         if isPreOS8 {
             containerView = UIView(frame: containerFrame)
@@ -92,11 +91,11 @@ public class PhotoCaptureViewController: UIViewController {
             containerContentView = containerView
         } else {
             containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
+            containerView.frame = containerFrame
             if let containerView = containerView as? UIVisualEffectView {
                 containerContentView = containerView.contentView
             }
         }
-        containerView.frame = containerFrame
         view.addSubview(containerView)
 
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
