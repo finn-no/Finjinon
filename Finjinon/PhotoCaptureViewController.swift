@@ -86,7 +86,7 @@ public class PhotoCaptureViewController: UIViewController {
 
         var containerContentView : UIView!
         let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
-        if (isPreOS8) {
+        if isPreOS8 {
             containerView = UIView(frame: containerFrame)
             containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
             containerContentView = containerView
