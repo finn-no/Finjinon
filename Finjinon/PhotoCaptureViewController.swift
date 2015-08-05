@@ -40,7 +40,7 @@ public class PhotoCaptureViewController: UIViewController {
     private var previewView: UIView!
     private var captureButton: TriggerButton!
     private let collectionView = UICollectionView(frame: CGRect.zeroRect, collectionViewLayout: UICollectionViewFlowLayout())
-    private var containerView: UIVisualEffectView!
+    private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
 
@@ -52,6 +52,7 @@ public class PhotoCaptureViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor.blackColor()
+        let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
 
         // TODO: Move all the boring view setup to a storyboard/xib
 
@@ -82,8 +83,15 @@ public class PhotoCaptureViewController: UIViewController {
 
         let collectionViewHeight: CGFloat = 102
 
-        containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
-        containerView.frame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
+        let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
+
+        if (isPreOS8){
+            containerView = UIView(frame: containerFrame)
+            containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
+        } else {
+            containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
+        }
+        containerView.frame = containerFrame
         view.addSubview(containerView)
 
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
@@ -104,7 +112,11 @@ public class PhotoCaptureViewController: UIViewController {
 
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.alwaysBounceHorizontal = true
-        containerView.contentView.addSubview(collectionView)
+        if let containerView = containerView as? UIVisualEffectView {
+            containerView.contentView.addSubview(collectionView)
+        } else {
+            containerView.addSubview(collectionView)
+        }
         collectionView.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "PhotoCell")
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -112,15 +124,22 @@ public class PhotoCaptureViewController: UIViewController {
         captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-33, y: containerView.frame.height - 66 - 4, width: 66, height: 66))
         captureButton.layer.cornerRadius = 33
         captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
-        containerView.contentView.addSubview(captureButton)
+        if let containerView = containerView as? UIVisualEffectView {
+            containerView.contentView.addSubview(captureButton)
+        } else {
+            containerView.addSubview(captureButton)
+        }
         captureButton.enabled = false
 
         let closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
-        containerView.contentView.addSubview(closeButton)
-
+        if let containerView = containerView as? UIVisualEffectView {
+            containerView.contentView.addSubview(closeButton)
+        } else {
+            containerView.addSubview(closeButton)
+        }
         let pickerButtonWidth: CGFloat = 114
         let pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
         pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
@@ -322,8 +341,8 @@ public class PhotoCaptureViewController: UIViewController {
                 insertedIndexPath = NSIndexPath(forItem: 0, inSection: 0)
             }
             self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
-        }, completion: { finished in
-            self.scrollToLastAddedAssetAnimated(true)
+            }, completion: { finished in
+                self.scrollToLastAddedAssetAnimated(true)
         })
     }
 
@@ -377,31 +396,10 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return delegate?.photoCaptureViewControllerNumberOfAssets(self) ?? 0
     }
-
+    
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell: PhotoCollectionViewCell
         if let delegateCell = delegate?.photoCaptureViewControllerDidFinish(self, cellForItemAtIndexPath: indexPath) {
             cell = delegateCell
         } else {
-            cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
-        }
-
-        cell.delegate = self
-        return cell
-    }
-
-    func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
-        if let indexPath = collectionView.indexPathForCell(cell) {
-            self.deleteAssetAtIndex(indexPath.item, handler: {
-                self.delegate?.photoCaptureViewController(self, deleteAssetAtIndexPath: indexPath)
-            })
-        }
-    }
-}
-
-
-extension PhotoCaptureViewController: UICollectionViewDelegate {
-    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
-    }
-}
+            cell = collectionView.dequeueReusableCellWithReuseId
