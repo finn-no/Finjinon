@@ -52,7 +52,6 @@ public class PhotoCaptureViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor.blackColor()
-        let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
 
         // TODO: Move all the boring view setup to a storyboard/xib
 
@@ -86,6 +85,7 @@ public class PhotoCaptureViewController: UIViewController {
         let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
 
         var containerContentView : UIView!
+        let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
         if (isPreOS8){
             containerView = UIView(frame: containerFrame)
             containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
