@@ -85,11 +85,14 @@ public class PhotoCaptureViewController: UIViewController {
 
         let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
 
+        var containerContentView : UIView
         if (isPreOS8){
             containerView = UIView(frame: containerFrame)
             containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
+            containerContentView = containerView
         } else {
             containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
+            containerContentView = containerView
         }
         containerView.frame = containerFrame
         view.addSubview(containerView)
@@ -112,11 +115,7 @@ public class PhotoCaptureViewController: UIViewController {
 
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.alwaysBounceHorizontal = true
-        if let containerView = containerView as? UIVisualEffectView {
-            containerView.contentView.addSubview(collectionView)
-        } else {
-            containerView.addSubview(collectionView)
-        }
+        containerContentView.addSubview(collectionView)
         collectionView.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "PhotoCell")
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -124,22 +123,15 @@ public class PhotoCaptureViewController: UIViewController {
         captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-33, y: containerView.frame.height - 66 - 4, width: 66, height: 66))
         captureButton.layer.cornerRadius = 33
         captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
-        if let containerView = containerView as? UIVisualEffectView {
-            containerView.contentView.addSubview(captureButton)
-        } else {
-            containerView.addSubview(captureButton)
-        }
+        containerContentView.addSubview(captureButton)
         captureButton.enabled = false
 
         let closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
-        if let containerView = containerView as? UIVisualEffectView {
-            containerView.contentView.addSubview(closeButton)
-        } else {
-            containerView.addSubview(closeButton)
-        }
+        containerContentView.addSubview(closeButton)
+
         let pickerButtonWidth: CGFloat = 114
         let pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
         pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
