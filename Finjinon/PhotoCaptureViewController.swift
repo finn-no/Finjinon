@@ -85,14 +85,16 @@ public class PhotoCaptureViewController: UIViewController {
 
         let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
 
-        var containerContentView : UIView
+        var containerContentView : UIView!
         if (isPreOS8){
             containerView = UIView(frame: containerFrame)
             containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
             containerContentView = containerView
         } else {
             containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
-            containerContentView = containerView
+            if let containerView = containerView as? UIVisualEffectView {
+                containerContentView = containerView.contentView
+            }
         }
         containerView.frame = containerFrame
         view.addSubview(containerView)
