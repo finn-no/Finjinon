@@ -341,8 +341,8 @@ public class PhotoCaptureViewController: UIViewController {
                 insertedIndexPath = NSIndexPath(forItem: 0, inSection: 0)
             }
             self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
-            }, completion: { finished in
-                self.scrollToLastAddedAssetAnimated(true)
+        }, completion: { finished in
+            self.scrollToLastAddedAssetAnimated(true)
         })
     }
 
@@ -396,10 +396,31 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return delegate?.photoCaptureViewControllerNumberOfAssets(self) ?? 0
     }
-    
+
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell: PhotoCollectionViewCell
         if let delegateCell = delegate?.photoCaptureViewControllerDidFinish(self, cellForItemAtIndexPath: indexPath) {
             cell = delegateCell
         } else {
-            cell = collectionView.dequeueReusableCellWithReuseId
+            cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
+        }
+
+        cell.delegate = self
+        return cell
+    }
+
+    func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell) {
+        if let indexPath = collectionView.indexPathForCell(cell) {
+            self.deleteAssetAtIndex(indexPath.item, handler: {
+                self.delegate?.photoCaptureViewController(self, deleteAssetAtIndexPath: indexPath)
+            })
+        }
+    }
+}
+
+
+extension PhotoCaptureViewController: UICollectionViewDelegate {
+    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
+    }
+}
