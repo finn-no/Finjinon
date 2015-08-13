@@ -31,7 +31,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: NSIndexPath)
 }
 
-public class PhotoCaptureViewController: UIViewController {
+public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     public weak var delegate: PhotoCaptureViewControllerDelegate?
     public var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
 
@@ -43,6 +43,15 @@ public class PhotoCaptureViewController: UIViewController {
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
+    
+    // MARK: - PhotoCollectionViewLayoutDelegate
+    public var photoCollectionViewLayoutShouldAllowCellMove:Bool
+        {
+        get {
+            // Add logic here to prevent moving of cells in specific situations
+            return true
+        }
+    }
 
     deinit {
         captureManager.stop(nil)
@@ -100,6 +109,7 @@ public class PhotoCaptureViewController: UIViewController {
 
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
         let layout = PhotoCollectionViewLayout()
+        layout.delegate = self
         collectionView.collectionViewLayout = layout
 
         layout.scrollDirection = .Horizontal
