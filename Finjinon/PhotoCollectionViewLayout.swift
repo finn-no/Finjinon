@@ -31,6 +31,10 @@ private class DraggingProxy: UIImageView {
     }
 }
 
+public protocol PhotoCollectionViewLayoutDelegate: NSObjectProtocol {
+    var photoCollectionViewLayoutShouldAllowCellMove:Bool {get}
+}
+
 internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
     internal var didReorderHandler: (fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) -> Void = { (_,_) in }
     private var insertedIndexPaths: [NSIndexPath] = []
@@ -38,6 +42,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     private var longPressGestureRecognizer: UILongPressGestureRecognizer!
     private var panGestureRecgonizer: UIPanGestureRecognizer!
     private var dragProxy: DraggingProxy?
+    internal weak var delegate: PhotoCollectionViewLayoutDelegate?
 
     override init() {
         super.init()
@@ -167,6 +172,11 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     // MARK: -  Private methods
 
     func handleLongPressGestureRecognized(recognizer: UILongPressGestureRecognizer) {
+        let allowMove = delegate?.photoCollectionViewLayoutShouldAllowCellMove ?? true
+        if allowMove == false {
+            return
+        }
+        
         switch recognizer.state {
         case .Began:
             let location = recognizer.locationInView(collectionView)
