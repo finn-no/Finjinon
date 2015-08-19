@@ -29,6 +29,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     // eg photoCaptureViewControllerNumberOfAssets should be +1 after didAddAsset is called
     func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset)
     func photoCaptureViewController(controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: NSIndexPath)
+    func photoCaptureViewController(controller: PhotoCaptureViewController, canMoveItemAtIndexPath indexPath: NSIndexPath) -> Bool
 }
 
 public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
@@ -43,15 +44,6 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
-    
-    // MARK: - PhotoCollectionViewLayoutDelegate
-    public var photoCollectionViewLayoutShouldAllowCellMove:Bool
-        {
-        get {
-            // Add logic here to prevent moving of cells in specific situations
-            return true
-        }
-    }
 
     deinit {
         captureManager.stop(nil)
@@ -376,6 +368,12 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
 
             captureManager.lockFocusAtPointOfInterest(point)
         }
+    }
+
+    // MARK: - PhotoCollectionViewLayoutDelegate
+
+    public func photoCollectionViewLayout(layout: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return delegate?.photoCaptureViewController(self, canMoveItemAtIndexPath: indexPath) ?? true
     }
 
     // MARK: - Private methods
