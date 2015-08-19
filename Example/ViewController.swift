@@ -96,4 +96,9 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
     func photoCaptureViewController(controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: NSIndexPath) {
         assets.removeAtIndex(indexPath.item)
         tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Automatic)
-    }}
+    }
+
+    func photoCaptureViewController(controller: PhotoCaptureViewController, canMoveItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+}

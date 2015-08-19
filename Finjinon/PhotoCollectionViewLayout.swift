@@ -32,7 +32,7 @@ private class DraggingProxy: UIImageView {
 }
 
 public protocol PhotoCollectionViewLayoutDelegate: NSObjectProtocol {
-    var photoCollectionViewLayoutShouldAllowCellMove:Bool {get}
+    func photoCollectionViewLayout(layout: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: NSIndexPath) -> Bool
 }
 
 internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
@@ -159,6 +159,17 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     }
 
     func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        func canMoveItemAtIndexPath(indexPath: NSIndexPath) -> Bool {
+            return delegate?.photoCollectionViewLayout(self, canMoveItemAtIndexPath: indexPath) ?? true
+        }
+
+        if gestureRecognizer == longPressGestureRecognizer {
+            let location = gestureRecognizer.locationInView(collectionView)
+            if let indexPath = collectionView?.indexPathForItemAtPoint(location) where !canMoveItemAtIndexPath(indexPath) {
+                return false
+            }
+        }
+
         let states: [UIGestureRecognizerState] = [.Possible, .Failed]
         if gestureRecognizer == longPressGestureRecognizer && !contains(states, collectionView!.panGestureRecognizer.state) {
             return false
@@ -172,11 +183,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     // MARK: -  Private methods
 
     func handleLongPressGestureRecognized(recognizer: UILongPressGestureRecognizer) {
-        let allowMove = delegate?.photoCollectionViewLayoutShouldAllowCellMove ?? true
-        if allowMove == false {
-            return
-        }
-        
         switch recognizer.state {
         case .Began:
             let location = recognizer.locationInView(collectionView)
