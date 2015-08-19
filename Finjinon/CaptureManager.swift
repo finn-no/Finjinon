@@ -177,6 +177,16 @@ class CaptureManager: NSObject {
                 self.session.addOutput(self.stillImageOutput)
             }
 
+            if self.cameraDevice.isFocusModeSupported(.ContinuousAutoFocus) {
+                var configLockError: NSError?
+                self.cameraDevice.lockForConfiguration(&configLockError)
+                self.cameraDevice.focusMode = .ContinuousAutoFocus
+                if self.cameraDevice.smoothAutoFocusSupported {
+                    self.cameraDevice.smoothAutoFocusEnabled = true
+                }
+                self.cameraDevice.unlockForConfiguration()
+            }
+
             self.session.startRunning()
 
             dispatch_async(dispatch_get_main_queue()) {
