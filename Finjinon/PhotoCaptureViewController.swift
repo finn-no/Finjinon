@@ -12,6 +12,8 @@ import MobileCoreServices
 import AssetsLibrary
 
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
+let FinjinonCameraAccessErrorDeniedCode = 1
+let FinjinonCameraAccessErrorDeniedInitialRequestCode = 2
 let FinjinonLibraryAccessErrorDomain = "FinjinonLibraryAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {

@@ -56,7 +56,9 @@ class CaptureManager: NSObject {
                 if granted {
                     self.configure(completion)
                 } else {
-                    completion(self.accessDeniedError())
+                    dispatch_async(dispatch_get_main_queue()) {
+                        completion(self.accessDeniedError(FinjinonCameraAccessErrorDeniedInitialRequestCode))
+                    }
                 }
             })
         case .Denied, .Restricted:
@@ -130,9 +132,9 @@ class CaptureManager: NSObject {
 
     // MARK: - Private methods
 
-    private func accessDeniedError() -> NSError {
+    private func accessDeniedError(code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
         let info = [NSLocalizedDescriptionKey: NSLocalizedString("Camera access denied, please enable it in the Settings app to continue", comment: "")]
-        return NSError(domain: FinjinonCameraAccessErrorDomain, code: 0, userInfo: info)
+        return NSError(domain: FinjinonCameraAccessErrorDomain, code: code, userInfo: info)
     }
 
     private func lockCurrentCameraDeviceForConfiguration(configurator: AVCaptureDevice -> Void) {
