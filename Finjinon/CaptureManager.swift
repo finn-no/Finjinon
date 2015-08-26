@@ -57,7 +57,7 @@ class CaptureManager: NSObject {
                     self.configure(completion)
                 } else {
                     dispatch_async(dispatch_get_main_queue()) {
-                        completion(self.accessDeniedError(FinjinonCameraAccessErrorDeniedInitialRequestCode))
+                        completion(self.accessDeniedError(code: FinjinonCameraAccessErrorDeniedInitialRequestCode))
                     }
                 }
             })
