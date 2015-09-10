@@ -129,6 +129,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
         containerView.addSubview(captureButton)
         captureButton.enabled = false
+        captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
         
         let closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
