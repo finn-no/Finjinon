@@ -98,7 +98,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             containerFrame.size.height = containerHeight
         }
         containerView = UIView(frame: containerFrame)
-        containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)
+        containerView.backgroundColor = UIColor(white: 0, alpha: 0.4)
         view.addSubview(containerView)
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
         let layout = PhotoCollectionViewLayout()
