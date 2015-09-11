@@ -62,7 +62,13 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         previewView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
         view.addSubview(previewView)
         let previewLayer = captureManager.previewLayer
-        previewLayer.frame = previewView.layer.bounds
+        // We are using AVCaptureSessionPresetPhoto which has a 4:3 aspect ratio
+        var viewFinderWidth = view.bounds.size.width
+        var viewFinderHeight = (viewFinderWidth/3) * 4
+        if captureManager.viewfinderMode == .FullScreen {
+            viewFinderHeight = view.bounds.size.height
+        }
+        previewLayer.frame = CGRectMake(0, 0, viewFinderWidth, viewFinderHeight)
         previewView.layer.addSublayer(previewLayer)
 
         focusIndicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 64, height: 64))
@@ -84,23 +90,17 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         previewView.addGestureRecognizer(tapper)
 
         let collectionViewHeight: CGFloat = 102
+        let collectionViewBottomMargin : CGFloat = 70
 
-        var containerContentView : UIView!
-        let containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
-        let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
-        if isPreOS8 {
-            containerView = UIView(frame: containerFrame)
-            containerView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.8)
-            containerContentView = containerView
-        } else {
-            containerView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
-            containerView.frame = containerFrame
-            if let containerView = containerView as? UIVisualEffectView {
-                containerContentView = containerView.contentView
-            }
+        var containerFrame = CGRect(x: 0, y: view.frame.height-collectionViewBottomMargin-collectionViewHeight, width: view.frame.width, height: collectionViewBottomMargin+collectionViewHeight)
+        if captureManager.viewfinderMode == .Window {
+            let containerHeight = CGRectGetHeight(view.frame) - viewFinderHeight
+            containerFrame.origin.y = view.frame.height - containerHeight
+            containerFrame.size.height = containerHeight
         }
+        containerView = UIView(frame: containerFrame)
+        containerView.backgroundColor = UIColor(white: 0, alpha: 0.4)
         view.addSubview(containerView)
-
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
         let layout = PhotoCollectionViewLayout()
         layout.delegate = self
@@ -120,7 +120,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
 
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.alwaysBounceHorizontal = true
-        containerContentView.addSubview(collectionView)
+        containerView.addSubview(collectionView)
         collectionView.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "PhotoCell")
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -128,14 +128,15 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-33, y: containerView.frame.height - 66 - 4, width: 66, height: 66))
         captureButton.layer.cornerRadius = 33
         captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
-        containerContentView.addSubview(captureButton)
+        containerView.addSubview(captureButton)
         captureButton.enabled = false
+        captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
 
         let closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
-        containerContentView.addSubview(closeButton)
+        containerView.addSubview(closeButton)
 
         let pickerButtonWidth: CGFloat = 114
         let pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
@@ -338,8 +339,8 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
                 insertedIndexPath = NSIndexPath(forItem: 0, inSection: 0)
             }
             self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
-        }, completion: { finished in
-            self.scrollToLastAddedAssetAnimated(true)
+            }, completion: { finished in
+                self.scrollToLastAddedAssetAnimated(true)
         })
     }
 

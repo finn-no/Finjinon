@@ -9,6 +9,11 @@
 import UIKit
 import AVFoundation
 
+enum CaptureManagerViewfinderMode {
+    case FullScreen
+    case Window
+}
+
 class CaptureManager: NSObject {
     let previewLayer: AVCaptureVideoPreviewLayer
     var flashMode: AVCaptureFlashMode {
@@ -28,16 +33,33 @@ class CaptureManager: NSObject {
         }
         return modes
     }
+    let viewfinderMode : CaptureManagerViewfinderMode
 
     private let session = AVCaptureSession()
     private let captureQueue = dispatch_queue_create("no.finn.finjinon-captures", DISPATCH_QUEUE_SERIAL)
     private var cameraDevice: AVCaptureDevice!
     private var stillImageOutput: AVCaptureStillImageOutput!
+    private var orientation = AVCaptureVideoOrientation.Portrait
 
     override init() {
         session.sessionPreset = AVCaptureSessionPresetPhoto
+        var viewfinderMode : CaptureManagerViewfinderMode {
+            let isPreOS8 = floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1
+            let screenBounds = isPreOS8 ? UIScreen.mainScreen().bounds : UIScreen.mainScreen().nativeBounds
+            let ratio = screenBounds.height / screenBounds.width
+            return ratio <= 1.5 ? .FullScreen : .Window
+        }
+        self.viewfinderMode = viewfinderMode
+
         previewLayer = AVCaptureVideoPreviewLayer.layerWithSession(session) as! AVCaptureVideoPreviewLayer
-        previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        previewLayer.videoGravity = self.viewfinderMode == .FullScreen ? AVLayerVideoGravityResizeAspectFill : AVLayerVideoGravityResize
+        super.init()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changedOrientationNotification:"), name: UIDeviceOrientationDidChangeNotification, object: nil)
+        changedOrientationNotification(nil)
+    }
+
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 
     // MARK: - API
@@ -78,7 +100,7 @@ class CaptureManager: NSObject {
     func captureImage(completion: (NSData, NSDictionary) -> Void) { // TODO: throws
         dispatch_async(captureQueue) {
             let connection = self.stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
-            connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIDevice.currentDevice().orientation.rawValue)!
+            connection.videoOrientation = self.orientation
 
             self.stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (sampleBuffer, error) in
                 if error == nil {
@@ -128,6 +150,18 @@ class CaptureManager: NSObject {
         let next = supportedFlashModes[startIndex..<supportedFlashModes.count].first ?? supportedFlashModes.first
 
         return next
+    }
+
+    // Orientation change function required because we've locked the interface in portrait
+    // and DeviceOrientation does not map 1:1 with AVCaptureVideoOrientation
+    func changedOrientationNotification(notification: NSNotification?) {
+        let currentDeviceOrientation = UIDevice.currentDevice().orientation
+        switch currentDeviceOrientation {
+        case .FaceDown, .FaceUp, .Unknown:
+            break
+        case .LandscapeLeft, .LandscapeRight, .Portrait, .PortraitUpsideDown:
+            orientation = AVCaptureVideoOrientation(rawValue: currentDeviceOrientation.rawValue)!
+        }
     }
 
     // MARK: - Private methods
