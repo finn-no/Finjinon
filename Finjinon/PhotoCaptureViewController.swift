@@ -90,8 +90,9 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         previewView.addGestureRecognizer(tapper)
 
         let collectionViewHeight: CGFloat = 102
+        let collectionViewBottomMargin : CGFloat = 76
 
-        var containerFrame = CGRect(x: 0, y: view.frame.height-76-collectionViewHeight, width: view.frame.width, height: 76+collectionViewHeight)
+        var containerFrame = CGRect(x: 0, y: view.frame.height-collectionViewBottomMargin-collectionViewHeight, width: view.frame.width, height: collectionViewBottomMargin+collectionViewHeight)
         if captureManager.viewfinderMode == .Window {
             let containerHeight = CGRectGetHeight(view.frame) - viewFinderHeight
             containerFrame.origin.y = view.frame.height - containerHeight
