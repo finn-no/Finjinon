@@ -89,16 +89,16 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
         previewView.addGestureRecognizer(tapper)
 
-        let collectionViewHeight: CGFloat = 102
+        var collectionViewHeight: CGFloat = min(view.frame.size.height/6, 120)
         let collectionViewBottomMargin : CGFloat = 70
         let cameraButtonHeight : CGFloat = 66
-        let cameraButtonPadding : CGFloat = 4
 
         var containerFrame = CGRect(x: 0, y: view.frame.height-collectionViewBottomMargin-collectionViewHeight, width: view.frame.width, height: collectionViewBottomMargin+collectionViewHeight)
         if captureManager.viewfinderMode == .Window {
             let containerHeight = CGRectGetHeight(view.frame) - viewFinderHeight
             containerFrame.origin.y = view.frame.height - containerHeight
             containerFrame.size.height = containerHeight
+            collectionViewHeight = containerHeight - cameraButtonHeight
         }
         containerView = UIView(frame: containerFrame)
         containerView.backgroundColor = UIColor(white: 0, alpha: 0.4)
@@ -127,7 +127,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         collectionView.dataSource = self
         collectionView.delegate = self
 
-        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-cameraButtonHeight/2, y: containerView.frame.height - cameraButtonHeight - cameraButtonPadding, width: cameraButtonHeight, height: cameraButtonHeight))
+        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-cameraButtonHeight/2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight))
         captureButton.layer.cornerRadius = cameraButtonHeight/2
         captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
         containerView.addSubview(captureButton)
