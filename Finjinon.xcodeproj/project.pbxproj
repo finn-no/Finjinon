@@ -203,6 +203,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = FIN;
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = "FINN.no AS";
 				TargetAttributes = {

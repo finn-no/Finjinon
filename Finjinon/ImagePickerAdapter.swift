@@ -28,13 +28,13 @@ public class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImage
         self.completionHandler = completion
 
         let picker = UIImagePickerController()
-        picker.mediaTypes = [kUTTypeImage]
+        picker.mediaTypes = [kUTTypeImage as String]
         picker.delegate = self
 
         return picker
     }
 
-    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [NSObject : AnyObject]) {
+    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         selectionHandler(info)
         completionHandler(false)
     }

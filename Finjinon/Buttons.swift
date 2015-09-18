@@ -26,7 +26,7 @@ class TriggerButton: UIButton {
         backgroundColor = UIColor.clearColor()
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -36,13 +36,13 @@ class TriggerButton: UIButton {
         let length = min(bounds.width, bounds.height)
         let outerRect = CGRect(x: (bounds.width/2)-(length/2), y: (bounds.height/2)-(length/2), width: length, height: length)
         let borderWidth: CGFloat = 6.0
-        let outerPath = UIBezierPath(ovalInRect: outerRect.rectByInsetting(dx: borderWidth, dy: borderWidth))
+        let outerPath = UIBezierPath(ovalInRect: outerRect.insetBy(dx: borderWidth, dy: borderWidth))
         outerPath.lineWidth = borderWidth
 
         buttonColor.setStroke()
         outerPath.stroke()
 
-        let innerPath = UIBezierPath(ovalInRect: outerRect.rectByInsetting(dx: borderWidth + 5, dy: borderWidth + 5))
+        let innerPath = UIBezierPath(ovalInRect: outerRect.insetBy(dx: borderWidth + 5, dy: borderWidth + 5))
         if enabled {
             buttonColor.setFill()
         } else {
@@ -64,7 +64,7 @@ class CloseButton: UIButton {
         backgroundColor = UIColor.lightGrayColor().colorWithAlphaComponent(0.9)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -80,7 +80,7 @@ class CloseButton: UIButton {
 
         // Draw a +
         let centerPoint = CGPoint(x: bounds.midX, y: bounds.midY)
-        let radius: CGFloat = bounds.rectByInsetting(dx: floor(bounds.width/8), dy: floor(bounds.width/8)).width / 2
+        let radius: CGFloat = bounds.insetBy(dx: floor(bounds.width/8), dy: floor(bounds.width/8)).width / 2
         let ratio: CGFloat = 0.5
         let xPath = UIBezierPath()
         xPath.moveToPoint(centerPoint)
@@ -101,7 +101,7 @@ class CloseButton: UIButton {
         xPath.applyTransform(CGAffineTransformMakeTranslation(pathBounds.midX, pathBounds.midY))
 
         xPath.lineWidth = 2
-        xPath.lineCapStyle = kCGLineCapRound
+        xPath.lineCapStyle = CGLineCap.Round
         strokeColor.setStroke()
 
         xPath.stroke()

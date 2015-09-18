@@ -12,7 +12,7 @@ import AssetsLibrary
 
 // TODO also support ALAsset/PHPhoto
 
-public struct Asset: Equatable, Printable {
+public struct Asset: Equatable, CustomStringConvertible {
     let UUID = NSUUID().UUIDString
     let storage: PhotoStorage
     struct Remote {
@@ -70,15 +70,20 @@ public class PhotoStorage {
     private let assetLibrary = ALAssetsLibrary()
 
     init() {
-        var cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last as! NSURL
+        var cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last!
         cacheURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
         self.baseURL = cacheURL.URLByAppendingPathComponent(NSUUID().UUIDString)
     }
 
     deinit {
         var error: NSError?
-        if fileManager.fileExistsAtPath(baseURL.path!) && !fileManager.removeItemAtURL(baseURL, error: &error) {
-            NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(error)")
+        if fileManager.fileExistsAtPath(baseURL.path!) {
+            do {
+                try fileManager.removeItemAtURL(baseURL)
+            } catch let error1 as NSError {
+                error = error1
+                NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(error)")
+            }
         }
     }
 
@@ -89,9 +94,14 @@ public class PhotoStorage {
             let asset = Asset(storage: self)
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
-            if !data.writeToFile(cacheURL.path!, options: .DataWritingAtomic, error: &error) {
+            do {
+                try data.writeToFile(cacheURL.path!, options: .DataWritingAtomic)
+            } catch let error1 as NSError {
+                error = error1
                 NSLog("Failed to write image to \(cacheURL): \(error)")
                 // TODO: throw
+            } catch {
+                fatalError()
             }
             dispatch_async(dispatch_get_main_queue()) {
                 completion(asset)
@@ -110,7 +120,7 @@ public class PhotoStorage {
     }
 
     func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
-        let data = UIImageJPEGRepresentation(image, 1.0)
+        let data = UIImageJPEGRepresentation(image, 1.0)!
         createAssetFromImageData(data, completion: completion)
     }
 
@@ -120,7 +130,7 @@ public class PhotoStorage {
                 let representation = asset.defaultRepresentation()
                 let bufferLength = Int(representation.size())
                 let data = NSMutableData(length: bufferLength)!
-                var buffer = UnsafeMutablePointer<UInt8>(data.mutableBytes)
+                let buffer = UnsafeMutablePointer<UInt8>(data.mutableBytes)
 
                 var error: NSError?
                 let bytesWritten = representation.getBytes(buffer, fromOffset: 0, length: bufferLength, error: &error)
@@ -158,8 +168,13 @@ public class PhotoStorage {
         dispatch_async(queue) {
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
-            if !self.fileManager.removeItemAtPath(cacheURL.path!, error: &error) {
+            do {
+                try self.fileManager.removeItemAtPath(cacheURL.path!)
+            } catch let error1 as NSError {
+                error = error1
                 NSLog("failed failed to remove asset at \(cacheURL): \(error)")
+            } catch {
+                fatalError()
             }
             dispatch_async(dispatch_get_main_queue(), completion)
         }
@@ -167,14 +182,15 @@ public class PhotoStorage {
 
     func dimensionsforAsset(asset: Asset) -> CGSize {
         let cacheFileURL = self.cacheURLForAsset(asset)
-        let source = CGImageSourceCreateWithURL(cacheFileURL, nil)
-        let imageProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as NSDictionary
-        if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
-            let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
-                return CGSize(width: width, height: height)
+        if let source = CGImageSourceCreateWithURL(cacheFileURL, nil) {
+            let imageProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as! NSDictionary
+            if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
+                let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
+                    return CGSize(width: width, height: height)
+            }
         } else {
             NSLog("*** Warning: failed to get CGImagePropertyPixel{Width,Height} from \(cacheFileURL)")
-            return CGSize.zeroSize
+            return CGSize.zero
         }
     }
 
@@ -199,10 +215,11 @@ public class PhotoStorage {
                     kCGImageSourceCreateThumbnailFromImageAlways as NSString: kCFBooleanTrue,
                 ]
 
-                let thumbnailImage = UIImage(CGImage: CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options))
-
-                dispatch_async(dispatch_get_main_queue()) {
-                    completion(thumbnailImage!)
+                if let thumbnailCGImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options) {
+                    let thumbnailImage = UIImage(CGImage: thumbnailCGImage)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        completion(thumbnailImage)
+                    }
                 }
             } // TODO else throws
         }
@@ -216,7 +233,10 @@ public class PhotoStorage {
     private func ensureCacheDirectoryExists() {
         if !fileManager.fileExistsAtPath(self.baseURL.path!) {
             var error: NSError?
-            if !fileManager.createDirectoryAtURL(self.baseURL, withIntermediateDirectories: true, attributes: nil, error: &error) {
+            do {
+                try fileManager.createDirectoryAtURL(self.baseURL, withIntermediateDirectories: true, attributes: nil)
+            } catch let error1 as NSError {
+                error = error1
                 NSLog("Failed to create cache directory at \(baseURL): \(error)")
             }
         }
