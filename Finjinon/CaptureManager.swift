@@ -110,12 +110,16 @@ class CaptureManager: NSObject {
             self.stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (sampleBuffer, error) in
                 if error == nil {
                     let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as? NSDictionary {
+                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) {
                         dispatch_async(dispatch_get_main_queue()) {
+                            print(metadata)
                             completion(data, metadata)
-                        }                    }
+                        }
+                    } else {
+                        NSLog("Failed creating metadata")
+                    }
                 } else {
-                    NSLog("Failed capturing still imagE: \(error)")
+                    NSLog("Failed capturing still image: \(error)")
                     // TODO
                 }
             })
@@ -222,14 +226,13 @@ class CaptureManager: NSObject {
                 self.session.addOutput(self.stillImageOutput)
             }
 
+
+
             if self.cameraDevice.isFocusModeSupported(.ContinuousAutoFocus) {
-//                var configLockError: NSError?
                 do {
                     try self.cameraDevice.lockForConfiguration()
-                } catch _ as NSError {
-//                    configLockError = error2
-                } catch {
-                    fatalError()
+                } catch let error2 as NSError {
+                    error = error2
                 }
                 self.cameraDevice.focusMode = .ContinuousAutoFocus
                 if self.cameraDevice.smoothAutoFocusSupported {
