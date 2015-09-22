@@ -236,7 +236,8 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 //TODO: Constrain to be within collectionView.frame:
                 // proxy.center.y = proxy.originalCenter.y + translation.y
 
-                if let fromIndexPath = proxy.dragIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
+                if let fromIndexPath = proxy.dragIndexPath,
+                    let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
                     let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath) {
                         proxy.dragIndexPath = toIndexPath
                         proxy.dragCenter = targetLayoutAttributes.center

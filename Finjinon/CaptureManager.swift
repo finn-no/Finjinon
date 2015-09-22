@@ -112,7 +112,6 @@ class CaptureManager: NSObject {
                     let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
                     if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) {
                         dispatch_async(dispatch_get_main_queue()) {
-                            print(metadata)
                             completion(data, metadata)
                         }
                     } else {
@@ -212,7 +211,6 @@ class CaptureManager: NSObject {
                 }
             } catch let error1 as NSError {
                 error = error1
-                print(error)
                 NSLog("failed to create capture device input")
             }
 
