@@ -183,9 +183,7 @@ public class PhotoStorage {
     func dimensionsforAsset(asset: Asset) -> CGSize {
         let cacheFileURL = self.cacheURLForAsset(asset)
         if let source = CGImageSourceCreateWithURL(cacheFileURL, nil),
-            let sourceProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) {
-                let imageProperties = sourceProperties as NSDictionary
-
+            let imageProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as NSDictionary? {
                 if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
                     let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
                         return CGSize(width: width, height: height)

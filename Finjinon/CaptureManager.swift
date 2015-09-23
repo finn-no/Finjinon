@@ -110,15 +110,15 @@ class CaptureManager: NSObject {
             self.stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (sampleBuffer, error) in
                 if error == nil {
                     let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) {
+                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
                         dispatch_async(dispatch_get_main_queue()) {
                             completion(data, metadata)
                         }
                     } else {
-                        NSLog("Failed creating metadata")
+                        print("failed creating metadata")
                     }
                 } else {
-                    NSLog("Failed capturing still image: \(error)")
+                    NSLog("Failed capturing still imagE: \(error)")
                     // TODO
                 }
             })
