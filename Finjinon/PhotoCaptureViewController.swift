@@ -42,7 +42,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private let captureManager = CaptureManager()
     private var previewView: UIView!
     private var captureButton: TriggerButton!
-    private let collectionView = UICollectionView(frame: CGRect.zeroRect, collectionViewLayout: UICollectionViewFlowLayout())
+    private let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
@@ -59,11 +59,11 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         // TODO: Move all the boring view setup to a storyboard/xib
 
         previewView = UIView(frame: view.bounds)
-        previewView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+        previewView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         view.addSubview(previewView)
         let previewLayer = captureManager.previewLayer
         // We are using AVCaptureSessionPresetPhoto which has a 4:3 aspect ratio
-        var viewFinderWidth = view.bounds.size.width
+        let viewFinderWidth = view.bounds.size.width
         var viewFinderHeight = (viewFinderWidth/3) * 4
         if captureManager.viewfinderMode == .FullScreen {
             viewFinderHeight = view.bounds.size.height
@@ -196,8 +196,8 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         return false
     }
 
-    public override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    public override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
 
     // MARK: - API
@@ -222,7 +222,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     }
 
     func selectedPreviewIndexPath() -> NSIndexPath? {
-        if let selection = collectionView.indexPathsForSelectedItems() as? [NSIndexPath] {
+        if let selection = collectionView.indexPathsForSelectedItems() {
             return selection.first
         }
 
@@ -242,7 +242,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             rect.origin.y -= collectionView.contentOffset.y
             return view.convertRect(rect, fromView: collectionView.superview)
         }
-        return CGRect.zeroRect
+        return CGRect.zero
     }
 
     func createAssetFromImageData(data: NSData, completion: Asset -> Void) {

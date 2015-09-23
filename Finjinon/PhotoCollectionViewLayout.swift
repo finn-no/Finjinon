@@ -10,13 +10,13 @@ import UIKit
 
 private class DraggingProxy: UIImageView {
     var dragIndexPath: NSIndexPath? // Current indexPath
-    var dragCenter = CGPoint.zeroPoint // point being dragged from
+    var dragCenter = CGPoint.zero // point being dragged from
     var fromIndexPath: NSIndexPath? // Original index path
     var toIndexPath: NSIndexPath? // index path the proxy was dragged to
-    var initialCenter = CGPoint.zeroPoint
+    var initialCenter = CGPoint.zero
 
     init(cell: UICollectionViewCell) {
-        super.init(frame: CGRect.zeroRect)
+        super.init(frame: CGRect.zero)
 
         UIGraphicsBeginImageContextWithOptions(cell.bounds.size, false, 0)
         cell.drawViewHierarchyInRect(cell.bounds, afterScreenUpdates: true)
@@ -26,7 +26,7 @@ private class DraggingProxy: UIImageView {
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
@@ -46,19 +46,19 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
     override init() {
         super.init()
-        self.addObserver(self, forKeyPath: "collectionView", options: nil, context: nil)
+        self.addObserver(self, forKeyPath: "collectionView", options: [], context: nil)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.addObserver(self, forKeyPath: "collectionView", options: nil, context: nil)
+        self.addObserver(self, forKeyPath: "collectionView", options: [], context: nil)
     }
 
     deinit {
         self.removeObserver(self, forKeyPath: "collectionView", context: nil)
     }
 
-    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if keyPath == "collectionView" {
             setupGestureRecognizers()
         } else {
@@ -68,18 +68,18 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
     // MARK: - UICollectionView
 
-    override func prepareForCollectionViewUpdates(updateItems: [AnyObject]!) {
+    override func prepareForCollectionViewUpdates(updateItems: [UICollectionViewUpdateItem]) {
         super.prepareForCollectionViewUpdates(updateItems)
 
         insertedIndexPaths.removeAll(keepCapacity: false)
         deletedIndexPaths.removeAll(keepCapacity: false)
 
-        for update in updateItems as! [UICollectionViewUpdateItem] {
+        for update in updateItems {
             switch update.updateAction {
             case .Insert:
-                insertedIndexPaths.append(update.indexPathAfterUpdate!)
+                insertedIndexPaths.append(update.indexPathAfterUpdate)
             case .Delete:
-                deletedIndexPaths.append(update.indexPathBeforeUpdate!)
+                deletedIndexPaths.append(update.indexPathBeforeUpdate)
             default:
                 return
             }
@@ -96,7 +96,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     override func initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attrs = super.initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath)
 
-        if contains(insertedIndexPaths, itemIndexPath) {
+        if insertedIndexPaths.contains(itemIndexPath) {
             // only change attributes on inserted cells
             if let attrs = attrs {
                 attrs.alpha = 0.0
@@ -112,7 +112,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attrs = super.finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath)
 
-        if contains(deletedIndexPaths, itemIndexPath) {
+        if deletedIndexPaths.contains(itemIndexPath) {
             if let attrs = attrs {
                 attrs.alpha = 0.0
                 attrs.center.x = self.collectionView!.frame.width / 2
@@ -129,8 +129,8 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         return CATransform3DScale(transform, scale, scale, 1)
     }
 
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [AnyObject]? {
-        if let attributes = super.layoutAttributesForElementsInRect(rect) as? [UICollectionViewLayoutAttributes] {
+    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        if let attributes = super.layoutAttributesForElementsInRect(rect) {
             for layoutAttribute in attributes {
                 if layoutAttribute.representedElementCategory != .Cell {
                     continue
@@ -171,9 +171,9 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         }
 
         let states: [UIGestureRecognizerState] = [.Possible, .Failed]
-        if gestureRecognizer == longPressGestureRecognizer && !contains(states, collectionView!.panGestureRecognizer.state) {
+        if gestureRecognizer == longPressGestureRecognizer && !states.contains(collectionView!.panGestureRecognizer.state) {
             return false
-        } else if gestureRecognizer == panGestureRecgonizer && contains(states, longPressGestureRecognizer.state) {
+        } else if gestureRecognizer == panGestureRecgonizer && states.contains(longPressGestureRecognizer.state) {
             return false
         }
 
@@ -207,7 +207,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             }
         case .Ended:
             if let proxy = self.dragProxy {
-                UIView.animateWithDuration(0.2, delay: 0.0, options: .BeginFromCurrentState | .CurveEaseIn, animations: {
+                UIView.animateWithDuration(0.2, delay: 0.0, options: [.BeginFromCurrentState, .CurveEaseIn], animations: {
                     proxy.center = proxy.dragCenter
                     proxy.transform = CGAffineTransformIdentity
                 }, completion: { finished in
@@ -236,16 +236,18 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 //TODO: Constrain to be within collectionView.frame:
                 // proxy.center.y = proxy.originalCenter.y + translation.y
 
-                if let fromIndexPath = proxy.dragIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center) {
-                    let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath)
-                    proxy.dragIndexPath = toIndexPath
-                    proxy.dragCenter = targetLayoutAttributes.center
-                    proxy.bounds = targetLayoutAttributes.bounds
-                    proxy.toIndexPath = toIndexPath
+                if let fromIndexPath = proxy.dragIndexPath,
+                    let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
+                    let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath) {
+                        proxy.dragIndexPath = toIndexPath
+                        proxy.dragCenter = targetLayoutAttributes.center
+                        proxy.bounds = targetLayoutAttributes.bounds
+                        proxy.toIndexPath = toIndexPath
 
-                    collectionView?.performBatchUpdates({
-                        self.collectionView?.moveItemAtIndexPath(fromIndexPath, toIndexPath: toIndexPath)
-                    }, completion: nil)
+                        collectionView?.performBatchUpdates({
+                            self.collectionView?.moveItemAtIndexPath(fromIndexPath, toIndexPath: toIndexPath)
+                            }, completion: nil
+                        )
                 }
             }
         default:

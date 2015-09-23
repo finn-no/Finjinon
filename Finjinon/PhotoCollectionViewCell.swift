@@ -16,7 +16,7 @@ internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
 public class PhotoCollectionViewCell: UICollectionViewCell {
     class func cellIdentifier() -> String { return "PhotoCell" }
 
-    public let imageView = UIImageView(frame: CGRect.zeroRect)
+    public let imageView = UIImageView(frame: CGRect.zero)
     public let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     public internal(set) var asset: Asset?
 
@@ -27,14 +27,14 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
 
         let offset = self.closeButton.bounds.height/3
         imageView.frame = CGRect(x: offset, y: offset, width: contentView.bounds.width - (offset*2), height: contentView.bounds.height - (offset*2))
-        imageView.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+        imageView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
         contentView.addSubview(imageView)
 
         closeButton.addTarget(self, action: Selector("closeButtonTapped:"), forControlEvents: .TouchUpInside)
         contentView.addSubview(closeButton)
     }
 
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

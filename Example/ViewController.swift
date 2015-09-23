@@ -34,7 +34,7 @@ class ViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("ItemCell", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("ItemCell", forIndexPath: indexPath) 
         let asset = assets[indexPath.row]
         cell.textLabel?.text = asset.UUID
         cell.imageView?.image = nil
@@ -53,7 +53,7 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
         return controller.dequeuedReusableCellForClass(PhotoCollectionViewCell.self, indexPath: indexPath) { cell in
             let asset = self.assets[indexPath.item]
             // Set a thumbnail form the source image, or add your own network fetch code etc
-            if let assetURL = asset.imageURL {
+            if let _ = asset.imageURL {
 
             } else {
                 asset.imageWithWidth(cell.imageView.bounds.width) { image in
