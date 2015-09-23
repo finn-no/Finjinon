@@ -53,7 +53,9 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
         return controller.dequeuedReusableCellForClass(PhotoCollectionViewCell.self, indexPath: indexPath) { cell in
             let asset = self.assets[indexPath.item]
             // Set a thumbnail form the source image, or add your own network fetch code etc
-            if asset.imageURL == nil {
+            if let _ = asset.imageURL {
+
+            } else {
                 asset.imageWithWidth(cell.imageView.bounds.width) { image in
                     cell.imageView.image = image
                 }
