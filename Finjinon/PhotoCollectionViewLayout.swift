@@ -17,9 +17,10 @@ private class DraggingProxy: UIImageView {
 
     init(cell: UICollectionViewCell) {
         super.init(frame: CGRect.zero)
+        backgroundColor = UIColor.darkGrayColor() // fallback for iOS9 which sometimes winds up without an image
 
         UIGraphicsBeginImageContextWithOptions(cell.bounds.size, false, 0)
-        cell.drawViewHierarchyInRect(cell.bounds, afterScreenUpdates: true)
+        cell.drawViewHierarchyInRect(cell.bounds, afterScreenUpdates: false) // false, because == true fails every single time on iOS9
         let cellImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         image = cellImage
@@ -198,7 +199,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 proxy.fromIndexPath = indexPath
 
                 dragProxy = proxy
-                collectionView?.addSubview(proxy)
+                collectionView?.addSubview(dragProxy!)
 
                 invalidateLayout()
 
@@ -211,16 +212,16 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 UIView.animateWithDuration(0.2, delay: 0.0, options: [.BeginFromCurrentState, .CurveEaseIn], animations: {
                     proxy.center = proxy.dragCenter
                     proxy.transform = CGAffineTransformIdentity
-                }, completion: { finished in
-                    proxy.removeFromSuperview()
+                    }, completion: { finished in
+                        proxy.removeFromSuperview()
 
-                    if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = proxy.toIndexPath {
-                        self.didReorderHandler(fromIndexPath: fromIndexPath, toIndexPath: toIndexPath)
-                    }
+                        if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = proxy.toIndexPath {
+                            self.didReorderHandler(fromIndexPath: fromIndexPath, toIndexPath: toIndexPath)
+                        }
 
-                    self.dragProxy = nil
+                        self.dragProxy = nil
 
-                    self.invalidateLayout()
+                        self.invalidateLayout()
                 })
             }
         default:
@@ -237,8 +238,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 //TODO: Constrain to be within collectionView.frame:
                 // proxy.center.y = proxy.originalCenter.y + translation.y
 
-                if let fromIndexPath = proxy.dragIndexPath,
-                    let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
+                if let fromIndexPath = proxy.dragIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
                     let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath) {
                         proxy.dragIndexPath = toIndexPath
                         proxy.dragCenter = targetLayoutAttributes.center
@@ -264,7 +264,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             panGestureRecgonizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
             panGestureRecgonizer.delegate = self
             panGestureRecgonizer.maximumNumberOfTouches = 1
-
+            
             collectionView.addGestureRecognizer(longPressGestureRecognizer)
             collectionView.addGestureRecognizer(panGestureRecgonizer)
         }
