@@ -187,6 +187,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         case .Began:
             let location = recognizer.locationInView(collectionView)
             if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
+                dragProxy?.removeFromSuperview()
                 let proxy = DraggingProxy(cell: cell)
                 proxy.dragIndexPath = indexPath
                 proxy.frame = cell.bounds
