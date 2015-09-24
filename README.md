@@ -14,7 +14,7 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 ## Requirements
 
 * iOS7+
-* Swift 1.2
+* Swift 2.0
 
 ## Installation
 
