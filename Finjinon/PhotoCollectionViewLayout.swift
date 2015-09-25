@@ -40,8 +40,8 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     internal var didReorderHandler: (fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) -> Void = { (_,_) in }
     private var insertedIndexPaths: [NSIndexPath] = []
     private var deletedIndexPaths: [NSIndexPath] = []
-    private var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    private var panGestureRecgonizer: UIPanGestureRecognizer!
+    private var longPressGestureRecognizer = UILongPressGestureRecognizer()
+    private var panGestureRecognizer = UIPanGestureRecognizer()
     private var dragProxy: DraggingProxy?
     internal weak var delegate: PhotoCollectionViewLayoutDelegate?
 
@@ -150,9 +150,9 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     // MARK: - UIGestureRecognizerDelegate
 
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer == longPressGestureRecognizer && otherGestureRecognizer == panGestureRecgonizer {
+        if gestureRecognizer == longPressGestureRecognizer && otherGestureRecognizer == panGestureRecognizer {
             return true
-        } else if gestureRecognizer == panGestureRecgonizer {
+        } else if gestureRecognizer == panGestureRecognizer {
             return otherGestureRecognizer == longPressGestureRecognizer
         }
 
@@ -174,7 +174,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         let states: [UIGestureRecognizerState] = [.Possible, .Failed]
         if gestureRecognizer == longPressGestureRecognizer && !states.contains(collectionView!.panGestureRecognizer.state) {
             return false
-        } else if gestureRecognizer == panGestureRecgonizer && states.contains(longPressGestureRecognizer.state) {
+        } else if gestureRecognizer == panGestureRecognizer && states.contains(longPressGestureRecognizer.state) {
             return false
         }
 
@@ -238,7 +238,8 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 //TODO: Constrain to be within collectionView.frame:
                 // proxy.center.y = proxy.originalCenter.y + translation.y
 
-                if let fromIndexPath = proxy.dragIndexPath, let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
+                if let fromIndexPath = proxy.dragIndexPath,
+                    let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
                     let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath) {
                         proxy.dragIndexPath = toIndexPath
                         proxy.dragCenter = targetLayoutAttributes.center
@@ -257,16 +258,19 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     }
 
     private func setupGestureRecognizers() {
-        if let collectionView = self.collectionView {
+        if let _ = self.collectionView {
+            // Because iOS9 calls this twice, and it will be called again if we change the collectionView.layout anyways
+            collectionView!.removeGestureRecognizer(longPressGestureRecognizer)
+            collectionView!.removeGestureRecognizer(panGestureRecognizer)
+
             longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPressGestureRecognized:"))
             longPressGestureRecognizer.delegate = self
-
-            panGestureRecgonizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
-            panGestureRecgonizer.delegate = self
-            panGestureRecgonizer.maximumNumberOfTouches = 1
+            collectionView!.addGestureRecognizer(longPressGestureRecognizer)
             
-            collectionView.addGestureRecognizer(longPressGestureRecognizer)
-            collectionView.addGestureRecognizer(panGestureRecgonizer)
+            panGestureRecognizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
+            panGestureRecognizer.delegate = self
+            panGestureRecognizer.maximumNumberOfTouches = 1
+            collectionView!.addGestureRecognizer(panGestureRecognizer)
         }
     }
 }
