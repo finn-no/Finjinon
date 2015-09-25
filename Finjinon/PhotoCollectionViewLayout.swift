@@ -8,23 +8,21 @@
 
 import UIKit
 
-private class DraggingProxy: UIImageView {
+private class DraggingProxy: UIView {
     var dragIndexPath: NSIndexPath? // Current indexPath
     var dragCenter = CGPoint.zero // point being dragged from
     var fromIndexPath: NSIndexPath? // Original index path
     var toIndexPath: NSIndexPath? // index path the proxy was dragged to
     var initialCenter = CGPoint.zero
+    private var imageView : UIImageView
 
-    init(cell: UICollectionViewCell) {
+    init(cell: PhotoCollectionViewCell) {
+        let image = cell.imageView.image
+        imageView = UIImageView(image: image)
         super.init(frame: CGRect.zero)
-        backgroundColor = UIColor.darkGrayColor() // fallback for iOS9 which sometimes winds up without an image
-
-        UIGraphicsBeginImageContextWithOptions(cell.bounds.size, false, 0)
-        cell.drawViewHierarchyInRect(cell.bounds, afterScreenUpdates: false) // false, because == true fails every single time on iOS9
-        let cellImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        image = cellImage
+        addSubview(imageView)
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
+        imageView.frame = cell.imageView.frame
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -189,7 +187,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             let location = recognizer.locationInView(collectionView)
             if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
                 dragProxy?.removeFromSuperview()
-                let proxy = DraggingProxy(cell: cell)
+                let proxy = DraggingProxy(cell: cell as! PhotoCollectionViewCell)
                 proxy.dragIndexPath = indexPath
                 proxy.frame = cell.bounds
                 proxy.initialCenter = cell.center
