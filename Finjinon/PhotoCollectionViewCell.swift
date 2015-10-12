@@ -28,6 +28,8 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         let offset = self.closeButton.bounds.height/3
         imageView.frame = CGRect(x: offset, y: offset, width: contentView.bounds.width - (offset*2), height: contentView.bounds.height - (offset*2))
         imageView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        imageView.contentMode = .ScaleAspectFill
+        imageView.clipsToBounds = true
         contentView.addSubview(imageView)
 
         closeButton.addTarget(self, action: Selector("closeButtonTapped:"), forControlEvents: .TouchUpInside)
