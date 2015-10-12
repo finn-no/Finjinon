@@ -14,8 +14,6 @@ private class DraggingProxy: UIView {
     var fromIndexPath: NSIndexPath? // Original index path
     var toIndexPath: NSIndexPath? // index path the proxy was dragged to
     var initialCenter = CGPoint.zero
-//    private var proxyImageView : UIImageView
-//    private var imageWrapper : UIView
 
     init(cell: PhotoCollectionViewCell) {
         super.init(frame: CGRect.zero)
@@ -25,26 +23,6 @@ private class DraggingProxy: UIView {
         clipsToBounds = true
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
 
-        let image = UIImage(CGImage: cell.imageView.image!.CGImage!, scale: cell.imageView.image!.scale, orientation: cell.imageView.image!.imageOrientation)
-
-        // Cumbersome indeed, but unfortunately re-rendering through begin graphicContext etc. fails quite often in iOS9
-        var imageRect : CGRect {
-            let viewSize = cell.imageView.frame.size
-
-            let imageIsLandscape = image.size.width > image.size.height
-            if imageIsLandscape {
-                let ratio = image.size.height / viewSize.height
-                let width = image.size.width / ratio
-                let x = -(width - viewSize.width)/2
-                return CGRectMake(x, 0, width, viewSize.height)
-            } else {
-                let ratio = image.size.width / viewSize.width
-                let height = image.size.height / ratio
-                let y = -(height - viewSize.height)/2
-                return CGRectMake(0, y, viewSize.width, height)
-            }
-        }
-
         var wrapperFrame = cell.imageView.bounds
         wrapperFrame.origin.x = (cell.bounds.size.width - wrapperFrame.size.width)/2
         wrapperFrame.origin.y = (cell.bounds.size.height - wrapperFrame.size.height)/2
@@ -52,11 +30,7 @@ private class DraggingProxy: UIView {
         let imageWrapper = UIView(frame: wrapperFrame)
         imageWrapper.clipsToBounds = true
 
-        let proxyImageView = UIImageView(image: image)
-        proxyImageView.contentMode = .ScaleAspectFill
-        proxyImageView.clipsToBounds = true
-        proxyImageView.frame = imageRect
-
+        let proxyImageView = cell.imageViewProxy() //UIImageView(image: image)
         imageWrapper.addSubview(proxyImageView)
         addSubview(imageWrapper)
     }

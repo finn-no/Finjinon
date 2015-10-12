@@ -50,4 +50,32 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
     internal func closeButtonTapped(sender: UIButton) {
         delegate?.collectionViewCellDidTapDelete(self)
     }
+
+    public func imageViewProxy() -> UIImageView {
+        let image = UIImage(CGImage: self.imageView.image!.CGImage!, scale: self.imageView.image!.scale, orientation: self.imageView.image!.imageOrientation)
+
+        // Cumbersome indeed, but unfortunately re-rendering through begin graphicContext etc. fails quite often in iOS9
+        var imageRect : CGRect {
+            let viewSize = self.imageView.frame.size
+
+            let imageIsLandscape = image.size.width > image.size.height
+            if imageIsLandscape {
+                let ratio = image.size.height / viewSize.height
+                let width = image.size.width / ratio
+                let x = -(width - viewSize.width)/2
+                return CGRectMake(x, 0, width, viewSize.height)
+            } else {
+                let ratio = image.size.width / viewSize.width
+                let height = image.size.height / ratio
+                let y = -(height - viewSize.height)/2
+                return CGRectMake(0, y, viewSize.width, height)
+            }
+        }
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .ScaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.frame = imageRect
+
+        return imageView
+    }
 }
