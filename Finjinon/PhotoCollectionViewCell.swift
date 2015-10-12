@@ -51,7 +51,13 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         delegate?.collectionViewCellDidTapDelete(self)
     }
 
-    public func imageViewProxy() -> UIImageView {
+    internal func proxy() -> UIView {
+        var wrapperFrame = self.imageView.bounds
+        wrapperFrame.origin.x = (bounds.size.width - wrapperFrame.size.width)/2
+        wrapperFrame.origin.y = (bounds.size.height - wrapperFrame.size.height)/2
+
+        let imageWrapper = UIView(frame: wrapperFrame)
+        imageWrapper.clipsToBounds = true
         let image = UIImage(CGImage: self.imageView.image!.CGImage!, scale: self.imageView.image!.scale, orientation: self.imageView.image!.imageOrientation)
 
         // Cumbersome indeed, but unfortunately re-rendering through begin graphicContext etc. fails quite often in iOS9
@@ -76,6 +82,8 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.frame = imageRect
 
-        return imageView
+        imageWrapper.addSubview(imageView)
+
+        return imageWrapper
     }
 }

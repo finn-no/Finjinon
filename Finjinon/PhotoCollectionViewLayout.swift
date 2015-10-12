@@ -23,16 +23,8 @@ private class DraggingProxy: UIView {
         clipsToBounds = true
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
 
-        var wrapperFrame = cell.imageView.bounds
-        wrapperFrame.origin.x = (cell.bounds.size.width - wrapperFrame.size.width)/2
-        wrapperFrame.origin.y = (cell.bounds.size.height - wrapperFrame.size.height)/2
-
-        let imageWrapper = UIView(frame: wrapperFrame)
-        imageWrapper.clipsToBounds = true
-
-        let proxyImageView = cell.imageViewProxy() //UIImageView(image: image)
-        imageWrapper.addSubview(proxyImageView)
-        addSubview(imageWrapper)
+        let proxyView = cell.proxy()
+        addSubview(proxyView)
     }
 
     required init?(coder aDecoder: NSCoder) {
