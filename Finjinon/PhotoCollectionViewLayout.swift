@@ -54,7 +54,7 @@ private class DraggingProxy: UIView {
         imageWrapper.clipsToBounds = true
 
         super.init(frame: CGRect.zero)
-        backgroundColor = UIColor.purpleColor()
+        backgroundColor = UIColor.clearColor()
 
         proxyImageView.frame = imageRect
         autoresizingMask = cell.autoresizingMask
@@ -242,7 +242,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 invalidateLayout()
 
                 UIView.animateWithDuration(0.16, animations: {
-//                    self.dragProxy?.transform = CGAffineTransformMakeScale(1.1, 1.1)
+                    self.dragProxy?.transform = CGAffineTransformMakeScale(1.1, 1.1)
                 })
             }
         case .Ended:
