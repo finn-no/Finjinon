@@ -18,6 +18,8 @@ private class DraggingProxy: UIView {
     private var imageWrapper : UIView
 
     init(cell: PhotoCollectionViewCell) {
+        //TODO: Have another look at this, should be possible to simplify!
+
         let image = UIImage(CGImage: cell.imageView.image!.CGImage!, scale: cell.imageView.image!.scale, orientation: cell.imageView.image!.imageOrientation)
         print(cell.imageView)
 
@@ -29,20 +31,21 @@ private class DraggingProxy: UIView {
                 let ratio = imageSize.height / viewSize.height
                 let height = viewSize.height
                 let width = imageSize.width / ratio
-//                let x = (cell.bounds.width - width)/2
-//                let y = (cell.bounds.height - height)/2
-                return CGRectMake(0, 0, width, height)
+                let x = -(width - viewSize.width)/2
+                return CGRectMake(x, 0, width, height)
             } else {
                 let ratio = imageSize.width / viewSize.width
                 let width = viewSize.width
                 let height = imageSize.height / ratio
-//                let x = (cell.bounds.width - width)/2
-//                let y = (cell.bounds.height - height)/2
-                return CGRectMake(0, 0, width, height)
+                let y = -(height - viewSize.height)/2
+                return CGRectMake(0, y, width, height)
             }
         }
 
         proxyImageView = UIImageView(image: image)
+        proxyImageView.contentMode = .ScaleAspectFill
+        proxyImageView.clipsToBounds = true
+
         var wrapperFrame = cell.imageView.bounds
         wrapperFrame.origin.x = (cell.bounds.size.width - wrapperFrame.size.width)/2
         wrapperFrame.origin.y = (cell.bounds.size.height - wrapperFrame.size.height)/2
