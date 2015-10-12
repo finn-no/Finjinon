@@ -14,55 +14,51 @@ private class DraggingProxy: UIView {
     var fromIndexPath: NSIndexPath? // Original index path
     var toIndexPath: NSIndexPath? // index path the proxy was dragged to
     var initialCenter = CGPoint.zero
-    private var proxyImageView : UIImageView
-    private var imageWrapper : UIView
+//    private var proxyImageView : UIImageView
+//    private var imageWrapper : UIView
 
     init(cell: PhotoCollectionViewCell) {
-        //TODO: Have another look at this, should be possible to simplify!
+        super.init(frame: CGRect.zero)
+
+        backgroundColor = UIColor.clearColor()
+        autoresizingMask = cell.autoresizingMask
+        clipsToBounds = true
+        frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
 
         let image = UIImage(CGImage: cell.imageView.image!.CGImage!, scale: cell.imageView.image!.scale, orientation: cell.imageView.image!.imageOrientation)
-        print(cell.imageView)
 
         // Cumbersome indeed, but unfortunately re-rendering through begin graphicContext etc. fails quite often in iOS9
         var imageRect : CGRect {
-            let imageSize = image.size
             let viewSize = cell.imageView.frame.size
-            if imageSize.width > imageSize.height {
-                let ratio = imageSize.height / viewSize.height
-                let height = viewSize.height
-                let width = imageSize.width / ratio
+
+            let imageIsLandscape = image.size.width > image.size.height
+            if imageIsLandscape {
+                let ratio = image.size.height / viewSize.height
+                let width = image.size.width / ratio
                 let x = -(width - viewSize.width)/2
-                return CGRectMake(x, 0, width, height)
+                return CGRectMake(x, 0, width, viewSize.height)
             } else {
-                let ratio = imageSize.width / viewSize.width
-                let width = viewSize.width
-                let height = imageSize.height / ratio
+                let ratio = image.size.width / viewSize.width
+                let height = image.size.height / ratio
                 let y = -(height - viewSize.height)/2
-                return CGRectMake(0, y, width, height)
+                return CGRectMake(0, y, viewSize.width, height)
             }
         }
-
-        proxyImageView = UIImageView(image: image)
-        proxyImageView.contentMode = .ScaleAspectFill
-        proxyImageView.clipsToBounds = true
 
         var wrapperFrame = cell.imageView.bounds
         wrapperFrame.origin.x = (cell.bounds.size.width - wrapperFrame.size.width)/2
         wrapperFrame.origin.y = (cell.bounds.size.height - wrapperFrame.size.height)/2
 
-        imageWrapper = UIView(frame: wrapperFrame)
+        let imageWrapper = UIView(frame: wrapperFrame)
         imageWrapper.clipsToBounds = true
 
-        super.init(frame: CGRect.zero)
-        backgroundColor = UIColor.clearColor()
-
+        let proxyImageView = UIImageView(image: image)
+        proxyImageView.contentMode = .ScaleAspectFill
+        proxyImageView.clipsToBounds = true
         proxyImageView.frame = imageRect
-        autoresizingMask = cell.autoresizingMask
-        clipsToBounds = true
+
         imageWrapper.addSubview(proxyImageView)
-        imageWrapper.backgroundColor = UIColor.yellowColor()
         addSubview(imageWrapper)
-        frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -229,7 +225,6 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 dragProxy?.removeFromSuperview()
                 let proxy = DraggingProxy(cell: cell as! PhotoCollectionViewCell)
                 proxy.dragIndexPath = indexPath
-//                proxy.frame = cell.bounds
                 proxy.initialCenter = cell.center
                 proxy.dragCenter = cell.center
                 proxy.center = proxy.dragCenter
