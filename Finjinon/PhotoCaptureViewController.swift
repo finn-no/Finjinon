@@ -46,6 +46,18 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
+    private var widgetOrientation : UIInterfaceOrientation = .Portrait
+    private var deviceOrientation : UIDeviceOrientation = UIDevice.currentDevice().orientation {
+        didSet {
+            let interfaceCompatibleOrientation = deviceOrientation != .FaceUp || deviceOrientation != .FaceDown || deviceOrientation != .Unknown
+            if interfaceCompatibleOrientation && widgetOrientation.rawValue != deviceOrientation.rawValue {
+                let newOrientation = UIInterfaceOrientation(rawValue: deviceOrientation.rawValue)!
+                updateWidgetsToOrientation(newOrientation)
+            }
+        }
+    }
+    private var pickerButton : UIButton!
+    private var closeButton : UIButton!
 
     deinit {
         captureManager.stop(nil)
@@ -134,18 +146,19 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         captureButton.enabled = false
         captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
 
-        let closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
+        closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
         containerView.addSubview(closeButton)
 
         let pickerButtonWidth: CGFloat = 114
-        let pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
+        pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
         pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
         pickerButton.setImage(UIImage(named: "PhotosIcon"), forState: .Normal)
         pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
         pickerButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
+        pickerButton.autoresizingMask = [.FlexibleTopMargin]
         roundifyButton(pickerButton)
         view.addSubview(pickerButton)
 
@@ -164,6 +177,10 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
                 self.captureButton.enabled = true
                 self.previewView.alpha = 1.0
             }
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(UIDeviceOrientationDidChangeNotification, object: nil, queue: nil) { (NSNotification) -> Void in
+            self.deviceOrientation = UIDevice.currentDevice().orientation
         }
     }
 
@@ -383,7 +400,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
 
     // MARK: - Private methods
 
-    func roundifyButton(button: UIButton, inset: CGFloat = 16) {
+    private func roundifyButton(button: UIButton, inset: CGFloat = 16) {
         button.tintColor = UIColor.whiteColor()
 
         button.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.3)
@@ -394,6 +411,45 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         var insets = button.imageEdgeInsets
         insets.left -= inset
         button.imageEdgeInsets = insets
+    }
+
+    private func updateWidgetsToOrientation(orientation: UIInterfaceOrientation) {
+        print(orientation.rawValue)
+        closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
+        flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
+        pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
+
+        var flashPosition = CGPointZero
+        var pickerPosition = CGPointZero
+
+        var radians : CGFloat {
+            switch orientation {
+            case .LandscapeLeft:
+                pickerPosition = CGPointMake(view.bounds.width - 45, 12) // 45 = width/2 - margin
+                flashPosition = CGPointMake(8, 12)
+                return CGFloat(-M_PI/2)
+            case .LandscapeRight:
+                pickerPosition = CGPointMake(view.bounds.width - 45, 12) // 45 = width/2 - margin
+                flashPosition = CGPointMake(8, 12)
+                return CGFloat(M_PI/2)
+            default:
+                pickerPosition = CGPointMake(view.bounds.width - 126, 12) // 126 = 114 + 12 (width + margin)?
+                flashPosition = CGPointMake(12, 12)
+                return 0
+            }
+        }
+        let animations = {
+            let rotation = CGAffineTransformMakeRotation(radians)
+            self.pickerButton.transform = rotation
+            self.pickerButton.frame.origin = pickerPosition
+
+            self.flashButton.transform = rotation
+            self.flashButton.frame.origin = flashPosition
+
+            self.closeButton.transform = rotation
+        }
+        UIView.animateWithDuration(0.25, animations: animations)
+        widgetOrientation = orientation
     }
 }
 
