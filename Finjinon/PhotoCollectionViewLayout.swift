@@ -8,22 +8,23 @@
 
 import UIKit
 
-private class DraggingProxy: UIImageView {
+private class DraggingProxy: UIView {
     var dragIndexPath: NSIndexPath? // Current indexPath
     var dragCenter = CGPoint.zero // point being dragged from
     var fromIndexPath: NSIndexPath? // Original index path
     var toIndexPath: NSIndexPath? // index path the proxy was dragged to
     var initialCenter = CGPoint.zero
 
-    init(cell: UICollectionViewCell) {
+    init(cell: PhotoCollectionViewCell) {
         super.init(frame: CGRect.zero)
 
-        UIGraphicsBeginImageContextWithOptions(cell.bounds.size, false, 0)
-        cell.drawViewHierarchyInRect(cell.bounds, afterScreenUpdates: true)
-        let cellImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        image = cellImage
+        backgroundColor = UIColor.clearColor()
+        autoresizingMask = cell.autoresizingMask
+        clipsToBounds = true
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
+
+        let proxyView = cell.proxy()
+        addSubview(proxyView)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -39,8 +40,8 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     internal var didReorderHandler: (fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) -> Void = { (_,_) in }
     private var insertedIndexPaths: [NSIndexPath] = []
     private var deletedIndexPaths: [NSIndexPath] = []
-    private var longPressGestureRecognizer: UILongPressGestureRecognizer!
-    private var panGestureRecgonizer: UIPanGestureRecognizer!
+    private var longPressGestureRecognizer = UILongPressGestureRecognizer()
+    private var panGestureRecognizer = UIPanGestureRecognizer()
     private var dragProxy: DraggingProxy?
     internal weak var delegate: PhotoCollectionViewLayoutDelegate?
 
@@ -149,9 +150,9 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     // MARK: - UIGestureRecognizerDelegate
 
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer == longPressGestureRecognizer && otherGestureRecognizer == panGestureRecgonizer {
+        if gestureRecognizer == longPressGestureRecognizer && otherGestureRecognizer == panGestureRecognizer {
             return true
-        } else if gestureRecognizer == panGestureRecgonizer {
+        } else if gestureRecognizer == panGestureRecognizer {
             return otherGestureRecognizer == longPressGestureRecognizer
         }
 
@@ -173,7 +174,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         let states: [UIGestureRecognizerState] = [.Possible, .Failed]
         if gestureRecognizer == longPressGestureRecognizer && !states.contains(collectionView!.panGestureRecognizer.state) {
             return false
-        } else if gestureRecognizer == panGestureRecgonizer && states.contains(longPressGestureRecognizer.state) {
+        } else if gestureRecognizer == panGestureRecognizer && states.contains(longPressGestureRecognizer.state) {
             return false
         }
 
@@ -187,9 +188,9 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         case .Began:
             let location = recognizer.locationInView(collectionView)
             if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
-                let proxy = DraggingProxy(cell: cell)
+                dragProxy?.removeFromSuperview()
+                let proxy = DraggingProxy(cell: cell as! PhotoCollectionViewCell)
                 proxy.dragIndexPath = indexPath
-                proxy.frame = cell.bounds
                 proxy.initialCenter = cell.center
                 proxy.dragCenter = cell.center
                 proxy.center = proxy.dragCenter
@@ -197,7 +198,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 proxy.fromIndexPath = indexPath
 
                 dragProxy = proxy
-                collectionView?.addSubview(proxy)
+                collectionView?.addSubview(dragProxy!)
 
                 invalidateLayout()
 
@@ -210,16 +211,16 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
                 UIView.animateWithDuration(0.2, delay: 0.0, options: [.BeginFromCurrentState, .CurveEaseIn], animations: {
                     proxy.center = proxy.dragCenter
                     proxy.transform = CGAffineTransformIdentity
-                }, completion: { finished in
-                    proxy.removeFromSuperview()
+                    }, completion: { finished in
+                        proxy.removeFromSuperview()
 
-                    if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = proxy.toIndexPath {
-                        self.didReorderHandler(fromIndexPath: fromIndexPath, toIndexPath: toIndexPath)
-                    }
+                        if let fromIndexPath = proxy.fromIndexPath, let toIndexPath = proxy.toIndexPath {
+                            self.didReorderHandler(fromIndexPath: fromIndexPath, toIndexPath: toIndexPath)
+                        }
 
-                    self.dragProxy = nil
+                        self.dragProxy = nil
 
-                    self.invalidateLayout()
+                        self.invalidateLayout()
                 })
             }
         default:
@@ -256,16 +257,19 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     }
 
     private func setupGestureRecognizers() {
-        if let collectionView = self.collectionView {
+        if let _ = self.collectionView {
+            // Because iOS9 calls this twice, and it will be called again if we change the collectionView.layout anyways
+            collectionView!.removeGestureRecognizer(longPressGestureRecognizer)
+            collectionView!.removeGestureRecognizer(panGestureRecognizer)
+
             longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPressGestureRecognized:"))
             longPressGestureRecognizer.delegate = self
-
-            panGestureRecgonizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
-            panGestureRecgonizer.delegate = self
-            panGestureRecgonizer.maximumNumberOfTouches = 1
-
-            collectionView.addGestureRecognizer(longPressGestureRecognizer)
-            collectionView.addGestureRecognizer(panGestureRecgonizer)
+            collectionView!.addGestureRecognizer(longPressGestureRecognizer)
+            
+            panGestureRecognizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
+            panGestureRecognizer.delegate = self
+            panGestureRecognizer.maximumNumberOfTouches = 1
+            collectionView!.addGestureRecognizer(panGestureRecognizer)
         }
     }
 }
