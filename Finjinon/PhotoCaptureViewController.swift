@@ -447,6 +447,10 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             self.flashButton.frame.origin = flashPosition
 
             self.closeButton.transform = rotation
+
+            for cell in self.collectionView.visibleCells() {
+                cell.transform = rotation
+            }
         }
         UIView.animateWithDuration(0.25, animations: animations)
         widgetOrientation = orientation
@@ -465,6 +469,14 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
             cell = delegateCell
         } else {
             cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
+        }
+
+        if widgetOrientation == .LandscapeLeft {
+            cell.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI/2))
+        } else if widgetOrientation == .LandscapeRight {
+            cell.transform = CGAffineTransformMakeRotation(CGFloat(M_PI/2))
+        } else {
+            cell.transform = CGAffineTransformMakeRotation(0)
         }
 
         cell.delegate = self
