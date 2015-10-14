@@ -49,7 +49,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var widgetOrientation : UIInterfaceOrientation = .Portrait
     private var deviceOrientation : UIDeviceOrientation = UIDevice.currentDevice().orientation {
         didSet {
-            let interfaceCompatibleOrientation = deviceOrientation != .FaceUp || deviceOrientation != .FaceDown || deviceOrientation != .Unknown
+            let interfaceCompatibleOrientation = deviceOrientation != .FaceUp && deviceOrientation != .FaceDown && deviceOrientation != .Unknown
             if interfaceCompatibleOrientation && widgetOrientation.rawValue != deviceOrientation.rawValue {
                 let newOrientation = UIInterfaceOrientation(rawValue: deviceOrientation.rawValue)!
                 updateWidgetsToOrientation(newOrientation)
