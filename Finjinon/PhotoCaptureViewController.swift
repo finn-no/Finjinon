@@ -47,15 +47,23 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
     private var widgetOrientation : UIInterfaceOrientation = .Portrait
-    private var deviceOrientation : UIDeviceOrientation = UIDevice.currentDevice().orientation {
-        didSet {
-            let interfaceCompatibleOrientation = deviceOrientation != .FaceUp && deviceOrientation != .FaceDown && deviceOrientation != .Unknown
-            if interfaceCompatibleOrientation && widgetOrientation.rawValue != deviceOrientation.rawValue {
-                let newOrientation = UIInterfaceOrientation(rawValue: deviceOrientation.rawValue)!
-                updateWidgetsToOrientation(newOrientation)
-            }
-        }
-    }
+//    private var deviceOrientation : UIDeviceOrientation = UIDevice.currentDevice().orientation {
+//        didSet {
+//            switch deviceOrientation {
+//            case .FaceDown, .FaceUp, .Unknown:
+//                ()
+//            case .LandscapeLeft:
+//                widgetOrientation = .LandscapeLeft
+//            case .LandscapeRight:
+//                widgetOrientation = .LandscapeRight
+//            case .Portrait:
+//                widgetOrientation = .Portrait
+//            case .PortraitUpsideDown:
+//                widgetOrientation = .PortraitUpsideDown
+//            }
+//            updateWidgetsToOrientation(widgetOrientation)
+//        }
+//    }
     private var pickerButton : UIButton!
     private var closeButton : UIButton!
     private let buttonMargin : CGFloat = 12
@@ -181,7 +189,20 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         }
 
         NSNotificationCenter.defaultCenter().addObserverForName(UIDeviceOrientationDidChangeNotification, object: nil, queue: nil) { (NSNotification) -> Void in
-            self.deviceOrientation = UIDevice.currentDevice().orientation
+            let deviceOrientation = UIDevice.currentDevice().orientation
+            switch deviceOrientation {
+            case .FaceDown, .FaceUp, .Unknown:
+                ()
+            case .LandscapeLeft:
+                self.widgetOrientation = .LandscapeLeft
+            case .LandscapeRight:
+                self.widgetOrientation = .LandscapeRight
+            case .Portrait:
+                self.widgetOrientation = .Portrait
+            case .PortraitUpsideDown:
+                self.widgetOrientation = .PortraitUpsideDown
+            }
+            self.updateWidgetsToOrientation(self.widgetOrientation)
         }
     }
 
@@ -429,9 +450,9 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         var radians : CGFloat {
             switch orientation {
             case .LandscapeLeft:
-                return CGFloat(-M_PI/2)
-            case .LandscapeRight:
                 return CGFloat(M_PI/2)
+            case .LandscapeRight:
+                return CGFloat(-M_PI/2)
             default:
                 return 0
             }
@@ -447,11 +468,10 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             self.closeButton.transform = rotation
 
             for cell in self.collectionView.visibleCells() {
-                cell.transform = rotation
+                cell.contentView.transform = rotation
             }
         }
         UIView.animateWithDuration(0.25, animations: animations)
-        widgetOrientation = orientation
     }
 }
 
@@ -470,11 +490,11 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
         }
 
         if widgetOrientation == .LandscapeLeft {
-            cell.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI/2))
+            cell.contentView.transform = CGAffineTransformMakeRotation(CGFloat(M_PI/2))
         } else if widgetOrientation == .LandscapeRight {
-            cell.transform = CGAffineTransformMakeRotation(CGFloat(M_PI/2))
+            cell.contentView.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI/2))
         } else {
-            cell.transform = CGAffineTransformMakeRotation(0)
+            cell.contentView.transform = CGAffineTransformMakeRotation(0)
         }
 
         cell.delegate = self
