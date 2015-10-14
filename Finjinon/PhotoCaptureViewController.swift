@@ -58,6 +58,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     }
     private var pickerButton : UIButton!
     private var closeButton : UIButton!
+    private let buttonMargin : CGFloat = 12
 
     deinit {
         captureManager.stop(nil)
@@ -90,7 +91,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton = UIButton(frame: CGRect(x: 12, y: 12, width: 70, height: 38))
+        flashButton = UIButton(frame: CGRect(x: buttonMargin, y: buttonMargin, width: 70, height: 38))
         flashButton.setImage(UIImage(named: "LightningIcon"), forState: .Normal)
         flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), forState: .Normal)
         flashButton.addTarget(self, action: Selector("flashButtonTapped:"), forControlEvents: .TouchUpInside)
@@ -153,7 +154,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         containerView.addSubview(closeButton)
 
         let pickerButtonWidth: CGFloat = 114
-        pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
+        pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
         pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
         pickerButton.setImage(UIImage(named: "PhotosIcon"), forState: .Normal)
         pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
@@ -414,27 +415,24 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     }
 
     private func updateWidgetsToOrientation(orientation: UIInterfaceOrientation) {
-        print(orientation.rawValue)
         closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
 
-        var flashPosition = CGPointZero
-        var pickerPosition = CGPointZero
+        var flashPosition = CGPointMake(buttonMargin - (buttonMargin/3), buttonMargin)
+        var pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width/2 - buttonMargin), buttonMargin)
+        if orientation == .Portrait || orientation == .PortraitUpsideDown {
+            pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width + buttonMargin), buttonMargin)
+            flashPosition = CGPointMake(buttonMargin, buttonMargin)
+        }
 
         var radians : CGFloat {
             switch orientation {
             case .LandscapeLeft:
-                pickerPosition = CGPointMake(view.bounds.width - 45, 12) // 45 = width/2 - margin
-                flashPosition = CGPointMake(8, 12)
                 return CGFloat(-M_PI/2)
             case .LandscapeRight:
-                pickerPosition = CGPointMake(view.bounds.width - 45, 12) // 45 = width/2 - margin
-                flashPosition = CGPointMake(8, 12)
                 return CGFloat(M_PI/2)
             default:
-                pickerPosition = CGPointMake(view.bounds.width - 126, 12) // 126 = 114 + 12 (width + margin)?
-                flashPosition = CGPointMake(12, 12)
                 return 0
             }
         }
