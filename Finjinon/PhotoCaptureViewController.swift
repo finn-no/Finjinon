@@ -46,24 +46,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
-    private var widgetOrientation : UIInterfaceOrientation = .Portrait
-//    private var deviceOrientation : UIDeviceOrientation = UIDevice.currentDevice().orientation {
-//        didSet {
-//            switch deviceOrientation {
-//            case .FaceDown, .FaceUp, .Unknown:
-//                ()
-//            case .LandscapeLeft:
-//                widgetOrientation = .LandscapeLeft
-//            case .LandscapeRight:
-//                widgetOrientation = .LandscapeRight
-//            case .Portrait:
-//                widgetOrientation = .Portrait
-//            case .PortraitUpsideDown:
-//                widgetOrientation = .PortraitUpsideDown
-//            }
-//            updateWidgetsToOrientation(widgetOrientation)
-//        }
-//    }
+//    private var widgetOrientation : UIInterfaceOrientation = .Portrait
     private var pickerButton : UIButton!
     private var closeButton : UIButton!
     private let buttonMargin : CGFloat = 12
@@ -189,20 +172,18 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         }
 
         NSNotificationCenter.defaultCenter().addObserverForName(UIDeviceOrientationDidChangeNotification, object: nil, queue: nil) { (NSNotification) -> Void in
-            let deviceOrientation = UIDevice.currentDevice().orientation
-            switch deviceOrientation {
+            switch UIDevice.currentDevice().orientation {
             case .FaceDown, .FaceUp, .Unknown:
                 ()
             case .LandscapeLeft:
-                self.widgetOrientation = .LandscapeLeft
+                self.updateWidgetsToOrientation(.LandscapeLeft)
             case .LandscapeRight:
-                self.widgetOrientation = .LandscapeRight
+                self.updateWidgetsToOrientation(.LandscapeRight)
             case .Portrait:
-                self.widgetOrientation = .Portrait
+                self.updateWidgetsToOrientation(.Portrait)
             case .PortraitUpsideDown:
-                self.widgetOrientation = .PortraitUpsideDown
+                self.updateWidgetsToOrientation(.PortraitUpsideDown)
             }
-            self.updateWidgetsToOrientation(self.widgetOrientation)
         }
     }
 
@@ -440,35 +421,24 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
 
-        var flashPosition = CGPointMake(buttonMargin - (buttonMargin/3), buttonMargin)
-        var pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width/2 - buttonMargin), buttonMargin)
-        if orientation == .Portrait || orientation == .PortraitUpsideDown {
+        var flashPosition = flashButton.frame.origin
+        var pickerPosition = pickerButton.frame.origin
+        if orientation == .LandscapeLeft || orientation == .LandscapeRight {
+            flashPosition = CGPointMake(buttonMargin - (buttonMargin/3), buttonMargin)
+            pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width/2 - buttonMargin), buttonMargin)
+        } else if orientation == .Portrait || orientation == .PortraitUpsideDown {
             pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width + buttonMargin), buttonMargin)
             flashPosition = CGPointMake(buttonMargin, buttonMargin)
         }
-
-        var radians : CGFloat {
-            switch orientation {
-            case .LandscapeLeft:
-                return CGFloat(M_PI/2)
-            case .LandscapeRight:
-                return CGFloat(-M_PI/2)
-            default:
-                return 0
-            }
-        }
         let animations = {
-            let rotation = CGAffineTransformMakeRotation(radians)
-            self.pickerButton.transform = rotation
+            self.pickerButton.rotateToDeviceOrientation()
             self.pickerButton.frame.origin = pickerPosition
-
-            self.flashButton.transform = rotation
+            self.flashButton.rotateToDeviceOrientation()
             self.flashButton.frame.origin = flashPosition
-
-            self.closeButton.transform = rotation
+            self.closeButton.rotateToDeviceOrientation()
 
             for cell in self.collectionView.visibleCells() {
-                cell.contentView.transform = rotation
+                cell.contentView.rotateToDeviceOrientation()
             }
         }
         UIView.animateWithDuration(0.25, animations: animations)
@@ -488,15 +458,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
         } else {
             cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
         }
-
-        if widgetOrientation == .LandscapeLeft {
-            cell.contentView.transform = CGAffineTransformMakeRotation(CGFloat(M_PI/2))
-        } else if widgetOrientation == .LandscapeRight {
-            cell.contentView.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI/2))
-        } else {
-            cell.contentView.transform = CGAffineTransformMakeRotation(0)
-        }
-
+        cell.contentView.rotateToDeviceOrientation()
         cell.delegate = self
         return cell
     }
@@ -514,5 +476,21 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 extension PhotoCaptureViewController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
+    }
+}
+
+
+extension UIView {
+    public func rotateToDeviceOrientation() {
+        switch UIDevice.currentDevice().orientation {
+        case .FaceDown, .FaceUp, .Unknown:
+            ()
+        case .LandscapeLeft:
+            self.transform = CGAffineTransformMakeRotation(CGFloat(M_PI/2))
+        case .LandscapeRight:
+            self.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI/2))
+        case .Portrait, .PortraitUpsideDown:
+            self.transform = CGAffineTransformMakeRotation(0)
+        }
     }
 }
