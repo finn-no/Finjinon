@@ -46,7 +46,6 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
-//    private var widgetOrientation : UIInterfaceOrientation = .Portrait
     private var pickerButton : UIButton!
     private var closeButton : UIButton!
     private let buttonMargin : CGFloat = 12
