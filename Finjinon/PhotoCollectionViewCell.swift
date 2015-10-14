@@ -81,6 +81,7 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .ScaleAspectFill
         imageView.clipsToBounds = true
         imageView.frame = imageRect
+        imageView.transform = transform
 
         imageWrapper.addSubview(imageView)
 
