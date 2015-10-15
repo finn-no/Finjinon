@@ -49,6 +49,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var pickerButton : UIButton!
     private var closeButton : UIButton!
     private let buttonMargin : CGFloat = 12
+    private var orientation : UIDeviceOrientation = .Portrait
 
     deinit {
         captureManager.stop(nil)
@@ -174,14 +175,9 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             switch UIDevice.currentDevice().orientation {
             case .FaceDown, .FaceUp, .Unknown:
                 ()
-            case .LandscapeLeft:
-                self.updateWidgetsToOrientation(.LandscapeLeft)
-            case .LandscapeRight:
-                self.updateWidgetsToOrientation(.LandscapeRight)
-            case .Portrait:
-                self.updateWidgetsToOrientation(.Portrait)
-            case .PortraitUpsideDown:
-                self.updateWidgetsToOrientation(.PortraitUpsideDown)
+            case .LandscapeLeft, .LandscapeRight, .Portrait, .PortraitUpsideDown:
+                self.orientation = UIDevice.currentDevice().orientation
+                self.updateWidgetsToOrientation()
             }
         }
     }
@@ -415,7 +411,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         button.imageEdgeInsets = insets
     }
 
-    private func updateWidgetsToOrientation(orientation: UIInterfaceOrientation) {
+    private func updateWidgetsToOrientation() {
         closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
@@ -430,14 +426,14 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             flashPosition = CGPointMake(buttonMargin, buttonMargin)
         }
         let animations = {
-            self.pickerButton.rotateToDeviceOrientation()
+            self.pickerButton.rotateToCurrentDeviceOrientation()
             self.pickerButton.frame.origin = pickerPosition
-            self.flashButton.rotateToDeviceOrientation()
+            self.flashButton.rotateToCurrentDeviceOrientation()
             self.flashButton.frame.origin = flashPosition
-            self.closeButton.rotateToDeviceOrientation()
+            self.closeButton.rotateToCurrentDeviceOrientation()
 
             for cell in self.collectionView.visibleCells() {
-                cell.contentView.rotateToDeviceOrientation()
+                cell.contentView.rotateToCurrentDeviceOrientation()
             }
         }
         UIView.animateWithDuration(0.25, animations: animations)
@@ -457,7 +453,8 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
         } else {
             cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
         }
-        cell.contentView.rotateToDeviceOrientation()
+        // This cannot use the currentRotation call as it might be called when .FaceUp or .FaceDown is device-orientation
+        cell.contentView.rotateToDeviceOrientation(orientation)
         cell.delegate = self
         return cell
     }
@@ -480,8 +477,12 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 
 
 extension UIView {
-    public func rotateToDeviceOrientation() {
-        switch UIDevice.currentDevice().orientation {
+    public func rotateToCurrentDeviceOrientation() {
+        self.rotateToDeviceOrientation(UIDevice.currentDevice().orientation)
+    }
+
+    public func rotateToDeviceOrientation(orientation: UIDeviceOrientation) {
+        switch orientation {
         case .FaceDown, .FaceUp, .Unknown:
             ()
         case .LandscapeLeft:
