@@ -83,6 +83,7 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.frame = imageRect
 
         imageWrapper.addSubview(imageView)
+        imageWrapper.transform = contentView.transform
 
         return imageWrapper
     }

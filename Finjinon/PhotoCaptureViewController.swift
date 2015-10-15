@@ -46,6 +46,10 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     private var containerView: UIView!
     private var focusIndicatorView: UIView!
     private var flashButton: UIButton!
+    private var pickerButton : UIButton!
+    private var closeButton : UIButton!
+    private let buttonMargin : CGFloat = 12
+    private var orientation : UIDeviceOrientation = .Portrait
 
     deinit {
         captureManager.stop(nil)
@@ -78,12 +82,13 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton = UIButton(frame: CGRect(x: 12, y: 12, width: 70, height: 38))
+        flashButton = UIButton(frame: CGRect(x: buttonMargin, y: buttonMargin, width: 70, height: 38))
         flashButton.setImage(UIImage(named: "LightningIcon"), forState: .Normal)
         flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), forState: .Normal)
         flashButton.addTarget(self, action: Selector("flashButtonTapped:"), forControlEvents: .TouchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
         flashButton.tintColor = UIColor.whiteColor()
+        flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         roundifyButton(flashButton, inset: 14)
 
         let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
@@ -134,18 +139,21 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         captureButton.enabled = false
         captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
 
-        let closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
+        closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
+        closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         containerView.addSubview(closeButton)
 
         let pickerButtonWidth: CGFloat = 114
-        let pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - 12, y: 12, width: pickerButtonWidth, height: 38))
+        pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
         pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
         pickerButton.setImage(UIImage(named: "PhotosIcon"), forState: .Normal)
         pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
         pickerButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
+        pickerButton.autoresizingMask = [.FlexibleTopMargin]
+        pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         roundifyButton(pickerButton)
         view.addSubview(pickerButton)
 
@@ -163,6 +171,16 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             UIView.animateWithDuration(0.2) {
                 self.captureButton.enabled = true
                 self.previewView.alpha = 1.0
+            }
+        }
+
+        NSNotificationCenter.defaultCenter().addObserverForName(UIDeviceOrientationDidChangeNotification, object: nil, queue: nil) { (NSNotification) -> Void in
+            switch UIDevice.currentDevice().orientation {
+            case .FaceDown, .FaceUp, .Unknown:
+                ()
+            case .LandscapeLeft, .LandscapeRight, .Portrait, .PortraitUpsideDown:
+                self.orientation = UIDevice.currentDevice().orientation
+                self.updateWidgetsToOrientation()
             }
         }
     }
@@ -383,7 +401,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
 
     // MARK: - Private methods
 
-    func roundifyButton(button: UIButton, inset: CGFloat = 16) {
+    private func roundifyButton(button: UIButton, inset: CGFloat = 16) {
         button.tintColor = UIColor.whiteColor()
 
         button.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.3)
@@ -394,6 +412,30 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         var insets = button.imageEdgeInsets
         insets.left -= inset
         button.imageEdgeInsets = insets
+    }
+
+    private func updateWidgetsToOrientation() {
+        var flashPosition = flashButton.frame.origin
+        var pickerPosition = pickerButton.frame.origin
+        if orientation == .LandscapeLeft || orientation == .LandscapeRight {
+            flashPosition = CGPointMake(buttonMargin - (buttonMargin/3), buttonMargin)
+            pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width/2 - buttonMargin), buttonMargin)
+        } else if orientation == .Portrait || orientation == .PortraitUpsideDown {
+            pickerPosition = CGPointMake(view.bounds.width - (pickerButton.bounds.size.width + buttonMargin), buttonMargin)
+            flashPosition = CGPointMake(buttonMargin, buttonMargin)
+        }
+        let animations = {
+            self.pickerButton.rotateToCurrentDeviceOrientation()
+            self.pickerButton.frame.origin = pickerPosition
+            self.flashButton.rotateToCurrentDeviceOrientation()
+            self.flashButton.frame.origin = flashPosition
+            self.closeButton.rotateToCurrentDeviceOrientation()
+
+            for cell in self.collectionView.visibleCells() {
+                cell.contentView.rotateToCurrentDeviceOrientation()
+            }
+        }
+        UIView.animateWithDuration(0.25, animations: animations)
     }
 }
 
@@ -410,7 +452,8 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
         } else {
             cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell
         }
-
+        // This cannot use the currentRotation call as it might be called when .FaceUp or .FaceDown is device-orientation
+        cell.contentView.rotateToDeviceOrientation(orientation)
         cell.delegate = self
         return cell
     }
@@ -428,5 +471,25 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 extension PhotoCaptureViewController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
+    }
+}
+
+
+extension UIView {
+    public func rotateToCurrentDeviceOrientation() {
+        self.rotateToDeviceOrientation(UIDevice.currentDevice().orientation)
+    }
+
+    public func rotateToDeviceOrientation(orientation: UIDeviceOrientation) {
+        switch orientation {
+        case .FaceDown, .FaceUp, .Unknown:
+            ()
+        case .LandscapeLeft:
+            self.transform = CGAffineTransformMakeRotation(CGFloat(M_PI/2))
+        case .LandscapeRight:
+            self.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI/2))
+        case .Portrait, .PortraitUpsideDown:
+            self.transform = CGAffineTransformMakeRotation(0)
+        }
     }
 }
