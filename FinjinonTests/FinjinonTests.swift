@@ -49,17 +49,17 @@ class FinjinonTests: XCTestCase {
 
         // Test that .FaceUp & .FaceDown does not trigger any changes.
         view.rotateToDeviceOrientation(.Portrait)
-        let unchangableTransform = view.transform
+        let unchangeableTransform = view.transform
         view.rotateToDeviceOrientation(.FaceDown)
         let faceDownTransform = view.transform
         view.rotateToDeviceOrientation(.FaceUp)
         let faceUpTransform = view.transform
-        XCTAssertEqual(unchangableTransform.a, faceDownTransform.a)
-        XCTAssertEqual(unchangableTransform.b, faceDownTransform.b)
-        XCTAssertEqual(unchangableTransform.c, faceDownTransform.c)
-        XCTAssertEqual(unchangableTransform.a, faceUpTransform.a)
-        XCTAssertEqual(unchangableTransform.b, faceUpTransform.b)
-        XCTAssertEqual(unchangableTransform.c, faceUpTransform.c)
+        XCTAssertEqual(unchangeableTransform.a, faceDownTransform.a)
+        XCTAssertEqual(unchangeableTransform.b, faceDownTransform.b)
+        XCTAssertEqual(unchangeableTransform.c, faceDownTransform.c)
+        XCTAssertEqual(unchangeableTransform.a, faceUpTransform.a)
+        XCTAssertEqual(unchangeableTransform.b, faceUpTransform.b)
+        XCTAssertEqual(unchangeableTransform.c, faceUpTransform.c)
     }
 
 
