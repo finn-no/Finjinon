@@ -88,6 +88,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         flashButton.addTarget(self, action: Selector("flashButtonTapped:"), forControlEvents: .TouchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
         flashButton.tintColor = UIColor.whiteColor()
+        flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         roundifyButton(flashButton, inset: 14)
 
         let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
@@ -142,6 +143,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
+        closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         containerView.addSubview(closeButton)
 
         let pickerButtonWidth: CGFloat = 114
@@ -151,6 +153,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
         pickerButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
         pickerButton.autoresizingMask = [.FlexibleTopMargin]
+        pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         roundifyButton(pickerButton)
         view.addSubview(pickerButton)
 
@@ -412,10 +415,6 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     }
 
     private func updateWidgetsToOrientation() {
-        closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
-        flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
-        pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
-
         var flashPosition = flashButton.frame.origin
         var pickerPosition = pickerButton.frame.origin
         if orientation == .LandscapeLeft || orientation == .LandscapeRight {
