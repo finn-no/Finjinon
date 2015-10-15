@@ -11,28 +11,6 @@ import XCTest
 import Finjinon
 
 class FinjinonTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock() {
-            // Put the code you want to measure the time of here.
-        }
-    }
 
     func testViewRotateToDeviceOrientationExtension() {
         let view = UIView(frame: CGRect.zero)
@@ -45,7 +23,7 @@ class FinjinonTests: XCTestCase {
         view.rotateToDeviceOrientation(.LandscapeRight)
         let landscapRightTransform = view.transform
 
-        // portrait vs. portrait
+        // portrait vs. portraitUpsideDown
         XCTAssertEqual(portraitTransform.a, portraitUpsideDownTransform.a)
         XCTAssertEqual(portraitTransform.b, portraitUpsideDownTransform.b)
         XCTAssertEqual(portraitTransform.c, portraitUpsideDownTransform.c)
@@ -64,7 +42,7 @@ class FinjinonTests: XCTestCase {
         XCTAssertNotEqual(portraitUpsideDownTransform.b, landscapRightTransform.b)
         XCTAssertNotEqual(portraitUpsideDownTransform.c, landscapRightTransform.c)
 
-        // landscape vs. landscape
+        // landscapeLeft vs. landscapeRight
         XCTAssertEqual(landscapRightTransform.a, landscapeLeftTransform.a)
         XCTAssertNotEqual(landscapRightTransform.b, landscapeLeftTransform.b)
         XCTAssertNotEqual(landscapRightTransform.c, landscapeLeftTransform.c)
