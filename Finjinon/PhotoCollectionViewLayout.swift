@@ -78,9 +78,9 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         for update in updateItems {
             switch update.updateAction {
             case .Insert:
-                insertedIndexPaths.append(update.indexPathAfterUpdate)
+                insertedIndexPaths.append(update.indexPathAfterUpdate!)
             case .Delete:
-                deletedIndexPaths.append(update.indexPathBeforeUpdate)
+                deletedIndexPaths.append(update.indexPathBeforeUpdate!)
             default:
                 return
             }
