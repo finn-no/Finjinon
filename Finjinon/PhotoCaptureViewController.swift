@@ -11,10 +11,10 @@ import AVFoundation
 import MobileCoreServices
 import Photos
 
-let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
-let FinjinonCameraAccessErrorDeniedCode = 1
-let FinjinonCameraAccessErrorDeniedInitialRequestCode = 2
-let FinjinonLibraryAccessErrorDomain = "FinjinonLibraryAccessErrorDomain"
+public let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
+public let FinjinonCameraAccessErrorDeniedCode = 1
+public let FinjinonCameraAccessErrorDeniedInitialRequestCode = 2
+public let FinjinonLibraryAccessErrorDomain = "FinjinonLibraryAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController)
@@ -219,26 +219,26 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
 
     // MARK: - API
 
-    func registerClass(cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
+    public func registerClass(cellClass: AnyClass?, forCellWithReuseIdentifier identifier: String) {
         collectionView.registerClass(cellClass, forCellWithReuseIdentifier: identifier)
     }
 
-    func dequeuedReusableCellForClass<T : PhotoCollectionViewCell>(clazz: T.Type, indexPath: NSIndexPath, config: (T -> Void)) -> T {
+    public func dequeuedReusableCellForClass<T : PhotoCollectionViewCell>(clazz: T.Type, indexPath: NSIndexPath, config: (T -> Void)) -> T {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(clazz.cellIdentifier(), forIndexPath: indexPath) as! T
         config(cell)
         return cell
     }
 
-    func reloadPreviewItemsAtIndexes(indexes: [Int]) {
+    public func reloadPreviewItemsAtIndexes(indexes: [Int]) {
         let indexPaths = indexes.map { NSIndexPath(forItem: $0, inSection: 0) }
         collectionView.reloadItemsAtIndexPaths(indexPaths)
     }
 
-    func reloadPreviews() {
+    public func reloadPreviews() {
         collectionView.reloadData()
     }
 
-    func selectedPreviewIndexPath() -> NSIndexPath? {
+    public func selectedPreviewIndexPath() -> NSIndexPath? {
         if let selection = collectionView.indexPathsForSelectedItems() {
             return selection.first
         }
@@ -246,13 +246,13 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         return nil
     }
 
-    func cellForpreviewAtIndexPath<T : PhotoCollectionViewCell>(indexPath: NSIndexPath) -> T? {
+    public func cellForpreviewAtIndexPath<T : PhotoCollectionViewCell>(indexPath: NSIndexPath) -> T? {
         return collectionView.cellForItemAtIndexPath(indexPath) as? T
     }
 
     /// returns the rect in view (minus the scroll offset) of the thumbnail at the given indexPath.
     /// Useful for presenting sheets etc from the thumbnail
-    func previewRectForIndexPath(indexPath: NSIndexPath) -> CGRect {
+    public func previewRectForIndexPath(indexPath: NSIndexPath) -> CGRect {
         if let attributes = collectionView.layoutAttributesForItemAtIndexPath(indexPath) {
             var rect = attributes.frame
             rect.origin.x -= collectionView.contentOffset.x
@@ -262,20 +262,20 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         return CGRect.zero
     }
 
-    func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
+    public func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
         storage.createAssetFromImageData(data, completion: completion)
     }
 
-    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+    public func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
         storage.createAssetFromImage(image, completion: completion)
     }
 
-    func createAssetFromImageURL(imageURL: NSURL, dimensions: CGSize, completion: Asset -> Void) {
+    public func createAssetFromImageURL(imageURL: NSURL, dimensions: CGSize, completion: Asset -> Void) {
         storage.createAssetFromImageURL(imageURL, dimensions: dimensions, completion: completion)
     }
 
     /// Deletes item at the given index. Perform any deletions from datamodel in the handler
-    func deleteAssetAtIndex(idx: Int, handler: () -> Void) {
+    public func deleteAssetAtIndex(idx: Int, handler: () -> Void) {
         let indexPath = NSIndexPath(forItem: idx, inSection: 0)
         if let asset = delegate?.photoCaptureViewController(self, assetForIndexPath: indexPath) {
             self.collectionView.performBatchUpdates({
@@ -289,11 +289,11 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         }
     }
 
-    func libraryAuthorizationStatus() -> PHAuthorizationStatus {
+    public func libraryAuthorizationStatus() -> PHAuthorizationStatus {
         return PHPhotoLibrary.authorizationStatus()
     }
 
-    func cameraAuthorizationStatus() -> AVAuthorizationStatus {
+    public func cameraAuthorizationStatus() -> AVAuthorizationStatus {
         return captureManager.authorizationStatus()
     }
 

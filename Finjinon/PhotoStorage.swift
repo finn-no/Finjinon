@@ -13,7 +13,7 @@ import AssetsLibrary
 // TODO also support ALAsset/PHPhoto
 
 public struct Asset: Equatable, CustomStringConvertible {
-    let UUID = NSUUID().UUIDString
+    public let UUID = NSUUID().UUIDString
     let storage: PhotoStorage
     struct Remote {
         let url: NSURL

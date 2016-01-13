@@ -14,7 +14,7 @@ internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
 
 
 public class PhotoCollectionViewCell: UICollectionViewCell {
-    class func cellIdentifier() -> String { return "PhotoCell" }
+    public class func cellIdentifier() -> String { return "PhotoCell" }
 
     public let imageView = UIImageView(frame: CGRect.zero)
     public let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
@@ -22,7 +22,7 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
 
     internal weak var delegate: PhotoCollectionViewCellDelegate?
 
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
 
         let offset = self.closeButton.bounds.height/3
