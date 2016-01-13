@@ -324,12 +324,14 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
             let resolver = AssetResolver()
             assets.forEach { asset in
-                resolver.resolve(asset, completion: { image in
+                resolver.enqueueResolve(asset, completion: { image in
                     self.createAssetFromImage(image, completion: self.didAddAsset)
                 })
             }
         }, completion: { cancelled in
-            self.dismissViewControllerAnimated(true, completion: nil)
+            dispatch_async(dispatch_get_main_queue()) {
+                self.dismissViewControllerAnimated(true, completion: nil)
+            }
         })
 
         presentViewController(controller, animated: true, completion: nil)
@@ -349,18 +351,20 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
     }
 
     private func didAddAsset(asset: Asset) {
-        collectionView.performBatchUpdates({
-            self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
-            let insertedIndexPath: NSIndexPath
-            if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
-                insertedIndexPath = NSIndexPath(forItem: count-1, inSection: 0)
-            } else {
-                insertedIndexPath = NSIndexPath(forItem: 0, inSection: 0)
-            }
-            self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
+        dispatch_async(dispatch_get_main_queue()) {
+            self.collectionView.performBatchUpdates({
+                self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
+                let insertedIndexPath: NSIndexPath
+                if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
+                    insertedIndexPath = NSIndexPath(forItem: count-1, inSection: 0)
+                } else {
+                    insertedIndexPath = NSIndexPath(forItem: 0, inSection: 0)
+                }
+                self.collectionView.insertItemsAtIndexPaths([insertedIndexPath])
             }, completion: { finished in
                 self.scrollToLastAddedAssetAnimated(true)
-        })
+            })
+        }
     }
 
     private func scrollToLastAddedAssetAnimated(animated: Bool) {
