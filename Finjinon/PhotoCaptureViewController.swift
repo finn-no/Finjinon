@@ -17,12 +17,11 @@ let FinjinonCameraAccessErrorDeniedInitialRequestCode = 2
 let FinjinonLibraryAccessErrorDomain = "FinjinonLibraryAccessErrorDomain"
 
 public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
-    func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell?
-
     func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: NSIndexPath)
     func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError)
 
+    func photoCaptureViewController(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell?
     func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath)
 
     func photoCaptureViewControllerNumberOfAssets(controller: PhotoCaptureViewController) -> Int
@@ -450,7 +449,7 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell: PhotoCollectionViewCell
-        if let delegateCell = delegate?.photoCaptureViewControllerDidFinish(self, cellForItemAtIndexPath: indexPath) {
+        if let delegateCell = delegate?.photoCaptureViewController(self, cellForItemAtIndexPath: indexPath) {
             cell = delegateCell
         } else {
             cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoCollectionViewCell.cellIdentifier(), forIndexPath: indexPath) as! PhotoCollectionViewCell

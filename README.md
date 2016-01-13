@@ -13,39 +13,16 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 
 ## Requirements
 
-* iOS7+
+* iOS8+
 * Swift 2.0
 
 ## Installation
 
 If you need to support iOS7 you have to copy the sources in `Finjinon` into your project. Otherwise there's a Finjinon.podspec available in the repo.
 
-## Code Example
+## Usage
 
-        let controller = PhotoCaptureViewController()
-        controller.delegate = self
-        presentViewController(controller, animated: true, completion: nil)
-        
-        extension ViewController: PhotoCaptureViewControllerDelegate {
-            func photoCaptureViewController(controller: PhotoCaptureViewController, didFinishEditingAssets assets: [Asset]) {
-                // assets is an array of structs containing references to the selected images.
-                // these are provided as references as opposed to actual UIImages to save memory
-                for asset in assets {
-                    asset.retrieveImageWithWidth(100) { image in
-                        // image is a 100pt wide thumbnail
-                    }
-                }
-            }
-        }
-
-See the included Example project for full API
-
-## TODO
-
-- [x] Localization (Norwegian)
-- [x] iPad support
-- [ ] Autoscrolling when reordering near edges (like Springboard)
-
+See the included Example project for usage.
 
 ## License
 

@@ -49,7 +49,7 @@ class ViewController: UITableViewController {
 
 
 extension ViewController: PhotoCaptureViewControllerDelegate {
-    func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell? {
+    func photoCaptureViewController(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell? {
         return controller.dequeuedReusableCellForClass(PhotoCollectionViewCell.self, indexPath: indexPath) { cell in
             let asset = self.assets[indexPath.item]
             // Set a thumbnail form the source image, or add your own network fetch code etc
