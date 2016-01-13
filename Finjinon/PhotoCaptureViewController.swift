@@ -9,7 +9,6 @@
 import UIKit
 import AVFoundation
 import MobileCoreServices
-import AssetsLibrary
 import Photos
 
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
@@ -291,8 +290,8 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         }
     }
 
-    func libraryAuthorizationStatus() -> ALAuthorizationStatus {
-        return ALAssetsLibrary.authorizationStatus()
+    func libraryAuthorizationStatus() -> PHAuthorizationStatus {
+        return PHPhotoLibrary.authorizationStatus()
     }
 
     func cameraAuthorizationStatus() -> AVAuthorizationStatus {
