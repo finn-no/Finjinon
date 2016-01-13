@@ -16,7 +16,8 @@ internal struct AssetResolver {
         let manager = PHImageManager.defaultManager()
         let size = targetSize ?? defaultTargetSize
         manager.requestImageForAsset(asset, targetSize: size, contentMode: .AspectFill, options: nil) { image, info in
-            if let image = image {
+            let isDegraded = (info?[PHImageResultIsDegradedKey] as? Bool) ?? false
+            if let image = image where !isDegraded {
                 completion(image)
             }
         }
