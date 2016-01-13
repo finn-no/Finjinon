@@ -44,13 +44,7 @@ class CaptureManager: NSObject {
     override init() {
         session.sessionPreset = AVCaptureSessionPresetPhoto
         var viewfinderMode : CaptureManagerViewfinderMode {
-            var screenBounds : CGRect {
-                if #available(iOS 8, *) {
-                    return UIScreen.mainScreen().nativeBounds
-                } else {
-                    return UIScreen.mainScreen().bounds
-                }
-            }
+            let screenBounds = UIScreen.mainScreen().nativeBounds
             let ratio = screenBounds.height / screenBounds.width
             return ratio <= 1.5 ? .FullScreen : .Window
         }
