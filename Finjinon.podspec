@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Finjinon"
-  s.version      = "2.0"
+  s.version      = "2.0.1"
   s.summary      = "Custom iOS camera optimized for taking a sequence of photos quickly and/or selecting from an image picker"
 
   s.description  = <<-DESC
@@ -35,7 +35,7 @@ Finjinon is a custom AVFoundation based camera UI, focused on quickly adding sev
   s.platform     = :ios
   s.ios.deployment_target = "8.1"
 
-  s.source       = { :git => "https://github.com/finn-no/Finjinon.git", :tag => "2.0" }
+  s.source       = { :git => "https://github.com/finn-no/Finjinon.git", :tag => "2.0.1" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
