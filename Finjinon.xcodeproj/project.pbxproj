@@ -20,6 +20,7 @@
 		76BEC38C1B3D6C3400B8D671 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3861B3D6C3400B8D671 /* Images.xcassets */; };
 		76BEC38E1B3D6C3400B8D671 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BEC3881B3D6C3400B8D671 /* ViewController.swift */; };
 		76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3961B3D6D3200B8D671 /* Localizable.strings */; };
+		76E7FF291C466DCC0086DACA /* AssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E7FF281C466DCC0086DACA /* AssetResolver.swift */; };
 		76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */; };
 		76F257321B4BBAC800666DFE /* hoff.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 76F257311B4BBAC800666DFE /* hoff.jpeg */; };
 /* End PBXBuildFile section */
@@ -55,6 +56,7 @@
 		76BEC3911B3D6C9B00B8D671 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Main.strings; sourceTree = "<group>"; };
 		76BEC3951B3D6D3200B8D671 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		76BEC3971B3D6D4200B8D671 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Localizable.strings; sourceTree = "<group>"; };
+		76E7FF281C466DCC0086DACA /* AssetResolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AssetResolver.swift; path = Finjinon/AssetResolver.swift; sourceTree = "<group>"; };
 		76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImagePickerAdapter.swift; path = Finjinon/ImagePickerAdapter.swift; sourceTree = "<group>"; };
 		76F257311B4BBAC800666DFE /* hoff.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = hoff.jpeg; path = Finjinon/hoff.jpeg; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -131,6 +133,7 @@
 				7670E51F1B21B42600544E09 /* CaptureManager.swift */,
 				764A24481B32E6830080E832 /* PhotoStorage.swift */,
 				76BC283A1B382E690039DEDF /* PhotoCollectionViewLayout.swift */,
+				76E7FF281C466DCC0086DACA /* AssetResolver.swift */,
 			);
 			name = Internal;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 				76BC283B1B382E690039DEDF /* PhotoCollectionViewLayout.swift in Sources */,
 				76BC28391B382E250039DEDF /* PhotoCollectionViewCell.swift in Sources */,
 				76BEC38E1B3D6C3400B8D671 /* ViewController.swift in Sources */,
+				76E7FF291C466DCC0086DACA /* AssetResolver.swift in Sources */,
 				7670E5201B21B42600544E09 /* CaptureManager.swift in Sources */,
 				764A24431B32ABFD0080E832 /* Buttons.swift in Sources */,
 				7670E5181B21806200544E09 /* PhotoCaptureViewController.swift in Sources */,

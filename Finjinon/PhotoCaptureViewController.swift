@@ -10,6 +10,7 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 import AssetsLibrary
+import Photos
 
 let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 let FinjinonCameraAccessErrorDeniedCode = 1
@@ -321,16 +322,15 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
             return
         }
 
-        let controller = imagePickerAdapter.viewControllerForImageSelection({ info in
-            if let imageURL = info[UIImagePickerControllerMediaURL] as? NSURL, let data = NSData(contentsOfURL: imageURL) {
-                self.createAssetFromImageData(data, completion: self.didAddAsset)
-            } else if let assetURL = info[UIImagePickerControllerReferenceURL] as? NSURL {
-                self.storage.createAssetFromAssetLibraryURL(assetURL, completion: self.didAddAsset)
-            } else if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-                self.createAssetFromImage(image, completion: self.didAddAsset)
+        let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
+            let resolver = AssetResolver()
+            assets.forEach { asset in
+                resolver.resolve(asset, completion: { image in
+                    self.createAssetFromImage(image, completion: self.didAddAsset)
+                })
             }
-            }, completion: { cancelled in
-                self.dismissViewControllerAnimated(true, completion: nil)
+        }, completion: { cancelled in
+            self.dismissViewControllerAnimated(true, completion: nil)
         })
 
         presentViewController(controller, animated: true, completion: nil)
