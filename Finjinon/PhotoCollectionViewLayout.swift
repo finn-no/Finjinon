@@ -101,6 +101,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             // only change attributes on inserted cells
             if let attrs = attrs {
                 attrs.alpha = 0.0
+                attrs.zIndex = itemIndexPath.item
                 attrs.center.x = -(attrs.frame.width + minimumInteritemSpacing)
                 attrs.center.y = self.collectionView!.frame.height / 2
                 attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
