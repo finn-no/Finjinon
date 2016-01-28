@@ -89,7 +89,7 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
     }
 
     func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset) {
-        assets.insert(asset, atIndex: 0)
+        assets.append(asset)
         tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Automatic)
     }
 

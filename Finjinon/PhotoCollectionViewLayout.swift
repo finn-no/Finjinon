@@ -101,9 +101,13 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             // only change attributes on inserted cells
             if let attrs = attrs {
                 attrs.alpha = 0.0
-                attrs.center.x = -(attrs.frame.width + minimumInteritemSpacing)
-                attrs.center.y = self.collectionView!.frame.height / 2
-                attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
+                attrs.zIndex = itemIndexPath.item
+                attrs.center.x = self.collectionView!.frame.width / 2
+                attrs.center.y = self.collectionView!.frame.height
+                if self.collectionView!.contentOffset.x > 0.0 {
+                    attrs.center.x += self.collectionView!.contentOffset.x
+                }
+                attrs.transform3D = CATransform3DScale(attrs.transform3D, 0.001, 0.001, 1)
             }
         }
 
@@ -117,17 +121,15 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             if let attrs = attrs {
                 attrs.alpha = 0.0
                 attrs.center.x = self.collectionView!.frame.width / 2
-                attrs.center.y = self.collectionView!.frame.height + minimumLineSpacing
-                attrs.transform3D = scaledTransform3DForLayoutAttribute(attrs, scale: 0.001)
+                attrs.center.y = self.collectionView!.frame.height
+                if self.collectionView!.contentOffset.x > 0.0 {
+                    attrs.center.x += self.collectionView!.contentOffset.x
+                }
+                attrs.transform3D = CATransform3DScale(attrs.transform3D, 0.001, 0.001, 1)
             }
         }
 
         return attrs
-    }
-
-    private func scaledTransform3DForLayoutAttribute(attributes: UICollectionViewLayoutAttributes,scale: CGFloat) -> CATransform3D {
-        let transform = CATransform3DTranslate(attributes.transform3D, attributes.frame.midX - self.collectionView!.frame.midX, attributes.frame.midY - self.collectionView!.frame.midY, 0)
-        return CATransform3DScale(transform, scale, scale, 1)
     }
 
     override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
