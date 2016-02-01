@@ -7,170 +7,131 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		764A24431B32ABFD0080E832 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24421B32ABFD0080E832 /* Buttons.swift */; };
-		764A24491B32E6830080E832 /* PhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764A24481B32E6830080E832 /* PhotoStorage.swift */; };
-		7670E4DC1B217F2C00544E09 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E4DB1B217F2C00544E09 /* FinjinonTests.swift */; };
-		7670E5181B21806200544E09 /* PhotoCaptureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E5171B21806200544E09 /* PhotoCaptureViewController.swift */; };
-		7670E5201B21B42600544E09 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7670E51F1B21B42600544E09 /* CaptureManager.swift */; };
-		76BC28391B382E250039DEDF /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BC28381B382E250039DEDF /* PhotoCollectionViewCell.swift */; };
-		76BC283B1B382E690039DEDF /* PhotoCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BC283A1B382E690039DEDF /* PhotoCollectionViewLayout.swift */; };
-		76BEC3891B3D6C3400B8D671 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BEC3811B3D6C3400B8D671 /* AppDelegate.swift */; };
-		76BEC38A1B3D6C3400B8D671 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3821B3D6C3400B8D671 /* LaunchScreen.xib */; };
-		76BEC38B1B3D6C3400B8D671 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3841B3D6C3400B8D671 /* Main.storyboard */; };
-		76BEC38C1B3D6C3400B8D671 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3861B3D6C3400B8D671 /* Images.xcassets */; };
-		76BEC38E1B3D6C3400B8D671 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76BEC3881B3D6C3400B8D671 /* ViewController.swift */; };
-		76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 76BEC3961B3D6D3200B8D671 /* Localizable.strings */; };
-		76E7FF291C466DCC0086DACA /* AssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E7FF281C466DCC0086DACA /* AssetResolver.swift */; };
-		76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */; };
-		76F257321B4BBAC800666DFE /* hoff.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 76F257311B4BBAC800666DFE /* hoff.jpeg */; };
+		DF039B1A1C5F9298005E10F5 /* Finjinon.h in Headers */ = {isa = PBXBuildFile; fileRef = DF039B191C5F9298005E10F5 /* Finjinon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DF039B211C5F9298005E10F5 /* Finjinon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF039B161C5F9298005E10F5 /* Finjinon.framework */; };
+		DF039B261C5F9298005E10F5 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B251C5F9298005E10F5 /* FinjinonTests.swift */; };
+		DF039B331C5F9369005E10F5 /* AssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B301C5F9369005E10F5 /* AssetResolver.swift */; };
+		DF039B341C5F9369005E10F5 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B311C5F9369005E10F5 /* Buttons.swift */; };
+		DF039B351C5F9369005E10F5 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B321C5F9369005E10F5 /* CaptureManager.swift */; };
+		DF039B3B1C5F937A005E10F5 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B361C5F937A005E10F5 /* ImagePickerAdapter.swift */; };
+		DF039B3C1C5F937A005E10F5 /* PhotoCaptureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B371C5F937A005E10F5 /* PhotoCaptureViewController.swift */; };
+		DF039B3D1C5F937A005E10F5 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B381C5F937A005E10F5 /* PhotoCollectionViewCell.swift */; };
+		DF039B3E1C5F937A005E10F5 /* PhotoCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B391C5F937A005E10F5 /* PhotoCollectionViewLayout.swift */; };
+		DF039B3F1C5F937A005E10F5 /* PhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF039B3A1C5F937A005E10F5 /* PhotoStorage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7670E4D61B217F2C00544E09 /* PBXContainerItemProxy */ = {
+		DF039B221C5F9298005E10F5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 7670E4B81B217F2B00544E09 /* Project object */;
+			containerPortal = DF039B0D1C5F9298005E10F5 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 7670E4BF1B217F2B00544E09;
+			remoteGlobalIDString = DF039B151C5F9298005E10F5;
 			remoteInfo = Finjinon;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		764A24421B32ABFD0080E832 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Buttons.swift; path = Finjinon/Buttons.swift; sourceTree = "<group>"; };
-		764A24481B32E6830080E832 /* PhotoStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoStorage.swift; path = Finjinon/PhotoStorage.swift; sourceTree = "<group>"; };
-		7670E4C01B217F2B00544E09 /* Finjinon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Finjinon.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7670E4D51B217F2C00544E09 /* FinjinonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinjinonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7670E4DA1B217F2C00544E09 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7670E4DB1B217F2C00544E09 /* FinjinonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinjinonTests.swift; sourceTree = "<group>"; };
-		7670E5171B21806200544E09 /* PhotoCaptureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoCaptureViewController.swift; path = Finjinon/PhotoCaptureViewController.swift; sourceTree = "<group>"; };
-		7670E51F1B21B42600544E09 /* CaptureManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CaptureManager.swift; path = Finjinon/CaptureManager.swift; sourceTree = "<group>"; };
-		76BC28381B382E250039DEDF /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoCollectionViewCell.swift; path = Finjinon/PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
-		76BC283A1B382E690039DEDF /* PhotoCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoCollectionViewLayout.swift; path = Finjinon/PhotoCollectionViewLayout.swift; sourceTree = "<group>"; };
-		76BEC3811B3D6C3400B8D671 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		76BEC3831B3D6C3400B8D671 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		76BEC3851B3D6C3400B8D671 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		76BEC3861B3D6C3400B8D671 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		76BEC3871B3D6C3400B8D671 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		76BEC3881B3D6C3400B8D671 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		76BEC3901B3D6C9B00B8D671 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
-		76BEC3911B3D6C9B00B8D671 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Main.strings; sourceTree = "<group>"; };
-		76BEC3951B3D6D3200B8D671 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
-		76BEC3971B3D6D4200B8D671 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Localizable.strings; sourceTree = "<group>"; };
-		76E7FF281C466DCC0086DACA /* AssetResolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AssetResolver.swift; path = Finjinon/AssetResolver.swift; sourceTree = "<group>"; };
-		76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImagePickerAdapter.swift; path = Finjinon/ImagePickerAdapter.swift; sourceTree = "<group>"; };
-		76F257311B4BBAC800666DFE /* hoff.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = hoff.jpeg; path = Finjinon/hoff.jpeg; sourceTree = SOURCE_ROOT; };
+		DF039B161C5F9298005E10F5 /* Finjinon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Finjinon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF039B191C5F9298005E10F5 /* Finjinon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Finjinon.h; sourceTree = "<group>"; };
+		DF039B1B1C5F9298005E10F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DF039B201C5F9298005E10F5 /* FinjinonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinjinonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF039B251C5F9298005E10F5 /* FinjinonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinjinonTests.swift; sourceTree = "<group>"; };
+		DF039B271C5F9298005E10F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DF039B301C5F9369005E10F5 /* AssetResolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResolver.swift; sourceTree = "<group>"; };
+		DF039B311C5F9369005E10F5 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		DF039B321C5F9369005E10F5 /* CaptureManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureManager.swift; sourceTree = "<group>"; };
+		DF039B361C5F937A005E10F5 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerAdapter.swift; sourceTree = "<group>"; };
+		DF039B371C5F937A005E10F5 /* PhotoCaptureViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCaptureViewController.swift; sourceTree = "<group>"; };
+		DF039B381C5F937A005E10F5 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
+		DF039B391C5F937A005E10F5 /* PhotoCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewLayout.swift; sourceTree = "<group>"; };
+		DF039B3A1C5F937A005E10F5 /* PhotoStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoStorage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		7670E4BD1B217F2B00544E09 /* Frameworks */ = {
+		DF039B121C5F9298005E10F5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7670E4D21B217F2C00544E09 /* Frameworks */ = {
+		DF039B1D1C5F9298005E10F5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF039B211C5F9298005E10F5 /* Finjinon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7670E4B71B217F2B00544E09 = {
+		DF039B0C1C5F9298005E10F5 = {
 			isa = PBXGroup;
 			children = (
-				7670E5161B21804400544E09 /* Finjinon */,
-				76BEC3801B3D6C3400B8D671 /* Example */,
-				7670E4D81B217F2C00544E09 /* FinjinonTests */,
-				7670E4C11B217F2B00544E09 /* Products */,
+				DF039B181C5F9298005E10F5 /* Finjinon */,
+				DF039B241C5F9298005E10F5 /* FinjinonTests */,
+				DF039B171C5F9298005E10F5 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		7670E4C11B217F2B00544E09 /* Products */ = {
+		DF039B171C5F9298005E10F5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7670E4C01B217F2B00544E09 /* Finjinon.app */,
-				7670E4D51B217F2C00544E09 /* FinjinonTests.xctest */,
+				DF039B161C5F9298005E10F5 /* Finjinon.framework */,
+				DF039B201C5F9298005E10F5 /* FinjinonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		7670E4D81B217F2C00544E09 /* FinjinonTests */ = {
+		DF039B181C5F9298005E10F5 /* Finjinon */ = {
 			isa = PBXGroup;
 			children = (
-				7670E4DB1B217F2C00544E09 /* FinjinonTests.swift */,
-				7670E4D91B217F2C00544E09 /* Supporting Files */,
+				DF039B301C5F9369005E10F5 /* AssetResolver.swift */,
+				DF039B311C5F9369005E10F5 /* Buttons.swift */,
+				DF039B321C5F9369005E10F5 /* CaptureManager.swift */,
+				DF039B361C5F937A005E10F5 /* ImagePickerAdapter.swift */,
+				DF039B371C5F937A005E10F5 /* PhotoCaptureViewController.swift */,
+				DF039B381C5F937A005E10F5 /* PhotoCollectionViewCell.swift */,
+				DF039B391C5F937A005E10F5 /* PhotoCollectionViewLayout.swift */,
+				DF039B3A1C5F937A005E10F5 /* PhotoStorage.swift */,
+				DF039B191C5F9298005E10F5 /* Finjinon.h */,
+				DF039B1B1C5F9298005E10F5 /* Info.plist */,
+			);
+			path = Finjinon;
+			sourceTree = "<group>";
+		};
+		DF039B241C5F9298005E10F5 /* FinjinonTests */ = {
+			isa = PBXGroup;
+			children = (
+				DF039B251C5F9298005E10F5 /* FinjinonTests.swift */,
+				DF039B271C5F9298005E10F5 /* Info.plist */,
 			);
 			path = FinjinonTests;
 			sourceTree = "<group>";
 		};
-		7670E4D91B217F2C00544E09 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				7670E4DA1B217F2C00544E09 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		7670E5161B21804400544E09 /* Finjinon */ = {
-			isa = PBXGroup;
-			children = (
-				7670E5171B21806200544E09 /* PhotoCaptureViewController.swift */,
-				76EEF5BD1B38151300E48071 /* ImagePickerAdapter.swift */,
-				76BC28381B382E250039DEDF /* PhotoCollectionViewCell.swift */,
-				76BC283C1B382E9A0039DEDF /* Internal */,
-			);
-			name = Finjinon;
-			sourceTree = "<group>";
-		};
-		76BC283C1B382E9A0039DEDF /* Internal */ = {
-			isa = PBXGroup;
-			children = (
-				764A24421B32ABFD0080E832 /* Buttons.swift */,
-				7670E51F1B21B42600544E09 /* CaptureManager.swift */,
-				764A24481B32E6830080E832 /* PhotoStorage.swift */,
-				76BC283A1B382E690039DEDF /* PhotoCollectionViewLayout.swift */,
-				76E7FF281C466DCC0086DACA /* AssetResolver.swift */,
-			);
-			name = Internal;
-			sourceTree = "<group>";
-		};
-		76BEC3801B3D6C3400B8D671 /* Example */ = {
-			isa = PBXGroup;
-			children = (
-				76BEC3811B3D6C3400B8D671 /* AppDelegate.swift */,
-				76BEC3881B3D6C3400B8D671 /* ViewController.swift */,
-				76BEC38F1B3D6C4C00B8D671 /* Resources */,
-			);
-			path = Example;
-			sourceTree = "<group>";
-		};
-		76BEC38F1B3D6C4C00B8D671 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				76F257311B4BBAC800666DFE /* hoff.jpeg */,
-				76BEC3821B3D6C3400B8D671 /* LaunchScreen.xib */,
-				76BEC3841B3D6C3400B8D671 /* Main.storyboard */,
-				76BEC3861B3D6C3400B8D671 /* Images.xcassets */,
-				76BEC3871B3D6C3400B8D671 /* Info.plist */,
-				76BEC3961B3D6D3200B8D671 /* Localizable.strings */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		DF039B131C5F9298005E10F5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DF039B1A1C5F9298005E10F5 /* Finjinon.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
-		7670E4BF1B217F2B00544E09 /* Finjinon */ = {
+		DF039B151C5F9298005E10F5 /* Finjinon */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7670E4DF1B217F2C00544E09 /* Build configuration list for PBXNativeTarget "Finjinon" */;
+			buildConfigurationList = DF039B2A1C5F9298005E10F5 /* Build configuration list for PBXNativeTarget "Finjinon" */;
 			buildPhases = (
-				7670E4BC1B217F2B00544E09 /* Sources */,
-				7670E4BD1B217F2B00544E09 /* Frameworks */,
-				7670E4BE1B217F2B00544E09 /* Resources */,
+				DF039B111C5F9298005E10F5 /* Sources */,
+				DF039B121C5F9298005E10F5 /* Frameworks */,
+				DF039B131C5F9298005E10F5 /* Headers */,
+				DF039B141C5F9298005E10F5 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -178,83 +139,72 @@
 			);
 			name = Finjinon;
 			productName = Finjinon;
-			productReference = 7670E4C01B217F2B00544E09 /* Finjinon.app */;
-			productType = "com.apple.product-type.application";
+			productReference = DF039B161C5F9298005E10F5 /* Finjinon.framework */;
+			productType = "com.apple.product-type.framework";
 		};
-		7670E4D41B217F2C00544E09 /* FinjinonTests */ = {
+		DF039B1F1C5F9298005E10F5 /* FinjinonTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7670E4E21B217F2C00544E09 /* Build configuration list for PBXNativeTarget "FinjinonTests" */;
+			buildConfigurationList = DF039B2D1C5F9298005E10F5 /* Build configuration list for PBXNativeTarget "FinjinonTests" */;
 			buildPhases = (
-				7670E4D11B217F2C00544E09 /* Sources */,
-				7670E4D21B217F2C00544E09 /* Frameworks */,
-				7670E4D31B217F2C00544E09 /* Resources */,
+				DF039B1C1C5F9298005E10F5 /* Sources */,
+				DF039B1D1C5F9298005E10F5 /* Frameworks */,
+				DF039B1E1C5F9298005E10F5 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				7670E4D71B217F2C00544E09 /* PBXTargetDependency */,
+				DF039B231C5F9298005E10F5 /* PBXTargetDependency */,
 			);
 			name = FinjinonTests;
 			productName = FinjinonTests;
-			productReference = 7670E4D51B217F2C00544E09 /* FinjinonTests.xctest */;
+			productReference = DF039B201C5F9298005E10F5 /* FinjinonTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		7670E4B81B217F2B00544E09 /* Project object */ = {
+		DF039B0D1C5F9298005E10F5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = FIN;
-				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastSwiftUpdateCheck = 0720;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "FINN.no AS";
 				TargetAttributes = {
-					7670E4BF1B217F2B00544E09 = {
-						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = 56289D44C8;
+					DF039B151C5F9298005E10F5 = {
+						CreatedOnToolsVersion = 7.2;
 					};
-					7670E4D41B217F2C00544E09 = {
-						CreatedOnToolsVersion = 6.3.2;
-						TestTargetID = 7670E4BF1B217F2B00544E09;
+					DF039B1F1C5F9298005E10F5 = {
+						CreatedOnToolsVersion = 7.2;
 					};
 				};
 			};
-			buildConfigurationList = 7670E4BB1B217F2B00544E09 /* Build configuration list for PBXProject "Finjinon" */;
+			buildConfigurationList = DF039B101C5F9298005E10F5 /* Build configuration list for PBXProject "Finjinon" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
-				nb,
 			);
-			mainGroup = 7670E4B71B217F2B00544E09;
-			productRefGroup = 7670E4C11B217F2B00544E09 /* Products */;
+			mainGroup = DF039B0C1C5F9298005E10F5;
+			productRefGroup = DF039B171C5F9298005E10F5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7670E4BF1B217F2B00544E09 /* Finjinon */,
-				7670E4D41B217F2C00544E09 /* FinjinonTests */,
+				DF039B151C5F9298005E10F5 /* Finjinon */,
+				DF039B1F1C5F9298005E10F5 /* FinjinonTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7670E4BE1B217F2B00544E09 /* Resources */ = {
+		DF039B141C5F9298005E10F5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				76BEC3941B3D6D3200B8D671 /* Localizable.strings in Resources */,
-				76BEC38C1B3D6C3400B8D671 /* Images.xcassets in Resources */,
-				76BEC38A1B3D6C3400B8D671 /* LaunchScreen.xib in Resources */,
-				76F257321B4BBAC800666DFE /* hoff.jpeg in Resources */,
-				76BEC38B1B3D6C3400B8D671 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7670E4D31B217F2C00544E09 /* Resources */ = {
+		DF039B1E1C5F9298005E10F5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -264,73 +214,41 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		7670E4BC1B217F2B00544E09 /* Sources */ = {
+		DF039B111C5F9298005E10F5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				76BEC3891B3D6C3400B8D671 /* AppDelegate.swift in Sources */,
-				76BC283B1B382E690039DEDF /* PhotoCollectionViewLayout.swift in Sources */,
-				76BC28391B382E250039DEDF /* PhotoCollectionViewCell.swift in Sources */,
-				76BEC38E1B3D6C3400B8D671 /* ViewController.swift in Sources */,
-				76E7FF291C466DCC0086DACA /* AssetResolver.swift in Sources */,
-				7670E5201B21B42600544E09 /* CaptureManager.swift in Sources */,
-				764A24431B32ABFD0080E832 /* Buttons.swift in Sources */,
-				7670E5181B21806200544E09 /* PhotoCaptureViewController.swift in Sources */,
-				764A24491B32E6830080E832 /* PhotoStorage.swift in Sources */,
-				76EEF5BE1B38151300E48071 /* ImagePickerAdapter.swift in Sources */,
+				DF039B331C5F9369005E10F5 /* AssetResolver.swift in Sources */,
+				DF039B3C1C5F937A005E10F5 /* PhotoCaptureViewController.swift in Sources */,
+				DF039B3B1C5F937A005E10F5 /* ImagePickerAdapter.swift in Sources */,
+				DF039B341C5F9369005E10F5 /* Buttons.swift in Sources */,
+				DF039B3F1C5F937A005E10F5 /* PhotoStorage.swift in Sources */,
+				DF039B3E1C5F937A005E10F5 /* PhotoCollectionViewLayout.swift in Sources */,
+				DF039B351C5F9369005E10F5 /* CaptureManager.swift in Sources */,
+				DF039B3D1C5F937A005E10F5 /* PhotoCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7670E4D11B217F2C00544E09 /* Sources */ = {
+		DF039B1C1C5F9298005E10F5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7670E4DC1B217F2C00544E09 /* FinjinonTests.swift in Sources */,
+				DF039B261C5F9298005E10F5 /* FinjinonTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		7670E4D71B217F2C00544E09 /* PBXTargetDependency */ = {
+		DF039B231C5F9298005E10F5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7670E4BF1B217F2B00544E09 /* Finjinon */;
-			targetProxy = 7670E4D61B217F2C00544E09 /* PBXContainerItemProxy */;
+			target = DF039B151C5F9298005E10F5 /* Finjinon */;
+			targetProxy = DF039B221C5F9298005E10F5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		76BEC3821B3D6C3400B8D671 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				76BEC3831B3D6C3400B8D671 /* Base */,
-				76BEC3901B3D6C9B00B8D671 /* nb */,
-			);
-			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
-		76BEC3841B3D6C3400B8D671 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				76BEC3851B3D6C3400B8D671 /* Base */,
-				76BEC3911B3D6C9B00B8D671 /* nb */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		76BEC3961B3D6D3200B8D671 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				76BEC3951B3D6D3200B8D671 /* Base */,
-				76BEC3971B3D6D4200B8D671 /* nb */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		7670E4DD1B217F2C00544E09 /* Debug */ = {
+		DF039B281C5F9298005E10F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -347,9 +265,9 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2.0.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -361,7 +279,6 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -373,10 +290,13 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
 		};
-		7670E4DE1B217F2C00544E09 /* Release */ = {
+		DF039B291C5F9298005E10F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -393,9 +313,9 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2.0.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -410,107 +330,101 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
-		7670E4E01B217F2C00544E09 /* Debug */ = {
+		DF039B2B1C5F9298005E10F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = Example/Info.plist;
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1.0;
+				DYLIB_CURRENT_VERSION = 2.0.2;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Finjinon/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "no.finn.$(PRODUCT_NAME:rfc1034identifier)";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = no.finn.Finjinon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		7670E4E11B217F2C00544E09 /* Release */ = {
+		DF039B2C1C5F9298005E10F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = Example/Info.plist;
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1.0;
+				DYLIB_CURRENT_VERSION = 2.0.2;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Finjinon/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "no.finn.$(PRODUCT_NAME:rfc1034identifier)";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = no.finn.Finjinon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
-		7670E4E31B217F2C00544E09 /* Debug */ = {
+		DF039B2E1C5F9298005E10F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = FinjinonTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "no.finn.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = no.finn.FinjinonTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Finjinon.app/Finjinon";
 			};
 			name = Debug;
 		};
-		7670E4E41B217F2C00544E09 /* Release */ = {
+		DF039B2F1C5F9298005E10F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = FinjinonTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "no.finn.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = no.finn.FinjinonTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Finjinon.app/Finjinon";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7670E4BB1B217F2B00544E09 /* Build configuration list for PBXProject "Finjinon" */ = {
+		DF039B101C5F9298005E10F5 /* Build configuration list for PBXProject "Finjinon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7670E4DD1B217F2C00544E09 /* Debug */,
-				7670E4DE1B217F2C00544E09 /* Release */,
+				DF039B281C5F9298005E10F5 /* Debug */,
+				DF039B291C5F9298005E10F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7670E4DF1B217F2C00544E09 /* Build configuration list for PBXNativeTarget "Finjinon" */ = {
+		DF039B2A1C5F9298005E10F5 /* Build configuration list for PBXNativeTarget "Finjinon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7670E4E01B217F2C00544E09 /* Debug */,
-				7670E4E11B217F2C00544E09 /* Release */,
+				DF039B2B1C5F9298005E10F5 /* Debug */,
+				DF039B2C1C5F9298005E10F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7670E4E21B217F2C00544E09 /* Build configuration list for PBXNativeTarget "FinjinonTests" */ = {
+		DF039B2D1C5F9298005E10F5 /* Build configuration list for PBXNativeTarget "FinjinonTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7670E4E31B217F2C00544E09 /* Debug */,
-				7670E4E41B217F2C00544E09 /* Release */,
+				DF039B2E1C5F9298005E10F5 /* Debug */,
+				DF039B2F1C5F9298005E10F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 7670E4B81B217F2B00544E09 /* Project object */;
+	rootObject = DF039B0D1C5F9298005E10F5 /* Project object */;
 }
