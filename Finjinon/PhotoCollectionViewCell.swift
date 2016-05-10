@@ -32,7 +32,7 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
 
-        closeButton.addTarget(self, action: Selector("closeButtonTapped:"), forControlEvents: .TouchUpInside)
+        closeButton.addTarget(self, action: #selector(closeButtonTapped(_:)), forControlEvents: .TouchUpInside)
         contentView.addSubview(closeButton)
     }
 

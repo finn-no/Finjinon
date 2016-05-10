@@ -53,7 +53,7 @@ class CaptureManager: NSObject {
         previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.videoGravity = self.viewfinderMode == .FullScreen ? AVLayerVideoGravityResizeAspectFill : AVLayerVideoGravityResize
         super.init()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("changedOrientationNotification:"), name: UIDeviceOrientationDidChangeNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(changedOrientationNotification(_:)), name: UIDeviceOrientationDidChangeNotification, object: nil)
         changedOrientationNotification(nil)
     }
 

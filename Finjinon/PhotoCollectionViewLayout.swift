@@ -264,11 +264,11 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
             collectionView!.removeGestureRecognizer(longPressGestureRecognizer)
             collectionView!.removeGestureRecognizer(panGestureRecognizer)
 
-            longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPressGestureRecognized:"))
+            longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGestureRecognized(_:)))
             longPressGestureRecognizer.delegate = self
             collectionView!.addGestureRecognizer(longPressGestureRecognizer)
             
-            panGestureRecognizer = UIPanGestureRecognizer(target: self, action: Selector("handlePanGestureRecognized:"))
+            panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGestureRecognized(_:)))
             panGestureRecognizer.delegate = self
             panGestureRecognizer.maximumNumberOfTouches = 1
             collectionView!.addGestureRecognizer(panGestureRecognizer)

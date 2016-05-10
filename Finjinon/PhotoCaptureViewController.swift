@@ -84,13 +84,13 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         flashButton = UIButton(frame: CGRect(x: buttonMargin, y: buttonMargin, width: 70, height: 38))
         flashButton.setImage(UIImage(named: "LightningIcon"), forState: .Normal)
         flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), forState: .Normal)
-        flashButton.addTarget(self, action: Selector("flashButtonTapped:"), forControlEvents: .TouchUpInside)
+        flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), forControlEvents: .TouchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
         flashButton.tintColor = UIColor.whiteColor()
         flashButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
         roundifyButton(flashButton, inset: 14)
 
-        let tapper = UITapGestureRecognizer(target: self, action: Selector("focusTapGestureRecognized:"))
+        let tapper = UITapGestureRecognizer(target: self, action: #selector(focusTapGestureRecognized(_:)))
         previewView.addGestureRecognizer(tapper)
 
         var collectionViewHeight: CGFloat = min(view.frame.size.height/6, 120)
@@ -133,13 +133,13 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
 
         captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-cameraButtonHeight/2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight))
         captureButton.layer.cornerRadius = cameraButtonHeight/2
-        captureButton.addTarget(self, action: Selector("capturePhotoTapped:"), forControlEvents: .TouchUpInside)
+        captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), forControlEvents: .TouchUpInside)
         containerView.addSubview(captureButton)
         captureButton.enabled = false
         captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
 
         closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
-        closeButton.addTarget(self, action: Selector("doneButtonTapped:"), forControlEvents: .TouchUpInside)
+        closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), forControlEvents: .TouchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), forState: .Normal)
         closeButton.tintColor = UIColor.whiteColor()
         closeButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
@@ -149,7 +149,7 @@ public class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLa
         pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
         pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), forState: .Normal)
         pickerButton.setImage(UIImage(named: "PhotosIcon"), forState: .Normal)
-        pickerButton.addTarget(self, action: Selector("presentImagePickerTapped:"), forControlEvents: .TouchUpInside)
+        pickerButton.addTarget(self, action: #selector(presentImagePickerTapped(_:)), forControlEvents: .TouchUpInside)
         pickerButton.titleLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleFootnote)
         pickerButton.autoresizingMask = [.FlexibleTopMargin]
         pickerButton.layer.anchorPoint = CGPointMake(0.5, 0.5)
