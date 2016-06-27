@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Finjinon"
-  s.version      = "2.0.3"
+  s.version      = "2.1"
   s.summary      = "Custom iOS camera optimized for taking a sequence of photos quickly and/or selecting from an image picker"
 
   s.description  = <<-DESC
