@@ -14,13 +14,13 @@ class FinjinonTests: XCTestCase {
 
     func testViewRotateToDeviceOrientationExtension() {
         let view = UIView(frame: CGRect.zero)
-        view.rotateToDeviceOrientation(.Portrait)
+        view.rotateToDeviceOrientation(.portrait)
         let portraitTransform = view.transform
-        view.rotateToDeviceOrientation(.PortraitUpsideDown)
+        view.rotateToDeviceOrientation(.portraitUpsideDown)
         let portraitUpsideDownTransform = view.transform
-        view.rotateToDeviceOrientation(.LandscapeLeft)
+        view.rotateToDeviceOrientation(.landscapeLeft)
         let landscapeLeftTransform = view.transform
-        view.rotateToDeviceOrientation(.LandscapeRight)
+        view.rotateToDeviceOrientation(.landscapeRight)
         let landscapRightTransform = view.transform
 
         // portrait vs. portraitUpsideDown
@@ -48,11 +48,11 @@ class FinjinonTests: XCTestCase {
         XCTAssertNotEqual(landscapRightTransform.c, landscapeLeftTransform.c)
 
         // Test that .FaceUp & .FaceDown does not trigger any changes.
-        view.rotateToDeviceOrientation(.Portrait)
+        view.rotateToDeviceOrientation(.portrait)
         let unchangeableTransform = view.transform
-        view.rotateToDeviceOrientation(.FaceDown)
+        view.rotateToDeviceOrientation(.faceDown)
         let faceDownTransform = view.transform
-        view.rotateToDeviceOrientation(.FaceUp)
+        view.rotateToDeviceOrientation(.faceUp)
         let faceUpTransform = view.transform
         XCTAssertEqual(unchangeableTransform.a, faceDownTransform.a)
         XCTAssertEqual(unchangeableTransform.b, faceDownTransform.b)

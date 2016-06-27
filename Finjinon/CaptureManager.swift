@@ -10,8 +10,8 @@ import UIKit
 import AVFoundation
 
 enum CaptureManagerViewfinderMode {
-    case FullScreen
-    case Window
+    case fullScreen
+    case window
 }
 
 class CaptureManager: NSObject {
@@ -22,11 +22,11 @@ class CaptureManager: NSObject {
         }
     }
     var hasFlash: Bool {
-        return cameraDevice.hasFlash && cameraDevice.flashAvailable
+        return cameraDevice.hasFlash && cameraDevice.isFlashAvailable
     }
     var supportedFlashModes: [AVCaptureFlashMode] {
         var modes: [AVCaptureFlashMode] = []
-        for mode in [AVCaptureFlashMode.Off, AVCaptureFlashMode.Auto, AVCaptureFlashMode.On] {
+        for mode in [AVCaptureFlashMode.off, AVCaptureFlashMode.auto, AVCaptureFlashMode.on] {
             if cameraDevice.isFlashModeSupported(mode) {
                 modes.append(mode)
             }
@@ -36,77 +36,77 @@ class CaptureManager: NSObject {
     let viewfinderMode : CaptureManagerViewfinderMode
 
     private let session = AVCaptureSession()
-    private let captureQueue = dispatch_queue_create("no.finn.finjinon-captures", DISPATCH_QUEUE_SERIAL)
+    private let captureQueue = DispatchQueue(label: "no.finn.finjinon-captures", attributes: DispatchQueueAttributes.serial)
     private var cameraDevice: AVCaptureDevice!
     private var stillImageOutput: AVCaptureStillImageOutput!
-    private var orientation = AVCaptureVideoOrientation.Portrait
+    private var orientation = AVCaptureVideoOrientation.portrait
 
     override init() {
         session.sessionPreset = AVCaptureSessionPresetPhoto
         var viewfinderMode : CaptureManagerViewfinderMode {
-            let screenBounds = UIScreen.mainScreen().nativeBounds
+            let screenBounds = UIScreen.main().nativeBounds
             let ratio = screenBounds.height / screenBounds.width
-            return ratio <= 1.5 ? .FullScreen : .Window
+            return ratio <= 1.5 ? .fullScreen : .window
         }
         self.viewfinderMode = viewfinderMode
 
         previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.videoGravity = self.viewfinderMode == .FullScreen ? AVLayerVideoGravityResizeAspectFill : AVLayerVideoGravityResize
+        previewLayer.videoGravity = self.viewfinderMode == .fullScreen ? AVLayerVideoGravityResizeAspectFill : AVLayerVideoGravityResize
         super.init()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(changedOrientationNotification(_:)), name: UIDeviceOrientationDidChangeNotification, object: nil)
+        NotificationCenter.default().addObserver(self, selector: #selector(changedOrientationNotification(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         changedOrientationNotification(nil)
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default().removeObserver(self)
     }
 
     // MARK: - API
 
     func authorizationStatus() -> AVAuthorizationStatus {
-        return AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+        return AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
     }
 
     // Prepares the capture session, possibly asking the user for camera access.
-    func prepare(completion: NSError? -> Void) {
+    func prepare(_ completion: (NSError?) -> Void) {
         switch authorizationStatus() {
-        case .Authorized:
+        case .authorized:
             configure(completion)
-        case .NotDetermined:
-            AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: { granted in
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { granted in
                 if granted {
                     self.configure(completion)
                 } else {
-                    dispatch_async(dispatch_get_main_queue()) {
+                    DispatchQueue.main.async {
                         completion(self.accessDeniedError(FinjinonCameraAccessErrorDeniedInitialRequestCode))
                     }
                 }
             })
-        case .Denied, .Restricted:
+        case .denied, .restricted:
             completion(self.accessDeniedError())
         }
     }
 
-    func stop(completion: (() -> Void)?) {
-        dispatch_async(captureQueue) {
-            if self.session.running {
+    func stop(_ completion: (() -> Void)?) {
+        captureQueue.async {
+            if self.session.isRunning {
                 self.session.stopRunning()
             }
             completion?()
         }
     }
 
-    func captureImage(completion: (NSData, NSDictionary) -> Void) { // TODO: throws
-        dispatch_async(captureQueue) {
-            let connection = self.stillImageOutput.connectionWithMediaType(AVMediaTypeVideo)
-            connection.videoOrientation = self.orientation
+    func captureImage(_ completion: (Data, NSDictionary) -> Void) { // TODO: throws
+        captureQueue.async {
+            let connection = self.stillImageOutput.connection(withMediaType: AVMediaTypeVideo)
+            connection?.videoOrientation = self.orientation
 
-            self.stillImageOutput.captureStillImageAsynchronouslyFromConnection(connection, completionHandler: { (sampleBuffer, error) in
+            self.stillImageOutput.captureStillImageAsynchronously(from: connection, completionHandler: { (sampleBuffer, error) in
                 if error == nil {
                     let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            completion(data, metadata)
+                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer!, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
+                        DispatchQueue.main.async {
+                            completion(data!, metadata)
                         }
                     } else {
                         print("failed creating metadata")
@@ -119,20 +119,20 @@ class CaptureManager: NSObject {
         }
     }
 
-    func lockFocusAtPointOfInterest(pointInLayer: CGPoint) {
-        let pointInCamera = previewLayer.captureDevicePointOfInterestForPoint(pointInLayer)
+    func lockFocusAtPointOfInterest(_ pointInLayer: CGPoint) {
+        let pointInCamera = previewLayer.captureDevicePointOfInterest(for: pointInLayer)
         self.lockCurrentCameraDeviceForConfiguration { cameraDevice in
-            if cameraDevice.focusPointOfInterestSupported {
+            if cameraDevice.isFocusPointOfInterestSupported {
                 cameraDevice.focusPointOfInterest = pointInCamera
-                cameraDevice.focusMode = .AutoFocus
+                cameraDevice.focusMode = .autoFocus
             }
         }
     }
 
-    func changeFlashMode(newMode: AVCaptureFlashMode, completion: () -> Void) {
+    func changeFlashMode(_ newMode: AVCaptureFlashMode, completion: () -> Void) {
         lockCurrentCameraDeviceForConfiguration { device in
             device.flashMode = newMode
-            dispatch_async(dispatch_get_main_queue(), completion)
+            DispatchQueue.main.async(execute: completion)
         }
     }
 
@@ -144,7 +144,7 @@ class CaptureManager: NSObject {
 
         // Find the next available mode, or wrap around
         var nextIndex = 0
-        if let idx = supportedFlashModes.indexOf(flashMode) {
+        if let idx = supportedFlashModes.index(of: flashMode) {
             nextIndex = idx + 1
         }
         let startIndex = min(nextIndex, supportedFlashModes.count)
@@ -155,25 +155,25 @@ class CaptureManager: NSObject {
 
     // Orientation change function required because we've locked the interface in portrait
     // and DeviceOrientation does not map 1:1 with AVCaptureVideoOrientation
-    func changedOrientationNotification(notification: NSNotification?) {
-        let currentDeviceOrientation = UIDevice.currentDevice().orientation
+    func changedOrientationNotification(_ notification: Notification?) {
+        let currentDeviceOrientation = UIDevice.current().orientation
         switch currentDeviceOrientation {
-        case .FaceDown, .FaceUp, .Unknown:
+        case .faceDown, .faceUp, .unknown:
             break
-        case .LandscapeLeft, .LandscapeRight, .Portrait, .PortraitUpsideDown:
+        case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
             orientation = AVCaptureVideoOrientation(rawValue: currentDeviceOrientation.rawValue)!
         }
     }
 
     // MARK: - Private methods
 
-    private func accessDeniedError(code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
+    private func accessDeniedError(_ code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
         let info = [NSLocalizedDescriptionKey: NSLocalizedString("Camera access denied, please enable it in the Settings app to continue", comment: "")]
         return NSError(domain: FinjinonCameraAccessErrorDomain, code: code, userInfo: info)
     }
 
-    private func lockCurrentCameraDeviceForConfiguration(configurator: AVCaptureDevice -> Void) {
-        dispatch_async(captureQueue) {
+    private func lockCurrentCameraDeviceForConfiguration(_ configurator: (AVCaptureDevice) -> Void) {
+        captureQueue.async {
             var error: NSError?
             do {
                 try self.cameraDevice.lockForConfiguration()
@@ -190,9 +190,9 @@ class CaptureManager: NSObject {
         }
     }
 
-    private func configure(completion: NSError? -> Void) {
-        dispatch_async(captureQueue) {
-            self.cameraDevice = self.cameraDeviceWithPosition(.Back)
+    private func configure(_ completion: (NSError?) -> Void) {
+        captureQueue.async {
+            self.cameraDevice = self.cameraDeviceWithPosition(.back)
             var error: NSError?
 
             do {
@@ -220,35 +220,35 @@ class CaptureManager: NSObject {
 
 
 
-            if self.cameraDevice.isFocusModeSupported(.ContinuousAutoFocus) {
+            if self.cameraDevice.isFocusModeSupported(.continuousAutoFocus) {
                 do {
                     try self.cameraDevice.lockForConfiguration()
                 } catch let error2 as NSError {
                     error = error2
                 }
-                self.cameraDevice.focusMode = .ContinuousAutoFocus
-                if self.cameraDevice.smoothAutoFocusSupported {
-                    self.cameraDevice.smoothAutoFocusEnabled = true
+                self.cameraDevice.focusMode = .continuousAutoFocus
+                if self.cameraDevice.isSmoothAutoFocusSupported {
+                    self.cameraDevice.isSmoothAutoFocusEnabled = true
                 }
                 self.cameraDevice.unlockForConfiguration()
             }
 
             self.session.startRunning()
 
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 completion(error)
             }
         }
     }
 
-    private func cameraDeviceWithPosition(position: AVCaptureDevicePosition) -> AVCaptureDevice? {
-        let availableCameraDevices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo)
+    private func cameraDeviceWithPosition(_ position: AVCaptureDevicePosition) -> AVCaptureDevice? {
+        let availableCameraDevices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo)
         for device in availableCameraDevices as! [AVCaptureDevice] {
             if device.position == position {
                 return device
             }
         }
 
-        return AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
+        return AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
     }
 }

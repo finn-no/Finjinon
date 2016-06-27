@@ -9,16 +9,16 @@
 import UIKit
 
 private class DraggingProxy: UIView {
-    var dragIndexPath: NSIndexPath? // Current indexPath
+    var dragIndexPath: IndexPath? // Current indexPath
     var dragCenter = CGPoint.zero // point being dragged from
-    var fromIndexPath: NSIndexPath? // Original index path
-    var toIndexPath: NSIndexPath? // index path the proxy was dragged to
+    var fromIndexPath: IndexPath? // Original index path
+    var toIndexPath: IndexPath? // index path the proxy was dragged to
     var initialCenter = CGPoint.zero
 
     init(cell: PhotoCollectionViewCell) {
         super.init(frame: CGRect.zero)
 
-        backgroundColor = UIColor.clearColor()
+        backgroundColor = UIColor.clear()
         autoresizingMask = cell.autoresizingMask
         clipsToBounds = true
         frame = CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height)
@@ -33,13 +33,13 @@ private class DraggingProxy: UIView {
 }
 
 public protocol PhotoCollectionViewLayoutDelegate: NSObjectProtocol {
-    func photoCollectionViewLayout(layout: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: NSIndexPath) -> Bool
+    func photoCollectionViewLayout(_ layout: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: IndexPath) -> Bool
 }
 
 internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
-    internal var didReorderHandler: (fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) -> Void = { (_,_) in }
-    private var insertedIndexPaths: [NSIndexPath] = []
-    private var deletedIndexPaths: [NSIndexPath] = []
+    internal var didReorderHandler: (fromIndexPath: IndexPath, toIndexPath: IndexPath) -> Void = { (_,_) in }
+    private var insertedIndexPaths: [IndexPath] = []
+    private var deletedIndexPaths: [IndexPath] = []
     private var longPressGestureRecognizer = UILongPressGestureRecognizer()
     private var panGestureRecognizer = UIPanGestureRecognizer()
     private var dragProxy: DraggingProxy?
@@ -59,27 +59,27 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         self.removeObserver(self, forKeyPath: "collectionView", context: nil)
     }
 
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?, change: [NSKeyValueChangeKey : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
         if keyPath == "collectionView" {
             setupGestureRecognizers()
         } else {
-            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
 
     // MARK: - UICollectionView
 
-    override func prepareForCollectionViewUpdates(updateItems: [UICollectionViewUpdateItem]) {
-        super.prepareForCollectionViewUpdates(updateItems)
+    override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem]) {
+        super.prepare(forCollectionViewUpdates: updateItems)
 
-        insertedIndexPaths.removeAll(keepCapacity: false)
-        deletedIndexPaths.removeAll(keepCapacity: false)
+        insertedIndexPaths.removeAll(keepingCapacity: false)
+        deletedIndexPaths.removeAll(keepingCapacity: false)
 
         for update in updateItems {
             switch update.updateAction {
-            case .Insert:
+            case .insert:
                 insertedIndexPaths.append(update.indexPathAfterUpdate!)
-            case .Delete:
+            case .delete:
                 deletedIndexPaths.append(update.indexPathBeforeUpdate!)
             default:
                 return
@@ -90,18 +90,18 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
     override func finalizeCollectionViewUpdates() {
         super.finalizeCollectionViewUpdates()
 
-        insertedIndexPaths.removeAll(keepCapacity: false)
-        deletedIndexPaths.removeAll(keepCapacity: false)
+        insertedIndexPaths.removeAll(keepingCapacity: false)
+        deletedIndexPaths.removeAll(keepingCapacity: false)
     }
 
-    override func initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-        let attrs = super.initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath)
+    override func initialLayoutAttributesForAppearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        let attrs = super.initialLayoutAttributesForAppearingItem(at: itemIndexPath)
 
         if insertedIndexPaths.contains(itemIndexPath) {
             // only change attributes on inserted cells
             if let attrs = attrs {
                 attrs.alpha = 0.0
-                attrs.zIndex = itemIndexPath.item
+                attrs.zIndex = (itemIndexPath as NSIndexPath).item
                 attrs.center.x = self.collectionView!.frame.width / 2
                 attrs.center.y = self.collectionView!.frame.height
                 if self.collectionView!.contentOffset.x > 0.0 {
@@ -114,8 +114,8 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         return attrs
     }
 
-    override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-        let attrs = super.finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath)
+    override func finalLayoutAttributesForDisappearingItem(at itemIndexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        let attrs = super.finalLayoutAttributesForDisappearingItem(at: itemIndexPath)
 
         if deletedIndexPaths.contains(itemIndexPath) {
             if let attrs = attrs {
@@ -132,10 +132,10 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         return attrs
     }
 
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        if let attributes = super.layoutAttributesForElementsInRect(rect) {
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        if let attributes = super.layoutAttributesForElements(in: rect) {
             for layoutAttribute in attributes {
-                if layoutAttribute.representedElementCategory != .Cell {
+                if layoutAttribute.representedElementCategory != .cell {
                     continue
                 }
 
@@ -151,7 +151,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
     // MARK: - UIGestureRecognizerDelegate
 
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == longPressGestureRecognizer && otherGestureRecognizer == panGestureRecognizer {
             return true
         } else if gestureRecognizer == panGestureRecognizer {
@@ -161,19 +161,19 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         return true
     }
 
-    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
-        func canMoveItemAtIndexPath(indexPath: NSIndexPath) -> Bool {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        func canMoveItemAtIndexPath(_ indexPath: IndexPath) -> Bool {
             return delegate?.photoCollectionViewLayout(self, canMoveItemAtIndexPath: indexPath) ?? true
         }
 
         if gestureRecognizer == longPressGestureRecognizer {
-            let location = gestureRecognizer.locationInView(collectionView)
-            if let indexPath = collectionView?.indexPathForItemAtPoint(location) where !canMoveItemAtIndexPath(indexPath) {
+            let location = gestureRecognizer.location(in: collectionView)
+            if let indexPath = collectionView?.indexPathForItem(at: location) where !canMoveItemAtIndexPath(indexPath) {
                 return false
             }
         }
 
-        let states: [UIGestureRecognizerState] = [.Possible, .Failed]
+        let states: [UIGestureRecognizerState] = [.possible, .failed]
         if gestureRecognizer == longPressGestureRecognizer && !states.contains(collectionView!.panGestureRecognizer.state) {
             return false
         } else if gestureRecognizer == panGestureRecognizer && states.contains(longPressGestureRecognizer.state) {
@@ -185,11 +185,11 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
     // MARK: -  Private methods
 
-    func handleLongPressGestureRecognized(recognizer: UILongPressGestureRecognizer) {
+    func handleLongPressGestureRecognized(_ recognizer: UILongPressGestureRecognizer) {
         switch recognizer.state {
-        case .Began:
-            let location = recognizer.locationInView(collectionView)
-            if let indexPath = collectionView!.indexPathForItemAtPoint(location), let cell = collectionView!.cellForItemAtIndexPath(indexPath) {
+        case .began:
+            let location = recognizer.location(in: collectionView)
+            if let indexPath = collectionView!.indexPathForItem(at: location), let cell = collectionView!.cellForItem(at: indexPath) {
                 dragProxy?.removeFromSuperview()
                 let proxy = DraggingProxy(cell: cell as! PhotoCollectionViewCell)
                 proxy.dragIndexPath = indexPath
@@ -204,15 +204,15 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
                 invalidateLayout()
 
-                UIView.animateWithDuration(0.16, animations: {
-                    self.dragProxy?.transform = CGAffineTransformMakeScale(1.1, 1.1)
+                UIView.animate(withDuration: 0.16, animations: {
+                    self.dragProxy?.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
                 })
             }
-        case .Ended:
+        case .ended:
             if let proxy = self.dragProxy {
-                UIView.animateWithDuration(0.2, delay: 0.0, options: [.BeginFromCurrentState, .CurveEaseIn], animations: {
+                UIView.animate(withDuration: 0.2, delay: 0.0, options: [.beginFromCurrentState, .curveEaseIn], animations: {
                     proxy.center = proxy.dragCenter
-                    proxy.transform = CGAffineTransformIdentity
+                    proxy.transform = CGAffineTransform.identity
                     }, completion: { finished in
                         proxy.removeFromSuperview()
 
@@ -230,25 +230,25 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         }
     }
 
-    func handlePanGestureRecognized(recognizer: UIPanGestureRecognizer) {
-        let translation = recognizer.translationInView(collectionView!)
+    func handlePanGestureRecognized(_ recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translation(in: collectionView!)
         switch recognizer.state {
-        case .Changed:
+        case .changed:
             if let proxy = dragProxy {
                 proxy.center.x = proxy.initialCenter.x + translation.x
                 //TODO: Constrain to be within collectionView.frame:
                 // proxy.center.y = proxy.originalCenter.y + translation.y
 
                 if let fromIndexPath = proxy.dragIndexPath,
-                    let toIndexPath = collectionView!.indexPathForItemAtPoint(proxy.center),
-                    let targetLayoutAttributes = layoutAttributesForItemAtIndexPath(toIndexPath) {
+                    let toIndexPath = collectionView!.indexPathForItem(at: proxy.center),
+                    let targetLayoutAttributes = layoutAttributesForItem(at: toIndexPath) {
                         proxy.dragIndexPath = toIndexPath
                         proxy.dragCenter = targetLayoutAttributes.center
                         proxy.bounds = targetLayoutAttributes.bounds
                         proxy.toIndexPath = toIndexPath
 
                         collectionView?.performBatchUpdates({
-                            self.collectionView?.moveItemAtIndexPath(fromIndexPath, toIndexPath: toIndexPath)
+                            self.collectionView?.moveItem(at: fromIndexPath, to: toIndexPath)
                             }, completion: nil
                         )
                 }

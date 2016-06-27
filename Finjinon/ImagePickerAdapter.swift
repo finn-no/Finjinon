@@ -16,15 +16,15 @@ public protocol ImagePickerAdapter {
     // The completion handler will be called when done, supplying the caller with a didCancel flag which will be true
     // if the user cancelled the image selection process.
     // NOTE: The caller is responsible for dismissing any presented view controllers in the completion handler.
-    func viewControllerForImageSelection(selectedAssetsHandler: [PHAsset] -> Void, completion: Bool -> Void) -> UIViewController
+    func viewControllerForImageSelection(_ selectedAssetsHandler: ([PHAsset]) -> Void, completion: (Bool) -> Void) -> UIViewController
 }
 
 
 public class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    var selectionHandler: [PHAsset] -> Void = { _ in }
+    var selectionHandler: ([PHAsset]) -> Void = { _ in }
     var completionHandler: (didCancel: Bool) -> Void = { _ in }
 
-    public func viewControllerForImageSelection(selectedAssetsHandler: [PHAsset] -> Void, completion: Bool -> Void) -> UIViewController {
+    public func viewControllerForImageSelection(_ selectedAssetsHandler: ([PHAsset]) -> Void, completion: (Bool) -> Void) -> UIViewController {
         self.selectionHandler = selectedAssetsHandler
         self.completionHandler = completion
 
@@ -35,14 +35,14 @@ public class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImage
         return picker
     }
 
-    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? NSURL else {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL else {
             completionHandler(didCancel: true)
             return
         }
 
-        let fetchResult = PHAsset.fetchAssetsWithALAssetURLs([referenceURL], options: nil)
-        if let asset = fetchResult.firstObject as? PHAsset {
+        let fetchResult = PHAsset.fetchAssets(withALAssetURLs: [referenceURL], options: nil)
+        if let asset = fetchResult.firstObject {
             selectionHandler([asset])
             completionHandler(didCancel: false)
         } else {
@@ -51,7 +51,7 @@ public class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImage
         }
     }
 
-    public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         completionHandler(didCancel: true)
     }
 }
