@@ -71,8 +71,8 @@ public class PhotoStorage {
 
     init() {
         var cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last!
-        cacheURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
-        self.baseURL = cacheURL.URLByAppendingPathComponent(NSUUID().UUIDString)
+        cacheURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")!
+        self.baseURL = cacheURL.URLByAppendingPathComponent(NSUUID().UUIDString)!
     }
 
     deinit {
@@ -229,7 +229,7 @@ public class PhotoStorage {
 
     private func cacheURLForAsset(asset: Asset) -> NSURL {
         ensureCacheDirectoryExists()
-        return baseURL.URLByAppendingPathComponent(asset.UUID)
+        return baseURL.URLByAppendingPathComponent(asset.UUID)!
     }
 
     private func ensureCacheDirectoryExists() {

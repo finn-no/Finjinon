@@ -25,6 +25,11 @@ class ViewController: UITableViewController {
         }
     }
 
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+
     @IBAction func addPhotosTapped(sender: AnyObject) {
         presentViewController(captureController, animated: true, completion: nil)
     }
