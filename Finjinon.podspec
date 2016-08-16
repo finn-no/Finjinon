@@ -47,7 +47,7 @@ Finjinon is a custom AVFoundation based camera UI, focused on quickly adding sev
   #
 
   s.source_files  = "Finjinon"
-  s.ios.resource_bundles  = { 'Finjinon-iOS' => ['Finjinon/*.lproj'] }
+  #s.ios.resource_bundles  = { 'Finjinon-iOS' => ['Finjinon/*.lproj'] }
 
   # s.public_header_files = "Classes/**/*.h"
 
