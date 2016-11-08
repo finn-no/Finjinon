@@ -20,26 +20,26 @@ class ViewController: UITableViewController {
         for i in 0..<6 {
             self.captureController.createAssetFromImage(UIImage(named: "hoff.jpeg")!) { asset in
                 self.assets.append(asset)
-                self.tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: i, inSection: 0)], withRowAnimation: .Automatic)
+                self.tableView.insertRows(at: [IndexPath(row: i, section: 0)], with: .automatic)
             }
         }
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
     }
 
-    @IBAction func addPhotosTapped(sender: AnyObject) {
-        presentViewController(captureController, animated: true, completion: nil)
+    @IBAction func addPhotosTapped(_ sender: AnyObject) {
+        present(captureController, animated: true, completion: nil)
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return assets.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("ItemCell", forIndexPath: indexPath) 
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath) 
         let asset = assets[indexPath.row]
         cell.textLabel?.text = asset.UUID
         cell.imageView?.image = nil
@@ -54,7 +54,7 @@ class ViewController: UITableViewController {
 
 
 extension ViewController: PhotoCaptureViewControllerDelegate {
-    func photoCaptureViewController(controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: NSIndexPath) -> PhotoCollectionViewCell? {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: IndexPath) -> PhotoCollectionViewCell? {
         return controller.dequeuedReusableCellForClass(PhotoCollectionViewCell.self, indexPath: indexPath) { cell in
             let asset = self.assets[indexPath.item]
             // Set a thumbnail form the source image, or add your own network fetch code etc
@@ -68,42 +68,42 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
         }
     }
 
-    func photoCaptureViewControllerDidFinish(controller: PhotoCaptureViewController) {
+    func photoCaptureViewControllerDidFinish(_ controller: PhotoCaptureViewController) {
 
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: NSIndexPath) {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: IndexPath) {
         NSLog("tapped in \(indexPath.row)")
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didFailWithError error: NSError) {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didFailWithError error: NSError) {
         NSLog("failure: \(error)")
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: IndexPath, toIndexPath: IndexPath) {
         NSLog("moved from #\(fromIndexPath.item) to #\(toIndexPath.item)")
-        tableView.moveRowAtIndexPath(fromIndexPath, toIndexPath: toIndexPath)
+        tableView.moveRow(at: fromIndexPath, to: toIndexPath)
     }
 
-    func photoCaptureViewControllerNumberOfAssets(controller: PhotoCaptureViewController) -> Int {
+    func photoCaptureViewControllerNumberOfAssets(_ controller: PhotoCaptureViewController) -> Int {
         return assets.count
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, assetForIndexPath indexPath: NSIndexPath) -> Asset {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, assetForIndexPath indexPath: IndexPath) -> Asset {
         return assets[indexPath.item]
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, didAddAsset asset: Asset) {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didAddAsset asset: Asset) {
         assets.append(asset)
-        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Automatic)
+        tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: NSIndexPath) {
-        assets.removeAtIndex(indexPath.item)
-        tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0)], withRowAnimation: .Automatic)
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: IndexPath) {
+        assets.remove(at: indexPath.item)
+        tableView.deleteRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
     }
 
-    func photoCaptureViewController(controller: PhotoCaptureViewController, canMoveItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, canMoveItemAtIndexPath indexPath: IndexPath) -> Bool {
         return true
     }
 }

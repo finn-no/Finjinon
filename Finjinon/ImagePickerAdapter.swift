@@ -16,15 +16,16 @@ public protocol ImagePickerAdapter {
     // The completion handler will be called when done, supplying the caller with a didCancel flag which will be true
     // if the user cancelled the image selection process.
     // NOTE: The caller is responsible for dismissing any presented view controllers in the completion handler.
-    func viewControllerForImageSelection(selectedAssetsHandler: [PHAsset] -> Void, completion: Bool -> Void) -> UIViewController
+    func viewControllerForImageSelection(_ selectedAssetsHandler: @escaping ([PHAsset]) -> Void, completion: @escaping (Bool) -> Void) -> UIViewController
 }
 
 
-public class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    var selectionHandler: [PHAsset] -> Void = { _ in }
-    var completionHandler: (didCancel: Bool) -> Void = { _ in }
+open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
-    public func viewControllerForImageSelection(selectedAssetsHandler: [PHAsset] -> Void, completion: Bool -> Void) -> UIViewController {
+    var selectionHandler: ([PHAsset]) -> Void = { _ in }
+    var completionHandler: (_ didCancel: Bool) -> Void = { _ in }
+
+    open func viewControllerForImageSelection(_ selectedAssetsHandler: @escaping ([PHAsset]) -> Void, completion: @escaping (Bool) -> Void) -> UIViewController {
         self.selectionHandler = selectedAssetsHandler
         self.completionHandler = completion
 
@@ -35,23 +36,23 @@ public class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImage
         return picker
     }
 
-    public func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? NSURL else {
-            completionHandler(didCancel: true)
+    open func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL else {
+            completionHandler(true)
             return
         }
 
-        let fetchResult = PHAsset.fetchAssetsWithALAssetURLs([referenceURL], options: nil)
-        if let asset = fetchResult.firstObject as? PHAsset {
+        let fetchResult = PHAsset.fetchAssets(withALAssetURLs: [referenceURL], options: nil)
+        if let asset = fetchResult.firstObject {
             selectionHandler([asset])
-            completionHandler(didCancel: false)
+            completionHandler(false)
         } else {
             NSLog("*** Failed to fetch PHAsset for asset library URL: \(referenceURL): \(fetchResult.firstObject)")
-            completionHandler(didCancel: true)
+            completionHandler(true)
         }
     }
 
-    public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        completionHandler(didCancel: true)
+    open func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        completionHandler(true)
     }
 }

@@ -13,18 +13,18 @@ import AssetsLibrary
 // TODO also support ALAsset/PHPhoto
 
 public struct Asset: Equatable, CustomStringConvertible {
-    public let UUID = NSUUID().UUIDString
+    public let UUID = Foundation.UUID().uuidString
     let storage: PhotoStorage
     struct Remote {
-        let url: NSURL
+        let url: URL
         let originalDimensions: CGSize
     }
-    private let remoteReference: Remote?
-    public var imageURL: NSURL? {
+    fileprivate let remoteReference: Remote?
+    public var imageURL: URL? {
         return remoteReference?.url
     }
 
-    internal init(storage: PhotoStorage, imageURL: NSURL, originalDimensions: CGSize) {
+    internal init(storage: PhotoStorage, imageURL: URL, originalDimensions: CGSize) {
         self.storage = storage
         self.remoteReference = Remote(url: imageURL, originalDimensions: originalDimensions)
     }
@@ -34,11 +34,11 @@ public struct Asset: Equatable, CustomStringConvertible {
         self.remoteReference = nil
     }
 
-    public func originalImage(result: UIImage -> Void) {
+    public func originalImage(_ result: @escaping (UIImage) -> Void) {
         storage.imageForAsset(self, completion: result)
     }
 
-    public func imageWithWidth(width: CGFloat, result: UIImage -> Void) {
+    public func imageWithWidth(_ width: CGFloat, result: @escaping (UIImage) -> Void) {
         storage.thumbnailForAsset(self, forWidth: width, completion: result)
     }
 
@@ -51,7 +51,7 @@ public struct Asset: Equatable, CustomStringConvertible {
     }
 
     public var description: String {
-        return "<\(self.dynamicType) UUID: \(UUID)>"
+        return "<\(type(of: self)) UUID: \(UUID)>"
     }
 }
 
@@ -61,30 +61,25 @@ public func ==(lhs: Asset, rhs: Asset) -> Bool {
 
 
 // Public API for creating Asset's
-public class PhotoStorage {
-    private let baseURL: NSURL
-    private let queue = dispatch_queue_create("no.finn.finjonon.disk-cache-writes", DISPATCH_QUEUE_SERIAL)
-    private let resizeQueue = dispatch_queue_create("no.finn.finjonon.disk-cache-resizes", DISPATCH_QUEUE_CONCURRENT)
-    private let fileManager = NSFileManager()
-    private var cache: [String: Asset] = [:]
-    private let assetLibrary = ALAssetsLibrary()
+open class PhotoStorage {
+    fileprivate let baseURL: URL
+    fileprivate let queue = DispatchQueue(label: "no.finn.finjonon.disk-cache-writes", attributes: [])
+    fileprivate let resizeQueue = DispatchQueue(label: "no.finn.finjonon.disk-cache-resizes", attributes: DispatchQueue.Attributes.concurrent)
+    fileprivate let fileManager = FileManager()
+    fileprivate var cache: [String: Asset] = [:]
+    fileprivate let assetLibrary = ALAssetsLibrary()
 
     init() {
-        var cacheURL = fileManager.URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask).last!
-        #if swift(>=2.3)
-            cacheURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")!
-            self.baseURL = cacheURL.URLByAppendingPathComponent(NSUUID().UUIDString)!
-        #else
-            cacheURL = cacheURL.URLByAppendingPathComponent("no.finn.finjonon.disk-cache")
-            self.baseURL = cacheURL.URLByAppendingPathComponent(NSUUID().UUIDString)
-        #endif
+        var cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).last!
+            cacheURL = cacheURL.appendingPathComponent("no.finn.finjonon.disk-cache")
+            self.baseURL = cacheURL.appendingPathComponent(NSUUID().uuidString)
     }
 
     deinit {
         var error: NSError?
-        if fileManager.fileExistsAtPath(baseURL.path!) {
+        if fileManager.fileExists(atPath: baseURL.path) {
             do {
-                try fileManager.removeItemAtURL(baseURL)
+                try fileManager.removeItem(at: baseURL)
             } catch let error1 as NSError {
                 error = error1
                 NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(error)")
@@ -94,13 +89,13 @@ public class PhotoStorage {
 
     // MARK: - API
 
-    func createAssetFromImageData(data: NSData, completion: Asset -> Void) {
-        dispatch_async(queue) {
+    func createAssetFromImageData(_ data: Data, completion: @escaping (Asset) -> Void) {
+        queue.async {
             let asset = Asset(storage: self)
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
             do {
-                try data.writeToFile(cacheURL.path!, options: .DataWritingAtomic)
+                try data.write(to: URL(fileURLWithPath: cacheURL.path), options: .atomic)
             } catch let error1 as NSError {
                 error = error1
                 NSLog("Failed to write image to \(cacheURL): \(error)")
@@ -108,55 +103,56 @@ public class PhotoStorage {
             } catch {
                 fatalError()
             }
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 completion(asset)
             }
         }
     }
 
-    func createAssetFromImageURL(imageURL: NSURL, dimensions: CGSize, completion: Asset -> Void) {
-        dispatch_async(queue) {
+    func createAssetFromImageURL(_ imageURL: URL, dimensions: CGSize, completion: @escaping (Asset) -> Void) {
+        queue.async {
             let asset = Asset(storage: self, imageURL: imageURL, originalDimensions: dimensions)
 
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 completion(asset)
             }
         }
     }
 
-    func createAssetFromImage(image: UIImage, completion: Asset -> Void) {
+    func createAssetFromImage(_ image: UIImage, completion: @escaping (Asset) -> Void) {
         let data = UIImageJPEGRepresentation(image, 1.0)!
         createAssetFromImageData(data, completion: completion)
     }
 
-    func createAssetFromAssetLibraryURL(assetURL: NSURL, completion: Asset -> Void) {
-        assetLibrary.assetForURL(assetURL, resultBlock: { asset in
-            let assetHandler: ALAsset -> Void = { asset in
-                let representation = asset.defaultRepresentation()
-                let bufferLength = Int(representation.size())
+    func createAssetFromAssetLibraryURL(_ assetURL: URL, completion: @escaping (Asset) -> Void) {
+        assetLibrary.asset(for: assetURL, resultBlock: { asset in
+            let assetHandler: (ALAsset) -> Void = { asset in
+                guard let representation = asset.defaultRepresentation() else { return }
+
+                let bufferLength = Int((representation.size()))
                 let data = NSMutableData(length: bufferLength)!
-                let buffer = UnsafeMutablePointer<UInt8>(data.mutableBytes)
+                let buffer = UnsafeMutablePointer<UInt8>(OpaquePointer(data.mutableBytes))
 
                 var error: NSError?
                 let bytesWritten = representation.getBytes(buffer, fromOffset: 0, length: bufferLength, error: &error)
                 if bytesWritten != bufferLength {
                     NSLog("failed to get all bytes (wrote \(bytesWritten)/\(bufferLength)): \(error)")
                 }
-                self.createAssetFromImageData(data, completion: completion)
+                self.createAssetFromImageData(data as Data, completion: completion)
             }
 
             if asset != nil {
-                assetHandler(asset)
+                assetHandler(asset!)
             } else {
                 // On iOS 8.1 [library assetForUrl] for Photo Streams always returns nil. Try to obtain it in an alternative way
                 // http://stackoverflow.com/questions/26480526/alassetslibrary-assetforurl-always-returning-nil-for-photos-in-my-photo-stream
-                self.assetLibrary.enumerateGroupsWithTypes(ALAssetsGroupType(ALAssetsGroupPhotoStream), usingBlock: { (group, stop: UnsafeMutablePointer<ObjCBool>) in
+                self.assetLibrary.enumerateGroups(withTypes: ALAssetsGroupType(ALAssetsGroupPhotoStream), using: { (group, stop) in
                     if let group = group {
-                        group.enumerateAssetsWithOptions(.Reverse, usingBlock: { (result, index, innerStop) in
-                            if let result = result where result.defaultRepresentation().url() == assetURL {
+                        group.enumerateAssets(options: .reverse, using: { (result, index, innerStop) in
+                            if let result = result, result.defaultRepresentation().url() == assetURL {
                                 assetHandler(result)
-                                innerStop.initialize(true)
-                                stop.initialize(true)
+                                innerStop?.initialize(to: true)
+                                stop?.initialize(to: true)
                             }
                         })
                     }
@@ -169,25 +165,25 @@ public class PhotoStorage {
         })
     }
 
-    func deleteAsset(asset: Asset, completion: () -> Void) {
-        dispatch_async(queue) {
+    func deleteAsset(_ asset: Asset, completion: @escaping () -> Void) {
+        queue.async {
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
             do {
-                try self.fileManager.removeItemAtPath(cacheURL.path!)
+                try self.fileManager.removeItem(atPath: cacheURL.path)
             } catch let error1 as NSError {
                 error = error1
                 NSLog("failed failed to remove asset at \(cacheURL): \(error)")
             } catch {
                 fatalError()
             }
-            dispatch_async(dispatch_get_main_queue(), completion)
+            DispatchQueue.main.async(execute: completion)
         }
     }
 
-    func dimensionsforAsset(asset: Asset) -> CGSize {
+    func dimensionsforAsset(_ asset: Asset) -> CGSize {
         let cacheFileURL = self.cacheURLForAsset(asset)
-        if let source = CGImageSourceCreateWithURL(cacheFileURL, nil),
+        if let source = CGImageSourceCreateWithURL(cacheFileURL as CFURL, nil),
             let imageProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as NSDictionary? {
                 if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
                     let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
@@ -203,28 +199,28 @@ public class PhotoStorage {
 
     // MARK: - Private
 
-    private func imageForAsset(asset: Asset, completion: UIImage -> Void) {
-        dispatch_async(queue) {
-            let path = self.cacheURLForAsset(asset).path!
+    fileprivate func imageForAsset(_ asset: Asset, completion: @escaping (UIImage) -> Void) {
+        queue.async {
+            let path = self.cacheURLForAsset(asset).path
             let image = UIImage(contentsOfFile: path)!
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 completion(image)
             }
         }
     }
 
-    private func thumbnailForAsset(asset: Asset, forWidth width: CGFloat, completion: UIImage -> Void) {
-        dispatch_async(self.resizeQueue) {
+    fileprivate func thumbnailForAsset(_ asset: Asset, forWidth width: CGFloat, completion: @escaping (UIImage) -> Void) {
+        self.resizeQueue.async {
             let imageURL = self.cacheURLForAsset(asset)
-            if let imageSource = CGImageSourceCreateWithURL(imageURL, nil) {
-                let options = [ kCGImageSourceThumbnailMaxPixelSize as NSString: width * UIScreen.mainScreen().scale,
+            if let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, nil) {
+                let options = [ kCGImageSourceThumbnailMaxPixelSize as NSString: width * UIScreen.main.scale,
                     kCGImageSourceCreateThumbnailWithTransform as NSString: kCFBooleanTrue,
                     kCGImageSourceCreateThumbnailFromImageAlways as NSString: kCFBooleanTrue,
-                ]
+                ] as [NSString : Any]
 
-                if let thumbnailCGImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options) {
-                    let thumbnailImage = UIImage(CGImage: thumbnailCGImage)
-                    dispatch_async(dispatch_get_main_queue()) {
+                if let thumbnailCGImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary?) {
+                    let thumbnailImage = UIImage(cgImage: thumbnailCGImage)
+                    DispatchQueue.main.async {
                         completion(thumbnailImage)
                     }
                 }
@@ -232,20 +228,16 @@ public class PhotoStorage {
         }
     }
 
-    private func cacheURLForAsset(asset: Asset) -> NSURL {
+    fileprivate func cacheURLForAsset(_ asset: Asset) -> URL {
         ensureCacheDirectoryExists()
-        #if swift(>=2.3)
-            return baseURL.URLByAppendingPathComponent(asset.UUID)!
-        #else
-            return baseURL.URLByAppendingPathComponent(asset.UUID)
-        #endif
+        return baseURL.appendingPathComponent(asset.UUID)
     }
 
-    private func ensureCacheDirectoryExists() {
-        if !fileManager.fileExistsAtPath(self.baseURL.path!) {
+    fileprivate func ensureCacheDirectoryExists() {
+        if !fileManager.fileExists(atPath: self.baseURL.path) {
             var error: NSError?
             do {
-                try fileManager.createDirectoryAtURL(self.baseURL, withIntermediateDirectories: true, attributes: nil)
+                try fileManager.createDirectory(at: self.baseURL, withIntermediateDirectories: true, attributes: nil)
             } catch let error1 as NSError {
                 error = error1
                 NSLog("Failed to create cache directory at \(baseURL): \(error)")

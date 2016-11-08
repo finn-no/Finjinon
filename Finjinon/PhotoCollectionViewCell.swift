@@ -9,16 +9,16 @@
 import UIKit
 
 internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
-    func collectionViewCellDidTapDelete(cell: PhotoCollectionViewCell)
+    func collectionViewCellDidTapDelete(_ cell: PhotoCollectionViewCell)
 }
 
 
-public class PhotoCollectionViewCell: UICollectionViewCell {
-    public class func cellIdentifier() -> String { return "PhotoCell" }
+open class PhotoCollectionViewCell: UICollectionViewCell {
+    open class func cellIdentifier() -> String { return "PhotoCell" }
 
-    public let imageView = UIImageView(frame: CGRect.zero)
-    public let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
-    public internal(set) var asset: Asset?
+    open let imageView = UIImageView(frame: CGRect.zero)
+    open let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
+    open internal(set) var asset: Asset?
 
     internal weak var delegate: PhotoCollectionViewCellDelegate?
 
@@ -27,12 +27,12 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
 
         let offset = self.closeButton.bounds.height/3
         imageView.frame = CGRect(x: offset, y: offset, width: contentView.bounds.width - (offset*2), height: contentView.bounds.height - (offset*2))
-        imageView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        imageView.contentMode = .ScaleAspectFill
+        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         contentView.addSubview(imageView)
 
-        closeButton.addTarget(self, action: #selector(closeButtonTapped(_:)), forControlEvents: .TouchUpInside)
+        closeButton.addTarget(self, action: #selector(closeButtonTapped(_:)), for: .touchUpInside)
         contentView.addSubview(closeButton)
     }
 
@@ -40,14 +40,14 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func prepareForReuse() {
+    open override func prepareForReuse() {
         super.prepareForReuse()
 
         delegate = nil
         asset = nil
     }
 
-    internal func closeButtonTapped(sender: UIButton) {
+    internal func closeButtonTapped(_ sender: UIButton) {
         delegate?.collectionViewCellDidTapDelete(self)
     }
 
@@ -58,7 +58,7 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
 
         let imageWrapper = UIView(frame: wrapperFrame)
         imageWrapper.clipsToBounds = true
-        let image = UIImage(CGImage: self.imageView.image!.CGImage!, scale: self.imageView.image!.scale, orientation: self.imageView.image!.imageOrientation)
+        let image = UIImage(cgImage: self.imageView.image!.cgImage!, scale: self.imageView.image!.scale, orientation: self.imageView.image!.imageOrientation)
 
         // Cumbersome indeed, but unfortunately re-rendering through begin graphicContext etc. fails quite often in iOS9
         var imageRect : CGRect {
@@ -69,16 +69,16 @@ public class PhotoCollectionViewCell: UICollectionViewCell {
                 let ratio = image.size.height / viewSize.height
                 let width = image.size.width / ratio
                 let x = -(width - viewSize.width)/2
-                return CGRectMake(x, 0, width, viewSize.height)
+                return CGRect(x: x, y: 0, width: width, height: viewSize.height)
             } else {
                 let ratio = image.size.width / viewSize.width
                 let height = image.size.height / ratio
                 let y = -(height - viewSize.height)/2
-                return CGRectMake(0, y, viewSize.width, height)
+                return CGRect(x: 0, y: y, width: viewSize.width, height: height)
             }
         }
         let imageView = UIImageView(image: image)
-        imageView.contentMode = .ScaleAspectFill
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.frame = imageRect
 
