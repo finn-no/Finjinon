@@ -36,6 +36,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
+    open var imagePickerProgressIndicatorView: UIView?
 
     fileprivate let storage = PhotoStorage()
     fileprivate let captureManager = CaptureManager()
@@ -319,12 +320,31 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             delegate?.photoCaptureViewController(self, didFailWithError: error)
             return
         }
-
+        
+        var asyncCompletionFinalCount = 0
+        var asyncCompletionCount = 0
+        func asyncCompletionCheck(count:Int, ofTotal total:Int) {
+            if count == total {
+                self.imagePickerProgressIndicatorView?.removeFromSuperview()
+            }
+        }
+        
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
+            if self.imagePickerProgressIndicatorView != nil {
+                self.imagePickerProgressIndicatorView!.center = self.view.center 
+                self.view.addSubview(self.imagePickerProgressIndicatorView!)
+            }
+            
             let resolver = AssetResolver()
+            asyncCompletionFinalCount = assets.count
             assets.forEach { asset in
                 resolver.enqueueResolve(asset, completion: { image in
-                    self.createAssetFromImage(image, completion: self.didAddAsset)
+                    self.createAssetFromImage(image, completion: { (asset: Asset) in
+                        self.didAddAsset(asset)
+                        
+                        asyncCompletionCount += 1
+                        asyncCompletionCheck(count: asyncCompletionCount, ofTotal: asyncCompletionFinalCount)
+                    })
                 })
             }
         }, completion: { cancelled in
@@ -332,7 +352,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.dismiss(animated: true, completion: nil)
             }
         })
-
+        
         present(controller, animated: true, completion: nil)
     }
 
