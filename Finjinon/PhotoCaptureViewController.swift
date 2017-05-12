@@ -325,6 +325,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
             if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
+                waitView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                waitView.frame = self.view.bounds
                 waitView.center = self.view.center
                 self.view.addSubview(waitView)
             }
