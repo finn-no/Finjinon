@@ -36,7 +36,9 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
-    open var imagePickerProgressIndicatorView: UIView?
+    
+    /// optional view to display when returning from imagePicker not finished retrieving data
+    open var imagePickerWaitingForImageDataView: UIView?
 
     fileprivate let storage = PhotoStorage()
     fileprivate let captureManager = CaptureManager()
@@ -322,9 +324,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
         
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
-            if self.imagePickerProgressIndicatorView != nil && assets.count > 0 {
-                self.imagePickerProgressIndicatorView!.center = self.view.center 
-                self.view.addSubview(self.imagePickerProgressIndicatorView!)
+            if self.imagePickerWaitingForImageDataView != nil && assets.count > 0 {
+                self.imagePickerWaitingForImageDataView!.center = self.view.center
+                self.view.addSubview(self.imagePickerWaitingForImageDataView!)
             }
             
             let resolver = AssetResolver()
@@ -336,7 +338,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                         
                         count -= 1
                         if count == 0{
-                            self.imagePickerProgressIndicatorView?.removeFromSuperview()
+                            self.imagePickerWaitingForImageDataView?.removeFromSuperview()
                         }
                     })
                 })
