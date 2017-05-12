@@ -321,29 +321,23 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             return
         }
         
-        var asyncCompletionFinalCount = 0
-        var asyncCompletionCount = 0
-        func asyncCompletionCheck(count:Int, ofTotal total:Int) {
-            if count == total {
-                self.imagePickerProgressIndicatorView?.removeFromSuperview()
-            }
-        }
-        
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
-            if self.imagePickerProgressIndicatorView != nil {
+            if self.imagePickerProgressIndicatorView != nil && assets.count > 0 {
                 self.imagePickerProgressIndicatorView!.center = self.view.center 
                 self.view.addSubview(self.imagePickerProgressIndicatorView!)
             }
             
             let resolver = AssetResolver()
-            asyncCompletionFinalCount = assets.count
+            var count = assets.count
             assets.forEach { asset in
                 resolver.enqueueResolve(asset, completion: { image in
                     self.createAssetFromImage(image, completion: { (asset: Asset) in
                         self.didAddAsset(asset)
                         
-                        asyncCompletionCount += 1
-                        asyncCompletionCheck(count: asyncCompletionCount, ofTotal: asyncCompletionFinalCount)
+                        count -= 1
+                        if count == 0{
+                            self.imagePickerProgressIndicatorView?.removeFromSuperview()
+                        }
                     })
                 })
             }
