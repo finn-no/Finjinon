@@ -324,9 +324,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
         
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
-            if self.imagePickerWaitingForImageDataView != nil && assets.count > 0 {
-                self.imagePickerWaitingForImageDataView!.center = self.view.center
-                self.view.addSubview(self.imagePickerWaitingForImageDataView!)
+            if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
+                waitView.center = self.view.center
+                self.view.addSubview(waitView)
             }
             
             let resolver = AssetResolver()
