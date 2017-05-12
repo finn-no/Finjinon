@@ -97,7 +97,7 @@ class CloseButton: UIButton {
         // Rotate path by 45° around its center
         let pathBounds = xPath.cgPath.boundingBox
         xPath.apply(CGAffineTransform(translationX: -pathBounds.midX, y: -pathBounds.midY))
-        xPath.apply(CGAffineTransform(rotationAngle: CGFloat(45.0 * M_PI / 180.0)))
+        xPath.apply(CGAffineTransform(rotationAngle: CGFloat(45.0 * Double.pi / 180.0)))
         xPath.apply(CGAffineTransform(translationX: pathBounds.midX, y: pathBounds.midY))
 
         xPath.lineWidth = 2

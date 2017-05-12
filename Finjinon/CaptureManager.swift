@@ -112,7 +112,7 @@ class CaptureManager: NSObject {
                         print("failed creating metadata")
                     }
                 } else {
-                    NSLog("Failed capturing still imagE: \(error)")
+                    NSLog("Failed capturing still imagE: \(String(describing: error))")
                     // TODO
                 }
             })
@@ -179,7 +179,7 @@ class CaptureManager: NSObject {
                 try self.cameraDevice.lockForConfiguration()
             } catch let error1 as NSError {
                 error = error1
-                NSLog("Failed to lock camera device for configuration: \(error)")
+                NSLog("Failed to lock camera device for configuration: \(String(describing: error))")
             } catch {
                 fatalError()
             }

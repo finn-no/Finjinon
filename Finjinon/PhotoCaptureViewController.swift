@@ -503,9 +503,9 @@ extension UIView {
         case .faceDown, .faceUp, .unknown:
             ()
         case .landscapeLeft:
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(M_PI/2))
+            self.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi/2))
         case .landscapeRight:
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(-M_PI/2))
+            self.transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi/2))
         case .portrait, .portraitUpsideDown:
             self.transform = CGAffineTransform(rotationAngle: 0)
         }
