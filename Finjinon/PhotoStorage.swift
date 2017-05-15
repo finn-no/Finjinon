@@ -82,7 +82,7 @@ open class PhotoStorage {
                 try fileManager.removeItem(at: baseURL)
             } catch let error1 as NSError {
                 error = error1
-                NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(error)")
+                NSLog("PhotoDiskCache: failed to cleanup cache dir at \(baseURL): \(String(describing: error))")
             }
         }
     }
@@ -98,7 +98,7 @@ open class PhotoStorage {
                 try data.write(to: URL(fileURLWithPath: cacheURL.path), options: .atomic)
             } catch let error1 as NSError {
                 error = error1
-                NSLog("Failed to write image to \(cacheURL): \(error)")
+                NSLog("Failed to write image to \(cacheURL): \(String(describing: error))")
                 // TODO: throw
             } catch {
                 fatalError()
@@ -136,7 +136,7 @@ open class PhotoStorage {
                 var error: NSError?
                 let bytesWritten = representation.getBytes(buffer, fromOffset: 0, length: bufferLength, error: &error)
                 if bytesWritten != bufferLength {
-                    NSLog("failed to get all bytes (wrote \(bytesWritten)/\(bufferLength)): \(error)")
+                    NSLog("failed to get all bytes (wrote \(bytesWritten)/\(bufferLength)): \(String(describing: error))")
                 }
                 self.createAssetFromImageData(data as Data, completion: completion)
             }
@@ -157,11 +157,11 @@ open class PhotoStorage {
                         })
                     }
                     }, failureBlock: { error in
-                        NSLog("failed to retrive ALAsset in 8.1 workaround: \(error)")
+                        NSLog("failed to retrive ALAsset in 8.1 workaround: \(String(describing: error))")
                 })
             }
             }, failureBlock: { error in
-                NSLog("failed to retrive ALAsset: \(error)")
+                NSLog("failed to retrive ALAsset: \(String(describing: error))")
         })
     }
 
@@ -173,7 +173,7 @@ open class PhotoStorage {
                 try self.fileManager.removeItem(atPath: cacheURL.path)
             } catch let error1 as NSError {
                 error = error1
-                NSLog("failed failed to remove asset at \(cacheURL): \(error)")
+                NSLog("failed failed to remove asset at \(cacheURL): \(String(describing: error))")
             } catch {
                 fatalError()
             }
@@ -240,7 +240,7 @@ open class PhotoStorage {
                 try fileManager.createDirectory(at: self.baseURL, withIntermediateDirectories: true, attributes: nil)
             } catch let error1 as NSError {
                 error = error1
-                NSLog("Failed to create cache directory at \(baseURL): \(error)")
+                NSLog("Failed to create cache directory at \(baseURL): \(String(describing: error))")
             }
         }
     }

@@ -47,7 +47,7 @@ open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePi
             selectionHandler([asset])
             completionHandler(false)
         } else {
-            NSLog("*** Failed to fetch PHAsset for asset library URL: \(referenceURL): \(fetchResult.firstObject)")
+            NSLog("*** Failed to fetch PHAsset for asset library URL: \(referenceURL): \(String(describing: fetchResult.firstObject))")
             completionHandler(true)
         }
     }

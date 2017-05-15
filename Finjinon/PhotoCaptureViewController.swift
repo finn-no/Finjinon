@@ -36,6 +36,9 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
+    
+    /// optional view to display when returning from imagePicker not finished retrieving data
+    open var imagePickerWaitingForImageDataView: UIView?
 
     fileprivate let storage = PhotoStorage()
     fileprivate let captureManager = CaptureManager()
@@ -319,12 +322,27 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             delegate?.photoCaptureViewController(self, didFailWithError: error)
             return
         }
-
+        
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
+            if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
+                waitView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                waitView.frame = self.view.bounds
+                waitView.center = self.view.center
+                self.view.addSubview(waitView)
+            }
+            
             let resolver = AssetResolver()
+            var count = assets.count
             assets.forEach { asset in
                 resolver.enqueueResolve(asset, completion: { image in
-                    self.createAssetFromImage(image, completion: self.didAddAsset)
+                    self.createAssetFromImage(image, completion: { (asset: Asset) in
+                        self.didAddAsset(asset)
+                        
+                        count -= 1
+                        if count == 0 {
+                            self.imagePickerWaitingForImageDataView?.removeFromSuperview()
+                        }
+                    })
                 })
             }
         }, completion: { cancelled in
@@ -332,7 +350,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.dismiss(animated: true, completion: nil)
             }
         })
-
+        
         present(controller, animated: true, completion: nil)
     }
 
@@ -487,9 +505,9 @@ extension UIView {
         case .faceDown, .faceUp, .unknown:
             ()
         case .landscapeLeft:
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(M_PI/2))
+            self.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi/2))
         case .landscapeRight:
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(-M_PI/2))
+            self.transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi/2))
         case .portrait, .portraitUpsideDown:
             self.transform = CGAffineTransform(rotationAngle: 0)
         }

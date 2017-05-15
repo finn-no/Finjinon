@@ -25,6 +25,7 @@ internal struct AssetResolver {
         let options = PHImageRequestOptions()
         options.deliveryMode = .highQualityFormat
         options.resizeMode = .fast
+        options.isNetworkAccessAllowed = true
 
         let size = targetSize ?? defaultTargetSize
         manager.requestImage(for: asset, targetSize: size, contentMode: .aspectFill, options: options) { image, info in
