@@ -339,7 +339,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                         self.didAddAsset(asset)
                         
                         count -= 1
-                        if count == 0{
+                        if count == 0 {
                             self.imagePickerWaitingForImageDataView?.removeFromSuperview()
                         }
                     })
