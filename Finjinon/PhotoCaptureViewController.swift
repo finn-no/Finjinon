@@ -333,7 +333,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                     return constraint.secondItem as! UIView == self.view
                 }))
                 self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
-                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
+                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: .centerY, multiplier: 1, constant: 0))
                 
                 switch UIDevice.current.orientation {
                 case .landscapeRight:
