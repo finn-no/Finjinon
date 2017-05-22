@@ -37,7 +37,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
     
-    /// optional view to display when returning from imagePicker not finished retrieving data
+    /// Optional view to display when returning from imagePicker not finished retrieving data.
+    /// Use constraints to position elements dynamically, as the view will be rotated and sized with the device.
     open var imagePickerWaitingForImageDataView: UIView?
 
     fileprivate let storage = PhotoStorage()
@@ -325,10 +326,29 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
             if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
-                waitView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                waitView.frame = self.view.bounds
-                waitView.center = self.view.center
+                waitView.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(waitView)
+                
+                waitView.removeConstraints(waitView.constraints.filter({ (constraint: NSLayoutConstraint) -> Bool in
+                    return constraint.secondItem as! UIView == self.view
+                }))
+                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
+                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
+                
+                switch UIDevice.current.orientation {
+                case .landscapeRight:
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
+                    
+                case .landscapeLeft:
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
+                    
+                default:
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
+                }
+                waitView.rotateToCurrentDeviceOrientation()
             }
             
             let resolver = AssetResolver()
