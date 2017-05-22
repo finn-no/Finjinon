@@ -388,7 +388,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             self.createAssetFromImageData(data as Data, completion: { ( asset: Asset) in
                 var mutableAsset = asset
                 mutableAsset.imageDataSourceType = .camera
-                self.didAddAsset(asset)
+                self.didAddAsset(mutableAsset)
             })
         }
     }
