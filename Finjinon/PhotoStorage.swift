@@ -10,6 +10,10 @@ import UIKit
 import ImageIO
 import AssetsLibrary
 
+public enum AssetImageDataSourceTypes {
+    case camera, library, unknown
+}
+
 // TODO also support ALAsset/PHPhoto
 
 public struct Asset: Equatable, CustomStringConvertible {
@@ -49,6 +53,8 @@ public struct Asset: Equatable, CustomStringConvertible {
             return storage.dimensionsforAsset(self)
         }
     }
+    
+    public var imageDataSourceType: AssetImageDataSourceTypes = .unknown
 
     public var description: String {
         return "<\(type(of: self)) UUID: \(UUID)>"

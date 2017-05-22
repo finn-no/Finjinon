@@ -333,7 +333,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                     return constraint.secondItem as! UIView == self.view
                 }))
                 self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
-                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
+                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: .centerY, multiplier: 1, constant: 0))
                 
                 switch UIDevice.current.orientation {
                 case .landscapeRight:
@@ -356,7 +356,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             assets.forEach { asset in
                 resolver.enqueueResolve(asset, completion: { image in
                     self.createAssetFromImage(image, completion: { (asset: Asset) in
-                        self.didAddAsset(asset)
+                        var mutableAsset = asset
+                        mutableAsset.imageDataSourceType = .library
+                        self.didAddAsset(mutableAsset)
                         
                         count -= 1
                         if count == 0 {
@@ -383,7 +385,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureManager.captureImage { (data, metadata) in
             sender.isEnabled = true
 
-            self.createAssetFromImageData(data as Data, completion: self.didAddAsset)
+            self.createAssetFromImageData(data as Data, completion: { ( asset: Asset) in
+                var mutableAsset = asset
+                mutableAsset.imageDataSourceType = .camera
+                self.didAddAsset(asset)
+            })
         }
     }
 
