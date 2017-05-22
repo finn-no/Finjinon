@@ -332,21 +332,21 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 waitView.removeConstraints(waitView.constraints.filter({ (constraint: NSLayoutConstraint) -> Bool in
                     return constraint.secondItem as! UIView == self.view
                 }))
-                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
-                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
+                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
+                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
                 
                 switch UIDevice.current.orientation {
                 case .landscapeRight:
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.height, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
                     
                 case .landscapeLeft:
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.height, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
                     
                 default:
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.height, multiplier: 1, constant: 0))
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.width, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
+                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
                 }
                 waitView.rotateToCurrentDeviceOrientation()
             }
