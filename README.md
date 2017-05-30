@@ -13,12 +13,8 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 
 ## Requirements
 
-* iOS8+
-* Swift 2.0
-
-## Installation
-
-If you need to support iOS7 you have to copy the sources in `Finjinon` into your project. Otherwise there's a Finjinon.podspec available in the repo.
+* iOS 8.1+
+* Swift 3.0
 
 ## Usage
 
