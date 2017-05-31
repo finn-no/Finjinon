@@ -16,6 +16,15 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 * iOS 8.1+
 * Swift 3.0
 
+## Installation
+
+**Finjinon** is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod 'Finjinon'
+```
+
 ## Usage
 
 See the included Example project for usage.
