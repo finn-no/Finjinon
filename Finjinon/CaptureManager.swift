@@ -18,16 +18,16 @@ class CaptureManager: NSObject {
     let previewLayer: AVCaptureVideoPreviewLayer
     var flashMode: AVCaptureFlashMode {
         get {
-            return cameraDevice.flashMode
+            return cameraDevice?.flashMode ?? .off
         }
     }
     var hasFlash: Bool {
-        return cameraDevice.hasFlash && cameraDevice.isFlashAvailable
+        return cameraDevice?.hasFlash ?? false && cameraDevice?.isFlashAvailable ?? false
     }
     var supportedFlashModes: [AVCaptureFlashMode] {
         var modes: [AVCaptureFlashMode] = []
         for mode in [AVCaptureFlashMode.off, AVCaptureFlashMode.auto, AVCaptureFlashMode.on] {
-            if cameraDevice.isFlashModeSupported(mode) {
+            if let cameraDevice = cameraDevice, cameraDevice.isFlashModeSupported(mode) {
                 modes.append(mode)
             }
         }
@@ -37,8 +37,8 @@ class CaptureManager: NSObject {
 
     fileprivate let session = AVCaptureSession()
     fileprivate let captureQueue = DispatchQueue(label: "no.finn.finjinon-captures", attributes: [])
-    fileprivate var cameraDevice: AVCaptureDevice!
-    fileprivate var stillImageOutput: AVCaptureStillImageOutput!
+    fileprivate var cameraDevice: AVCaptureDevice?
+    fileprivate var stillImageOutput: AVCaptureStillImageOutput?
     fileprivate var orientation = AVCaptureVideoOrientation.portrait
 
     override init() {
@@ -98,18 +98,21 @@ class CaptureManager: NSObject {
 
     func captureImage(_ completion: @escaping (Data, NSDictionary) -> Void) { // TODO: throws
         captureQueue.async {
-            let connection = self.stillImageOutput.connection(withMediaType: AVMediaTypeVideo)
-            connection?.videoOrientation = self.orientation
+            guard let connection = self.stillImageOutput?.connection(withMediaType: AVMediaTypeVideo) else {
+                return
+            }
+            connection.videoOrientation = self.orientation
 
-            self.stillImageOutput.captureStillImageAsynchronously(from: connection, completionHandler: { (sampleBuffer, error) in
+            self.stillImageOutput?.captureStillImageAsynchronously(from: connection, completionHandler: { (sampleBuffer, error) in
                 if error == nil {
-                    let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer)
-                    if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer!, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
-                        DispatchQueue.main.async {
-                            completion(data!, metadata)
+                    if let sampleBuffer = sampleBuffer, let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer) {
+                        if let metadata = CMCopyDictionaryOfAttachments(nil, sampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
+                            DispatchQueue.main.async {
+                                completion(data, metadata)
+                            }
+                        } else {
+                            print("failed creating metadata")
                         }
-                    } else {
-                        print("failed creating metadata")
                     }
                 } else {
                     NSLog("Failed capturing still imagE: \(String(describing: error))")
@@ -122,7 +125,7 @@ class CaptureManager: NSObject {
     func lockFocusAtPointOfInterest(_ pointInLayer: CGPoint) {
         let pointInCamera = previewLayer.captureDevicePointOfInterest(for: pointInLayer)
         self.lockCurrentCameraDeviceForConfiguration { cameraDevice in
-            if cameraDevice.isFocusPointOfInterestSupported {
+            if let cameraDevice = self.cameraDevice, cameraDevice.isFocusPointOfInterestSupported {
                 cameraDevice.focusPointOfInterest = pointInCamera
                 cameraDevice.focusMode = .autoFocus
             }
@@ -131,8 +134,10 @@ class CaptureManager: NSObject {
 
     func changeFlashMode(_ newMode: AVCaptureFlashMode, completion: @escaping () -> Void) {
         lockCurrentCameraDeviceForConfiguration { device in
-            device.flashMode = newMode
-            DispatchQueue.main.async(execute: completion)
+            if let device = device {
+                device.flashMode = newMode
+                DispatchQueue.main.async(execute: completion)
+            }
         }
     }
 
@@ -161,7 +166,7 @@ class CaptureManager: NSObject {
         case .faceDown, .faceUp, .unknown:
             break
         case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
-            orientation = AVCaptureVideoOrientation(rawValue: currentDeviceOrientation.rawValue)!
+            orientation = AVCaptureVideoOrientation(rawValue: currentDeviceOrientation.rawValue) ?? .portrait
         }
     }
 
@@ -172,11 +177,11 @@ class CaptureManager: NSObject {
         return NSError(domain: FinjinonCameraAccessErrorDomain, code: code, userInfo: info)
     }
 
-    fileprivate func lockCurrentCameraDeviceForConfiguration(_ configurator: @escaping (AVCaptureDevice) -> Void) {
+    fileprivate func lockCurrentCameraDeviceForConfiguration(_ configurator: @escaping (AVCaptureDevice?) -> Void) {
         captureQueue.async {
             var error: NSError?
             do {
-                try self.cameraDevice.lockForConfiguration()
+                try self.cameraDevice?.lockForConfiguration()
             } catch let error1 as NSError {
                 error = error1
                 NSLog("Failed to lock camera device for configuration: \(String(describing: error))")
@@ -186,7 +191,7 @@ class CaptureManager: NSObject {
 
             configurator(self.cameraDevice)
 
-            self.cameraDevice.unlockForConfiguration()
+            self.cameraDevice?.unlockForConfiguration()
         }
     }
 
@@ -219,18 +224,19 @@ class CaptureManager: NSObject {
             }
 
 
-
-            if self.cameraDevice.isFocusModeSupported(.continuousAutoFocus) {
-                do {
-                    try self.cameraDevice.lockForConfiguration()
-                } catch let error2 as NSError {
-                    error = error2
+            if let cameraDevice = self.cameraDevice {
+                if cameraDevice.isFocusModeSupported(.continuousAutoFocus) {
+                    do {
+                        try cameraDevice.lockForConfiguration()
+                    } catch let error2 as NSError {
+                        error = error2
+                    }
+                    cameraDevice.focusMode = .continuousAutoFocus
+                    if cameraDevice.isSmoothAutoFocusSupported {
+                        cameraDevice.isSmoothAutoFocusEnabled = true
+                    }
+                    cameraDevice.unlockForConfiguration()
                 }
-                self.cameraDevice.focusMode = .continuousAutoFocus
-                if self.cameraDevice.isSmoothAutoFocusSupported {
-                    self.cameraDevice.isSmoothAutoFocusEnabled = true
-                }
-                self.cameraDevice.unlockForConfiguration()
             }
 
             self.session.startRunning()
@@ -242,10 +248,11 @@ class CaptureManager: NSObject {
     }
 
     fileprivate func cameraDeviceWithPosition(_ position: AVCaptureDevicePosition) -> AVCaptureDevice? {
-        let availableCameraDevices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo)
-        for device in availableCameraDevices as! [AVCaptureDevice] {
-            if device.position == position {
-                return device
+        if let availableCameraDevices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as? [AVCaptureDevice] {
+            for device in availableCameraDevices {
+                if device.position == position {
+                    return device
+                }
             }
         }
 
