@@ -330,7 +330,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.view.addSubview(waitView)
                 
                 waitView.removeConstraints(waitView.constraints.filter({ (constraint: NSLayoutConstraint) -> Bool in
-                    return constraint.secondItem as! UIView == self.view
+                    return constraint.secondItem as? UIView == self.view
                 }))
                 self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
                 self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: .centerY, multiplier: 1, constant: 0))
