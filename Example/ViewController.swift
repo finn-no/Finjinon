@@ -1,9 +1,5 @@
 //
-//  ViewController.swift
-//  Finjinon
-//
-//  Created by johsoren on 06/04/2015.
-//  Copyright (c) 06/04/2015 johsoren. All rights reserved.
+//  Copyright (c) 2017 FINN.no AS. All rights reserved.
 //
 
 import UIKit

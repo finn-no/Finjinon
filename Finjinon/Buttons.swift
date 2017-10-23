@@ -1,9 +1,5 @@
 //
-//  TriggerButton.swift
-//  Finjinon
-//
-//  Created by Sørensen, Johan on 18.06.15.
-//  Copyright (c) 2015 FINN.no AS. All rights reserved.
+//  Copyright (c) 2017 FINN.no AS. All rights reserved.
 //
 
 import UIKit

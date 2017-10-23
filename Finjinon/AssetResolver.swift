@@ -1,9 +1,5 @@
 //
-//  AssetResolver.swift
-//  Finjinon
-//
-//  Created by Sørensen, Johan on 13.01.16.
-//  Copyright © 2016 FINN.no AS. All rights reserved.
+//  Copyright (c) 2017 FINN.no AS. All rights reserved.
 //
 
 import Foundation
