@@ -10,7 +10,7 @@ public enum AssetImageDataSourceTypes {
     case camera, library, unknown
 }
 
-// TODO also support ALAsset/PHPhoto
+// TODO: also support ALAsset/PHPhoto
 
 public struct Asset: Equatable, CustomStringConvertible {
     public let UUID = Foundation.UUID().uuidString
@@ -19,6 +19,7 @@ public struct Asset: Equatable, CustomStringConvertible {
         let url: URL
         let originalDimensions: CGSize
     }
+
     fileprivate let remoteReference: Remote?
     public var imageURL: URL? {
         return remoteReference?.url
@@ -26,12 +27,12 @@ public struct Asset: Equatable, CustomStringConvertible {
 
     internal init(storage: PhotoStorage, imageURL: URL, originalDimensions: CGSize) {
         self.storage = storage
-        self.remoteReference = Remote(url: imageURL, originalDimensions: originalDimensions)
+        remoteReference = Remote(url: imageURL, originalDimensions: originalDimensions)
     }
 
     internal init(storage: PhotoStorage) {
         self.storage = storage
-        self.remoteReference = nil
+        remoteReference = nil
     }
 
     public func originalImage(_ result: @escaping (UIImage) -> Void) {
@@ -49,7 +50,7 @@ public struct Asset: Equatable, CustomStringConvertible {
             return storage.dimensionsforAsset(self)
         }
     }
-    
+
     public var imageDataSourceType: AssetImageDataSourceTypes = .unknown
 
     public var description: String {
@@ -60,7 +61,6 @@ public struct Asset: Equatable, CustomStringConvertible {
 public func ==(lhs: Asset, rhs: Asset) -> Bool {
     return lhs.UUID == rhs.UUID
 }
-
 
 // Public API for creating Asset's
 open class PhotoStorage {
@@ -73,8 +73,8 @@ open class PhotoStorage {
 
     init() {
         var cacheURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).last!
-            cacheURL = cacheURL.appendingPathComponent("no.finn.finjonon.disk-cache")
-            self.baseURL = cacheURL.appendingPathComponent(NSUUID().uuidString)
+        cacheURL = cacheURL.appendingPathComponent("no.finn.finjonon.disk-cache")
+        baseURL = cacheURL.appendingPathComponent(NSUUID().uuidString)
     }
 
     deinit {
@@ -148,9 +148,9 @@ open class PhotoStorage {
             } else {
                 // On iOS 8.1 [library assetForUrl] for Photo Streams always returns nil. Try to obtain it in an alternative way
                 // http://stackoverflow.com/questions/26480526/alassetslibrary-assetforurl-always-returning-nil-for-photos-in-my-photo-stream
-                self.assetLibrary.enumerateGroups(withTypes: ALAssetsGroupType(ALAssetsGroupPhotoStream), using: { (group, stop) in
+                self.assetLibrary.enumerateGroups(withTypes: ALAssetsGroupType(ALAssetsGroupPhotoStream), using: { group, stop in
                     if let group = group {
-                        group.enumerateAssets(options: .reverse, using: { (result, index, innerStop) in
+                        group.enumerateAssets(options: .reverse, using: { result, _, innerStop in
                             if let result = result, result.defaultRepresentation().url() == assetURL {
                                 assetHandler(result)
                                 innerStop?.initialize(to: true)
@@ -158,12 +158,12 @@ open class PhotoStorage {
                             }
                         })
                     }
-                    }, failureBlock: { error in
-                        NSLog("failed to retrive ALAsset in 8.1 workaround: \(String(describing: error))")
+                }, failureBlock: { error in
+                    NSLog("failed to retrive ALAsset in 8.1 workaround: \(String(describing: error))")
                 })
             }
-            }, failureBlock: { error in
-                NSLog("failed to retrive ALAsset: \(String(describing: error))")
+        }, failureBlock: { error in
+            NSLog("failed to retrive ALAsset: \(String(describing: error))")
         })
     }
 
@@ -184,20 +184,19 @@ open class PhotoStorage {
     }
 
     func dimensionsforAsset(_ asset: Asset) -> CGSize {
-        let cacheFileURL = self.cacheURLForAsset(asset)
+        let cacheFileURL = cacheURLForAsset(asset)
         if let source = CGImageSourceCreateWithURL(cacheFileURL as CFURL, nil),
             let imageProperties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as NSDictionary? {
-                if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
-                    let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
-                        return CGSize(width: width, height: height)
-                }
-                return CGSize.zero
+            if let width = imageProperties[kCGImagePropertyPixelWidth as String] as? CGFloat,
+                let height = imageProperties[kCGImagePropertyPixelHeight as String] as? CGFloat {
+                return CGSize(width: width, height: height)
+            }
+            return CGSize.zero
         } else {
             NSLog("*** Warning: failed to get CGImagePropertyPixel{Width,Height} from \(cacheFileURL)")
             return CGSize.zero
         }
     }
-
 
     // MARK: - Private
 
@@ -212,13 +211,14 @@ open class PhotoStorage {
     }
 
     fileprivate func thumbnailForAsset(_ asset: Asset, forWidth width: CGFloat, completion: @escaping (UIImage) -> Void) {
-        self.resizeQueue.async {
+        resizeQueue.async {
             let imageURL = self.cacheURLForAsset(asset)
             if let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, nil) {
-                let options = [ kCGImageSourceThumbnailMaxPixelSize as NSString: width * UIScreen.main.scale,
+                let options = [
+                    kCGImageSourceThumbnailMaxPixelSize as NSString: width * UIScreen.main.scale,
                     kCGImageSourceCreateThumbnailWithTransform as NSString: kCFBooleanTrue,
                     kCGImageSourceCreateThumbnailFromImageAlways as NSString: kCFBooleanTrue,
-                ] as [NSString : Any]
+                ] as [NSString: Any]
 
                 if let thumbnailCGImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary?) {
                     let thumbnailImage = UIImage(cgImage: thumbnailCGImage)
@@ -226,7 +226,7 @@ open class PhotoStorage {
                         completion(thumbnailImage)
                     }
                 }
-            } // TODO else throws
+            } // TODO: else throws
         }
     }
 
@@ -236,10 +236,10 @@ open class PhotoStorage {
     }
 
     fileprivate func ensureCacheDirectoryExists() {
-        if !fileManager.fileExists(atPath: self.baseURL.path) {
+        if !fileManager.fileExists(atPath: baseURL.path) {
             var error: NSError?
             do {
-                try fileManager.createDirectory(at: self.baseURL, withIntermediateDirectories: true, attributes: nil)
+                try fileManager.createDirectory(at: baseURL, withIntermediateDirectories: true, attributes: nil)
             } catch let error1 as NSError {
                 error = error1
                 NSLog("Failed to create cache directory at \(baseURL): \(String(describing: error))")

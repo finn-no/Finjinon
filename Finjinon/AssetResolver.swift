@@ -9,7 +9,7 @@ internal struct AssetResolver {
     let queue = DispatchQueue(label: "com.finjinon.asset-resolvement", attributes: [])
     var defaultTargetSize = CGSize(width: 720, height: 1280)
 
-    func enqueueResolve(_ asset: PHAsset, targetSize: CGSize? = nil, completion: @escaping (UIImage) -> Void) {
+    func enqueueResolve(_ asset: PHAsset, targetSize _: CGSize? = nil, completion: @escaping (UIImage) -> Void) {
         queue.async {
             self.resolve(asset, completion: completion)
         }

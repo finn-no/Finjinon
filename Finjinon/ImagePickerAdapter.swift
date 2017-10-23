@@ -15,15 +15,14 @@ public protocol ImagePickerAdapter {
     func viewControllerForImageSelection(_ selectedAssetsHandler: @escaping ([PHAsset]) -> Void, completion: @escaping (Bool) -> Void) -> UIViewController
 }
 
-
 open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     var selectionHandler: ([PHAsset]) -> Void = { _ in }
     var completionHandler: (_ didCancel: Bool) -> Void = { _ in }
 
     open func viewControllerForImageSelection(_ selectedAssetsHandler: @escaping ([PHAsset]) -> Void, completion: @escaping (Bool) -> Void) -> UIViewController {
-        self.selectionHandler = selectedAssetsHandler
-        self.completionHandler = completion
+        selectionHandler = selectedAssetsHandler
+        completionHandler = completion
 
         let picker = UIImagePickerController()
         picker.mediaTypes = [kUTTypeImage as String]
@@ -32,7 +31,7 @@ open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePi
         return picker
     }
 
-    open func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    open func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [String: Any]) {
         guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL else {
             completionHandler(true)
             return
@@ -48,7 +47,7 @@ open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePi
         }
     }
 
-    open func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    open func imagePickerControllerDidCancel(_: UIImagePickerController) {
         completionHandler(true)
     }
 }

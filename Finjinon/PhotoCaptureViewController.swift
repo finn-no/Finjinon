@@ -32,7 +32,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
-    
+
     /// Optional view to display when returning from imagePicker not finished retrieving data.
     /// Use constraints to position elements dynamically, as the view will be rotated and sized with the device.
     open var imagePickerWaitingForImageDataView: UIView?
@@ -45,16 +45,16 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     fileprivate var containerView: UIView!
     fileprivate var focusIndicatorView: UIView!
     fileprivate var flashButton: UIButton!
-    fileprivate var pickerButton : UIButton!
-    fileprivate var closeButton : UIButton!
-    fileprivate let buttonMargin : CGFloat = 12
-    fileprivate var orientation : UIDeviceOrientation = .portrait
+    fileprivate var pickerButton: UIButton!
+    fileprivate var closeButton: UIButton!
+    fileprivate let buttonMargin: CGFloat = 12
+    fileprivate var orientation: UIDeviceOrientation = .portrait
 
     deinit {
         captureManager.stop(nil)
     }
 
-    override open func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor.black
@@ -67,7 +67,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         let previewLayer = captureManager.previewLayer
         // We are using AVCaptureSessionPresetPhoto which has a 4:3 aspect ratio
         let viewFinderWidth = view.bounds.size.width
-        var viewFinderHeight = (viewFinderWidth/3) * 4
+        var viewFinderHeight = (viewFinderWidth / 3) * 4
         if captureManager.viewfinderMode == .fullScreen {
             viewFinderHeight = view.bounds.size.height
         }
@@ -83,7 +83,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         flashButton = UIButton(frame: CGRect(x: buttonMargin, y: buttonMargin, width: 70, height: 38))
         flashButton.setImage(UIImage(named: "LightningIcon"), for: UIControlState())
-        flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), for: UIControlState())
+        flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: UIControlState())
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
         flashButton.tintColor = UIColor.white
@@ -93,11 +93,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         let tapper = UITapGestureRecognizer(target: self, action: #selector(focusTapGestureRecognized(_:)))
         previewView.addGestureRecognizer(tapper)
 
-        var collectionViewHeight: CGFloat = min(view.frame.size.height/6, 120)
-        let collectionViewBottomMargin : CGFloat = 70
-        let cameraButtonHeight : CGFloat = 66
+        var collectionViewHeight: CGFloat = min(view.frame.size.height / 6, 120)
+        let collectionViewBottomMargin: CGFloat = 70
+        let cameraButtonHeight: CGFloat = 66
 
-        var containerFrame = CGRect(x: 0, y: view.frame.height-collectionViewBottomMargin-collectionViewHeight, width: view.frame.width, height: collectionViewBottomMargin+collectionViewHeight)
+        var containerFrame = CGRect(x: 0, y: view.frame.height - collectionViewBottomMargin - collectionViewHeight, width: view.frame.width, height: collectionViewBottomMargin + collectionViewHeight)
         if captureManager.viewfinderMode == .window {
             let containerHeight = view.frame.height - viewFinderHeight
             containerFrame.origin.y = view.frame.height - containerHeight
@@ -114,11 +114,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         layout.scrollDirection = .horizontal
         let inset: CGFloat = 8
-        layout.itemSize = CGSize(width: collectionView.frame.height - (inset*2), height: collectionView.frame.height - (inset*2))
+        layout.itemSize = CGSize(width: collectionView.frame.height - (inset * 2), height: collectionView.frame.height - (inset * 2))
         layout.sectionInset = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
         layout.minimumInteritemSpacing = inset
         layout.minimumLineSpacing = inset
-        layout.didReorderHandler = { [weak self] (fromIndexPath, toIndexPath) in
+        layout.didReorderHandler = { [weak self] fromIndexPath, toIndexPath in
             if let welf = self {
                 welf.delegate?.photoCaptureViewController(welf, didMoveItemFromIndexPath: fromIndexPath as IndexPath, toIndexPath: toIndexPath as IndexPath)
             }
@@ -131,8 +131,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         collectionView.dataSource = self
         collectionView.delegate = self
 
-        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width/2)-cameraButtonHeight/2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight))
-        captureButton.layer.cornerRadius = cameraButtonHeight/2
+        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width / 2) - cameraButtonHeight / 2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight))
+        captureButton.layer.cornerRadius = cameraButtonHeight / 2
         captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), for: .touchUpInside)
         containerView.addSubview(captureButton)
         captureButton.isEnabled = false
@@ -170,10 +170,10 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             UIView.animate(withDuration: 0.2, animations: {
                 self.captureButton.isEnabled = true
                 self.previewView.alpha = 1.0
-            }) 
+            })
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIDeviceOrientationDidChange, object: nil, queue: nil) { (NSNotification) -> Void in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIDeviceOrientationDidChange, object: nil, queue: nil) { (_) -> Void in
             switch UIDevice.current.orientation {
             case .faceDown, .faceUp, .unknown:
                 ()
@@ -201,19 +201,19 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         UIApplication.shared.setStatusBarHidden(false, with: .slide)
     }
 
-    open override var preferredStatusBarUpdateAnimation : UIStatusBarAnimation {
+    open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         return .slide
     }
 
-    open override var prefersStatusBarHidden : Bool {
+    open override var prefersStatusBarHidden: Bool {
         return true
     }
 
-    open override var shouldAutorotate : Bool {
+    open override var shouldAutorotate: Bool {
         return false
     }
 
-    open override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.portrait
     }
 
@@ -223,7 +223,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
     }
 
-    open func dequeuedReusableCellForClass<T : PhotoCollectionViewCell>(_ clazz: T.Type, indexPath: IndexPath, config: ((T) -> Void)) -> T {
+    open func dequeuedReusableCellForClass<T: PhotoCollectionViewCell>(_ clazz: T.Type, indexPath: IndexPath, config: ((T) -> Void)) -> T {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: clazz.cellIdentifier(), for: indexPath) as! T
         config(cell)
         return cell
@@ -246,7 +246,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         return nil
     }
 
-    open func cellForpreviewAtIndexPath<T : PhotoCollectionViewCell>(_ indexPath: IndexPath) -> T? {
+    open func cellForpreviewAtIndexPath<T: PhotoCollectionViewCell>(_ indexPath: IndexPath) -> T? {
         return collectionView.cellForItem(at: indexPath) as? T
     }
 
@@ -278,13 +278,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     open func deleteAssetAtIndex(_ idx: Int, handler: @escaping () -> Void) {
         let indexPath = IndexPath(item: idx, section: 0)
         if let asset = delegate?.photoCaptureViewController(self, assetForIndexPath: indexPath) {
-            self.collectionView.performBatchUpdates({
+            collectionView.performBatchUpdates({
                 handler()
                 self.collectionView.deleteItems(at: [indexPath])
-                }, completion: { finished in
-                    if asset.imageURL == nil {
-                        self.storage.deleteAsset(asset, completion: {})
-                    }
+            }, completion: { _ in
+                if asset.imageURL == nil {
+                    self.storage.deleteAsset(asset, completion: {})
+                }
             })
         }
     }
@@ -299,54 +299,54 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     // MARK: - Actions
 
-    func flashButtonTapped(_ sender: UIButton) {
+    func flashButtonTapped(_: UIButton) {
         let mode = captureManager.nextAvailableFlashMode() ?? .off
         captureManager.changeFlashMode(mode) {
             switch mode {
             case .off:
-                self.flashButton.setTitle(NSLocalizedString("Off", comment:"flash off"), for: UIControlState())
+                self.flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: UIControlState())
             case .on:
-                self.flashButton.setTitle(NSLocalizedString("On", comment:"flash on"), for: UIControlState())
+                self.flashButton.setTitle(NSLocalizedString("On", comment: "flash on"), for: UIControlState())
             case .auto:
-                self.flashButton.setTitle(NSLocalizedString("Auto", comment:"flash Auto"), for: UIControlState())
+                self.flashButton.setTitle(NSLocalizedString("Auto", comment: "flash Auto"), for: UIControlState())
             }
         }
     }
 
-    func presentImagePickerTapped(_ sender: AnyObject) {
+    func presentImagePickerTapped(_: AnyObject) {
         if libraryAuthorizationStatus() == .denied || libraryAuthorizationStatus() == .restricted {
             let error = NSError(domain: FinjinonLibraryAccessErrorDomain, code: 0, userInfo: nil)
             delegate?.photoCaptureViewController(self, didFailWithError: error)
             return
         }
-        
+
         let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
             if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
                 waitView.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(waitView)
-                
+
                 waitView.removeConstraints(waitView.constraints.filter({ (constraint: NSLayoutConstraint) -> Bool in
-                    return constraint.secondItem as! UIView == self.view
+                    constraint.secondItem as! UIView == self.view
                 }))
                 self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
                 self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: .centerY, multiplier: 1, constant: 0))
-                
+
                 switch UIDevice.current.orientation {
                 case .landscapeRight:
                     self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
                     self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
-                    
+
                 case .landscapeLeft:
                     self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
                     self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
-                    
+
                 default:
                     self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
                     self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
                 }
                 waitView.rotateToCurrentDeviceOrientation()
             }
-            
+
             let resolver = AssetResolver()
             var count = assets.count
             assets.forEach { asset in
@@ -355,7 +355,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                         var mutableAsset = asset
                         mutableAsset.imageDataSourceType = .library
                         self.didAddAsset(mutableAsset)
-                        
+
                         count -= 1
                         if count == 0 {
                             self.imagePickerWaitingForImageDataView?.removeFromSuperview()
@@ -363,25 +363,25 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                     })
                 })
             }
-        }, completion: { cancelled in
+        }, completion: { _ in
             DispatchQueue.main.async {
                 self.dismiss(animated: true, completion: nil)
             }
         })
-        
+
         present(controller, animated: true, completion: nil)
     }
 
     func capturePhotoTapped(_ sender: UIButton) {
         sender.isEnabled = false
-        UIView.animate(withDuration: 0.1, animations: { self.previewView.alpha = 0.0 }, completion: { finished in
-            UIView.animate(withDuration: 0.1, animations: {self.previewView.alpha = 1.0})
+        UIView.animate(withDuration: 0.1, animations: { self.previewView.alpha = 0.0 }, completion: { _ in
+            UIView.animate(withDuration: 0.1, animations: { self.previewView.alpha = 1.0 })
         })
 
-        captureManager.captureImage { (data, metadata) in
+        captureManager.captureImage { data, _ in
             sender.isEnabled = true
 
-            self.createAssetFromImageData(data as Data, completion: { ( asset: Asset) in
+            self.createAssetFromImageData(data as Data, completion: { (asset: Asset) in
                 var mutableAsset = asset
                 mutableAsset.imageDataSourceType = .camera
                 self.didAddAsset(mutableAsset)
@@ -395,12 +395,12 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.delegate?.photoCaptureViewController(self, didAddAsset: asset)
                 let insertedIndexPath: IndexPath
                 if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self) {
-                    insertedIndexPath = IndexPath(item: count-1, section: 0)
+                    insertedIndexPath = IndexPath(item: count - 1, section: 0)
                 } else {
                     insertedIndexPath = IndexPath(item: 0, section: 0)
                 }
                 self.collectionView.insertItems(at: [insertedIndexPath])
-            }, completion: { finished in
+            }, completion: { _ in
                 self.scrollToLastAddedAssetAnimated(true)
             })
         }
@@ -408,12 +408,12 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     fileprivate func scrollToLastAddedAssetAnimated(_ animated: Bool) {
         if let count = self.delegate?.photoCaptureViewControllerNumberOfAssets(self), count > 0 {
-            self.collectionView.scrollToItem(at: IndexPath(item: count-1, section: 0), at: .left, animated: animated)
+            collectionView.scrollToItem(at: IndexPath(item: count - 1, section: 0), at: .left, animated: animated)
         }
     }
 
-    func doneButtonTapped(_ sender: UIButton) {
-        self.delegate?.photoCaptureViewControllerDidFinish(self)
+    func doneButtonTapped(_: UIButton) {
+        delegate?.photoCaptureViewControllerDidFinish(self)
 
         dismiss(animated: true, completion: nil)
     }
@@ -425,10 +425,10 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             focusIndicatorView.center = point
             UIView.animate(withDuration: 0.3, delay: 0.0, options: .beginFromCurrentState, animations: {
                 self.focusIndicatorView.alpha = 1.0
-                }, completion: { finished in
-                    UIView.animate(withDuration: 0.2, delay: 1.6, options: .beginFromCurrentState, animations: {
-                        self.focusIndicatorView.alpha = 0.0
-                        }, completion: nil)
+            }, completion: { _ in
+                UIView.animate(withDuration: 0.2, delay: 1.6, options: .beginFromCurrentState, animations: {
+                    self.focusIndicatorView.alpha = 0.0
+                }, completion: nil)
             })
 
             captureManager.lockFocusAtPointOfInterest(point)
@@ -437,7 +437,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     // MARK: - PhotoCollectionViewLayoutDelegate
 
-    open func photoCollectionViewLayout(_ layout: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: IndexPath) -> Bool {
+    open func photoCollectionViewLayout(_: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: IndexPath) -> Bool {
         return delegate?.photoCaptureViewController(self, canMoveItemAtIndexPath: indexPath) ?? true
     }
 
@@ -449,7 +449,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         button.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         button.layer.borderColor = button.tintColor!.cgColor
         button.layer.borderWidth = 1.0
-        button.layer.cornerRadius = button.bounds.height/2
+        button.layer.cornerRadius = button.bounds.height / 2
 
         var insets = button.imageEdgeInsets
         insets.left -= inset
@@ -460,8 +460,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         var flashPosition = flashButton.frame.origin
         var pickerPosition = pickerButton.frame.origin
         if orientation == .landscapeLeft || orientation == .landscapeRight {
-            flashPosition = CGPoint(x: buttonMargin - (buttonMargin/3), y: buttonMargin)
-            pickerPosition = CGPoint(x: view.bounds.width - (pickerButton.bounds.size.width/2 - buttonMargin), y: buttonMargin)
+            flashPosition = CGPoint(x: buttonMargin - (buttonMargin / 3), y: buttonMargin)
+            pickerPosition = CGPoint(x: view.bounds.width - (pickerButton.bounds.size.width / 2 - buttonMargin), y: buttonMargin)
         } else if orientation == .portrait || orientation == .portraitUpsideDown {
             pickerPosition = CGPoint(x: view.bounds.width - (pickerButton.bounds.size.width + buttonMargin), y: buttonMargin)
             flashPosition = CGPoint(x: buttonMargin, y: buttonMargin)
@@ -481,9 +481,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     }
 }
 
-
 extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectionViewCellDelegate {
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
         return delegate?.photoCaptureViewControllerNumberOfAssets(self) ?? 0
     }
 
@@ -502,24 +501,22 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 
     func collectionViewCellDidTapDelete(_ cell: PhotoCollectionViewCell) {
         if let indexPath = collectionView.indexPath(for: cell) {
-            self.deleteAssetAtIndex(indexPath.item, handler: {
+            deleteAssetAtIndex(indexPath.item, handler: {
                 self.delegate?.photoCaptureViewController(self, deleteAssetAtIndexPath: indexPath)
             })
         }
     }
 }
 
-
 extension PhotoCaptureViewController: UICollectionViewDelegate {
-    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
     }
 }
 
-
 extension UIView {
     public func rotateToCurrentDeviceOrientation() {
-        self.rotateToDeviceOrientation(UIDevice.current.orientation)
+        rotateToDeviceOrientation(UIDevice.current.orientation)
     }
 
     public func rotateToDeviceOrientation(_ orientation: UIDeviceOrientation) {
@@ -527,11 +524,11 @@ extension UIView {
         case .faceDown, .faceUp, .unknown:
             ()
         case .landscapeLeft:
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi/2))
+            transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi / 2))
         case .landscapeRight:
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi/2))
+            transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi / 2))
         case .portrait, .portraitUpsideDown:
-            self.transform = CGAffineTransform(rotationAngle: 0)
+            transform = CGAffineTransform(rotationAngle: 0)
         }
     }
 }

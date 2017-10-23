@@ -10,6 +10,7 @@ class TriggerButton: UIButton {
             setNeedsDisplay()
         }
     }
+
     override var isEnabled: Bool {
         didSet {
             setNeedsDisplay()
@@ -22,7 +23,7 @@ class TriggerButton: UIButton {
         backgroundColor = UIColor.clear
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -30,7 +31,7 @@ class TriggerButton: UIButton {
         super.draw(dirtyRect)
 
         let length = min(bounds.width, bounds.height)
-        let outerRect = CGRect(x: (bounds.width/2)-(length/2), y: (bounds.height/2)-(length/2), width: length, height: length)
+        let outerRect = CGRect(x: (bounds.width / 2) - (length / 2), y: (bounds.height / 2) - (length / 2), width: length, height: length)
         let borderWidth: CGFloat = 6.0
         let outerPath = UIBezierPath(ovalIn: outerRect.insetBy(dx: borderWidth, dy: borderWidth))
         outerPath.lineWidth = borderWidth
@@ -48,7 +49,6 @@ class TriggerButton: UIButton {
     }
 }
 
-
 class CloseButton: UIButton {
     var strokeColor = UIColor.black {
         didSet { setNeedsDisplay() }
@@ -60,14 +60,14 @@ class CloseButton: UIButton {
         backgroundColor = UIColor.lightGray.withAlphaComponent(0.9)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        layer.cornerRadius = bounds.height/2
+        layer.cornerRadius = bounds.height / 2
         layer.masksToBounds = true
     }
 
@@ -76,7 +76,7 @@ class CloseButton: UIButton {
 
         // Draw a +
         let centerPoint = CGPoint(x: bounds.midX, y: bounds.midY)
-        let radius: CGFloat = bounds.insetBy(dx: floor(bounds.width/8), dy: floor(bounds.width/8)).width / 2
+        let radius: CGFloat = bounds.insetBy(dx: floor(bounds.width / 8), dy: floor(bounds.width / 8)).width / 2
         let ratio: CGFloat = 0.5
         let xPath = UIBezierPath()
         xPath.move(to: centerPoint)

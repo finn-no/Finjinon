@@ -57,7 +57,4 @@ class FinjinonTests: XCTestCase {
         XCTAssertEqual(unchangeableTransform.b, faceUpTransform.b)
         XCTAssertEqual(unchangeableTransform.c, faceUpTransform.c)
     }
-
-
-    
 }

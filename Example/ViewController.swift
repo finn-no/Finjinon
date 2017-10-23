@@ -13,8 +13,8 @@ class ViewController: UITableViewController {
 
         captureController.delegate = self
 
-        for i in 0..<6 {
-            self.captureController.createAssetFromImage(UIImage(named: "hoff.jpeg")!) { asset in
+        for i in 0 ..< 6 {
+            captureController.createAssetFromImage(UIImage(named: "hoff.jpeg")!) { asset in
                 self.assets.append(asset)
                 self.tableView.insertRows(at: [IndexPath(row: i, section: 0)], with: .automatic)
             }
@@ -26,16 +26,16 @@ class ViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    @IBAction func addPhotosTapped(_ sender: AnyObject) {
+    @IBAction func addPhotosTapped(_: AnyObject) {
         present(captureController, animated: true, completion: nil)
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
         return assets.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath) 
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath)
         let asset = assets[indexPath.row]
         cell.textLabel?.text = asset.UUID
         cell.imageView?.image = nil
@@ -47,7 +47,6 @@ class ViewController: UITableViewController {
         return cell
     }
 }
-
 
 extension ViewController: PhotoCaptureViewControllerDelegate {
     func photoCaptureViewController(_ controller: PhotoCaptureViewController, cellForItemAtIndexPath indexPath: IndexPath) -> PhotoCollectionViewCell? {
@@ -64,42 +63,41 @@ extension ViewController: PhotoCaptureViewControllerDelegate {
         }
     }
 
-    func photoCaptureViewControllerDidFinish(_ controller: PhotoCaptureViewController) {
-
+    func photoCaptureViewControllerDidFinish(_: PhotoCaptureViewController) {
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: IndexPath) {
+    func photoCaptureViewController(_: PhotoCaptureViewController, didSelectAssetAtIndexPath indexPath: IndexPath) {
         NSLog("tapped in \(indexPath.row)")
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didFailWithError error: NSError) {
+    func photoCaptureViewController(_: PhotoCaptureViewController, didFailWithError error: NSError) {
         NSLog("failure: \(error)")
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: IndexPath, toIndexPath: IndexPath) {
+    func photoCaptureViewController(_: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: IndexPath, toIndexPath: IndexPath) {
         NSLog("moved from #\(fromIndexPath.item) to #\(toIndexPath.item)")
         tableView.moveRow(at: fromIndexPath, to: toIndexPath)
     }
 
-    func photoCaptureViewControllerNumberOfAssets(_ controller: PhotoCaptureViewController) -> Int {
+    func photoCaptureViewControllerNumberOfAssets(_: PhotoCaptureViewController) -> Int {
         return assets.count
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, assetForIndexPath indexPath: IndexPath) -> Asset {
+    func photoCaptureViewController(_: PhotoCaptureViewController, assetForIndexPath indexPath: IndexPath) -> Asset {
         return assets[indexPath.item]
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, didAddAsset asset: Asset) {
+    func photoCaptureViewController(_: PhotoCaptureViewController, didAddAsset asset: Asset) {
         assets.append(asset)
         tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: IndexPath) {
+    func photoCaptureViewController(_: PhotoCaptureViewController, deleteAssetAtIndexPath indexPath: IndexPath) {
         assets.remove(at: indexPath.item)
         tableView.deleteRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
     }
 
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, canMoveItemAtIndexPath indexPath: IndexPath) -> Bool {
+    func photoCaptureViewController(_: PhotoCaptureViewController, canMoveItemAtIndexPath _: IndexPath) -> Bool {
         return true
     }
 }
