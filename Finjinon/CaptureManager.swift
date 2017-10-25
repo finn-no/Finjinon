@@ -93,7 +93,7 @@ class CaptureManager: NSObject {
         }
     }
 
-    func captureImage(_ completion: @escaping (Data, NSDictionary) -> Void) { // TODO: throws
+    func captureImage(_ completion: @escaping (Data, NSDictionary) -> Void) {
         captureQueue.async {
             guard let connection = self.stillImageOutput?.connection(withMediaType: AVMediaTypeVideo) else {
                 return
@@ -112,8 +112,7 @@ class CaptureManager: NSObject {
                         }
                     }
                 } else {
-                    NSLog("Failed capturing still imagE: \(String(describing: error))")
-                    // TODO:
+                    NSLog("Failed capturing still images: \(String(describing: error))")
                 }
             })
         }
@@ -202,7 +201,6 @@ class CaptureManager: NSObject {
                 if self.session.canAddInput(input) {
                     self.session.addInput(input)
                 } else {
-                    // TODO: handle?
                     NSLog("failed to add input \(input) to session \(self.session)")
                 }
             } catch let error1 as NSError {

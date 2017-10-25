@@ -10,8 +10,6 @@ public enum AssetImageDataSourceTypes {
     case camera, library, unknown
 }
 
-// TODO: also support ALAsset/PHPhoto
-
 public struct Asset: Equatable, CustomStringConvertible {
     public let UUID = Foundation.UUID().uuidString
     let storage: PhotoStorage
@@ -101,7 +99,6 @@ open class PhotoStorage {
             } catch let error1 as NSError {
                 error = error1
                 NSLog("Failed to write image to \(cacheURL): \(String(describing: error))")
-                // TODO: throw
             } catch {
                 fatalError()
             }
@@ -226,7 +223,7 @@ open class PhotoStorage {
                         completion(thumbnailImage)
                     }
                 }
-            } // TODO: else throws
+            }
         }
     }
 
