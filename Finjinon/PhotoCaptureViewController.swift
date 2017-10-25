@@ -59,8 +59,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         view.backgroundColor = UIColor.black
 
-        // TODO: Move all the boring view setup to a storyboard/xib
-
         previewView = UIView(frame: view.bounds)
         previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(previewView)
