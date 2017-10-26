@@ -31,7 +31,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
-    open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
+    open var imagePickerAdapter: ImagePickerAdapter? = ImagePickerControllerAdapter()
 
     /// Optional view to display when returning from imagePicker not finished retrieving data.
     /// Use constraints to position elements dynamically, as the view will be rotated and sized with the device.
@@ -143,16 +143,18 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
 
-        let pickerButtonWidth: CGFloat = 114
-        pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
-        pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), for: UIControlState())
-        pickerButton.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
-        pickerButton.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
-        pickerButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
-        pickerButton.autoresizingMask = [.flexibleTopMargin]
-        pickerButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        roundifyButton(pickerButton)
-        view.addSubview(pickerButton)
+        if imagePickerAdapter != nil {
+            let pickerButtonWidth: CGFloat = 114
+            pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
+            pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), for: UIControlState())
+            pickerButton.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
+            pickerButton.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
+            pickerButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
+            pickerButton.autoresizingMask = [.flexibleTopMargin]
+            pickerButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            roundifyButton(pickerButton)
+            view.addSubview(pickerButton)
+        }
 
         previewView.alpha = 0.0
         captureManager.prepare { error in
@@ -318,7 +320,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             return
         }
 
-        let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
+        guard let controller = imagePickerAdapter?.viewControllerForImageSelection({ assets in
             if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
                 waitView.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(waitView)
@@ -365,7 +367,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             DispatchQueue.main.async {
                 self.dismiss(animated: true, completion: nil)
             }
-        })
+        }) else {
+            return
+        }
 
         present(controller, animated: true, completion: nil)
     }
@@ -530,3 +534,4 @@ extension UIView {
         }
     }
 }
+
