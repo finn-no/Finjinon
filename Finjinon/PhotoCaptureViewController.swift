@@ -31,6 +31,8 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
+    /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library. 
+    /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button. 
     open var imagePickerAdapter: ImagePickerAdapter? = ImagePickerControllerAdapter() {
         didSet {
             updateImagePickerButton()
