@@ -31,7 +31,13 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
-    open var imagePickerAdapter: ImagePickerAdapter = ImagePickerControllerAdapter()
+    /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library. 
+    /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button. 
+    open var imagePickerAdapter: ImagePickerAdapter? = ImagePickerControllerAdapter() {
+        didSet {
+            updateImagePickerButton()
+        }
+    }
 
     /// Optional view to display when returning from imagePicker not finished retrieving data.
     /// Use constraints to position elements dynamically, as the view will be rotated and sized with the device.
@@ -45,7 +51,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     fileprivate var containerView: UIView!
     fileprivate var focusIndicatorView: UIView!
     fileprivate var flashButton: UIButton!
-    fileprivate var pickerButton: UIButton!
+    fileprivate var pickerButton: UIButton?
     fileprivate var closeButton: UIButton!
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
@@ -143,16 +149,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
 
-        let pickerButtonWidth: CGFloat = 114
-        pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
-        pickerButton.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), for: UIControlState())
-        pickerButton.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
-        pickerButton.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
-        pickerButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
-        pickerButton.autoresizingMask = [.flexibleTopMargin]
-        pickerButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        roundifyButton(pickerButton)
-        view.addSubview(pickerButton)
+        updateImagePickerButton()
 
         previewView.alpha = 0.0
         captureManager.prepare { error in
@@ -178,6 +175,28 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
                 self.orientation = UIDevice.current.orientation
                 self.updateWidgetsToOrientation()
+            }
+        }
+    }
+
+    private func updateImagePickerButton() {
+        if imagePickerAdapter == nil {
+            if pickerButton != nil {
+                pickerButton?.removeFromSuperview()
+                pickerButton = nil
+            }
+        } else {
+            if pickerButton == nil {
+                let pickerButtonWidth: CGFloat = 114
+                pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
+                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), for: UIControlState())
+                pickerButton!.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
+                pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
+                pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
+                pickerButton!.autoresizingMask = [.flexibleTopMargin]
+                pickerButton!.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                roundifyButton(pickerButton!)
+                view.addSubview(pickerButton!)
             }
         }
     }
@@ -318,7 +337,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             return
         }
 
-        let controller = imagePickerAdapter.viewControllerForImageSelection({ assets in
+        guard let controller = imagePickerAdapter?.viewControllerForImageSelection({ assets in
             if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
                 waitView.translatesAutoresizingMaskIntoConstraints = false
                 self.view.addSubview(waitView)
@@ -365,7 +384,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             DispatchQueue.main.async {
                 self.dismiss(animated: true, completion: nil)
             }
-        })
+        }) else {
+            return
+        }
 
         present(controller, animated: true, completion: nil)
     }
@@ -456,17 +477,17 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     fileprivate func updateWidgetsToOrientation() {
         var flashPosition = flashButton.frame.origin
-        var pickerPosition = pickerButton.frame.origin
+        var pickerPosition: CGPoint = pickerButton?.frame.origin ?? .zero
         if orientation == .landscapeLeft || orientation == .landscapeRight {
             flashPosition = CGPoint(x: buttonMargin - (buttonMargin / 3), y: buttonMargin)
-            pickerPosition = CGPoint(x: view.bounds.width - (pickerButton.bounds.size.width / 2 - buttonMargin), y: buttonMargin)
+            pickerPosition = pickerButton != nil ? CGPoint(x: view.bounds.width - (pickerButton!.bounds.size.width / 2 - buttonMargin), y: buttonMargin) : .zero
         } else if orientation == .portrait || orientation == .portraitUpsideDown {
-            pickerPosition = CGPoint(x: view.bounds.width - (pickerButton.bounds.size.width + buttonMargin), y: buttonMargin)
+            pickerPosition = pickerButton != nil ? CGPoint(x: view.bounds.width - (pickerButton!.bounds.size.width + buttonMargin), y: buttonMargin) : .zero
             flashPosition = CGPoint(x: buttonMargin, y: buttonMargin)
         }
         let animations = {
-            self.pickerButton.rotateToCurrentDeviceOrientation()
-            self.pickerButton.frame.origin = pickerPosition
+            self.pickerButton?.rotateToCurrentDeviceOrientation()
+            self.pickerButton?.frame.origin = pickerPosition
             self.flashButton.rotateToCurrentDeviceOrientation()
             self.flashButton.frame.origin = flashPosition
             self.closeButton.rotateToCurrentDeviceOrientation()
@@ -530,3 +551,4 @@ extension UIView {
         }
     }
 }
+
