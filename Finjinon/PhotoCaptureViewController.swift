@@ -45,16 +45,21 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     fileprivate let storage = PhotoStorage()
     fileprivate let captureManager = CaptureManager()
-    fileprivate var previewView: UIView!
-    fileprivate var captureButton: TriggerButton!
+    fileprivate var previewView = UIView()
+    fileprivate var captureButton = TriggerButton()
     fileprivate let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
-    fileprivate var containerView: UIView!
-    fileprivate var focusIndicatorView: UIView!
-    fileprivate var flashButton: UIButton!
+    fileprivate var containerView = UIView()
+    fileprivate var focusIndicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 64, height: 64))
+    fileprivate var flashButton = UIButton()
     fileprivate var pickerButton: UIButton?
-    fileprivate var closeButton: UIButton!
+    fileprivate var closeButton = UIButton()
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
+
+    private var viewFrame = CGRect.zero
+    private var viewBounds = CGRect.zero
+    private var subviewSetupDone = false
+
 
     deinit {
         captureManager.stop(nil)
@@ -65,27 +70,65 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         view.backgroundColor = UIColor.black
 
-        previewView = UIView(frame: view.bounds)
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIDeviceOrientationDidChange, object: nil, queue: nil) { (_) -> Void in
+            switch UIDevice.current.orientation {
+            case .faceDown, .faceUp, .unknown:
+                ()
+            case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
+                self.orientation = UIDevice.current.orientation
+                self.updateWidgetsToOrientation()
+            }
+        }
+    }
+
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        // In case the application uses the old style for managing status bar appearance
+        UIApplication.shared.setStatusBarHidden(true, with: .slide)
+    }
+
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if #available(iOS 11.0, *) {
+            view.insetsLayoutMarginsFromSafeArea = true
+            viewFrame = view.convert(view.safeAreaLayoutGuide.layoutFrame, to: view.superview ?? view)
+            viewBounds = view.safeAreaLayoutGuide.layoutFrame
+        } else {
+            viewFrame = view.frame
+            viewBounds = view.bounds
+        }
+        setupSubviews()
+
+        collectionView.reloadData()
+        scrollToLastAddedAssetAnimated(false)
+    }
+
+    func setupSubviews() {
+        // Subviews need to be added and framed during viewDidAppear for the iPhone X's safeAreas to be known.
+        if subviewSetupDone { return }
+        subviewSetupDone = true
+
+        previewView.frame = viewBounds
         previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(previewView)
         let previewLayer = captureManager.previewLayer
         // We are using AVCaptureSessionPresetPhoto which has a 4:3 aspect ratio
-        let viewFinderWidth = view.bounds.size.width
+        let viewFinderWidth = viewBounds.size.width
         var viewFinderHeight = (viewFinderWidth / 3) * 4
         if captureManager.viewfinderMode == .fullScreen {
-            viewFinderHeight = view.bounds.size.height
+            viewFinderHeight = viewBounds.size.height
         }
         previewLayer.frame = CGRect(x: 0, y: 0, width: viewFinderWidth, height: viewFinderHeight)
         previewView.layer.addSublayer(previewLayer)
 
-        focusIndicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 64, height: 64))
         focusIndicatorView.backgroundColor = UIColor.clear
         focusIndicatorView.layer.borderColor = UIColor.orange.cgColor
         focusIndicatorView.layer.borderWidth = 1.0
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton = UIButton(frame: CGRect(x: buttonMargin, y: buttonMargin, width: 70, height: 38))
+        flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
         flashButton.setImage(UIImage(named: "LightningIcon"), for: UIControlState())
         flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: UIControlState())
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
@@ -97,18 +140,18 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         let tapper = UITapGestureRecognizer(target: self, action: #selector(focusTapGestureRecognized(_:)))
         previewView.addGestureRecognizer(tapper)
 
-        var collectionViewHeight: CGFloat = min(view.frame.size.height / 6, 120)
-        let collectionViewBottomMargin: CGFloat = 70
+        var collectionViewHeight: CGFloat = min(viewFrame.size.height / 6, 120)
+        let collectionViewBottomMargin: CGFloat = 0 //70
         let cameraButtonHeight: CGFloat = 66
 
-        var containerFrame = CGRect(x: 0, y: view.frame.height - collectionViewBottomMargin - collectionViewHeight, width: view.frame.width, height: collectionViewBottomMargin + collectionViewHeight)
+        var containerFrame = CGRect(x: viewFrame.origin.x, y: viewFrame.origin.y + viewBounds.height - collectionViewBottomMargin - collectionViewHeight, width: viewBounds.width, height: collectionViewBottomMargin + collectionViewHeight)
         if captureManager.viewfinderMode == .window {
-            let containerHeight = view.frame.height - viewFinderHeight
-            containerFrame.origin.y = view.frame.height - containerHeight
+            let containerHeight = viewFrame.height - viewFinderHeight
+            containerFrame.origin.y = viewFrame.origin.y + viewFrame.height - containerHeight
             containerFrame.size.height = containerHeight
             collectionViewHeight = containerHeight - cameraButtonHeight
         }
-        containerView = UIView(frame: containerFrame)
+        containerView.frame = containerFrame
         containerView.backgroundColor = UIColor(white: 0, alpha: 0.4)
         view.addSubview(containerView)
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
@@ -135,14 +178,14 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         collectionView.dataSource = self
         collectionView.delegate = self
 
-        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width / 2) - cameraButtonHeight / 2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight))
+        captureButton.frame = CGRect(x: (containerView.frame.width / 2) - cameraButtonHeight / 2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight)
         captureButton.layer.cornerRadius = cameraButtonHeight / 2
         captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), for: .touchUpInside)
         containerView.addSubview(captureButton)
         captureButton.isEnabled = false
         captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
 
-        closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: view.bounds.width - captureButton.frame.maxX, height: 44))
+        closeButton.frame = CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44)
         closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), for: .touchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), for: UIControlState())
         closeButton.tintColor = UIColor.white
@@ -167,16 +210,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.previewView.alpha = 1.0
             })
         }
-
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIDeviceOrientationDidChange, object: nil, queue: nil) { (_) -> Void in
-            switch UIDevice.current.orientation {
-            case .faceDown, .faceUp, .unknown:
-                ()
-            case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
-                self.orientation = UIDevice.current.orientation
-                self.updateWidgetsToOrientation()
-            }
-        }
     }
 
     private func updateImagePickerButton() {
@@ -186,10 +219,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 pickerButton = nil
             }
         } else {
+            let pickerButtonWidth: CGFloat = 114
+
             if pickerButton == nil {
-                let pickerButtonWidth: CGFloat = 114
-                pickerButton = UIButton(frame: CGRect(x: view.bounds.width - pickerButtonWidth - buttonMargin, y: buttonMargin, width: pickerButtonWidth, height: 38))
-                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), for: UIControlState())
+                pickerButton = UIButton(frame: CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38))
+                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: UIControlState())
                 pickerButton!.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
                 pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
@@ -197,19 +231,10 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 pickerButton!.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
                 roundifyButton(pickerButton!)
                 view.addSubview(pickerButton!)
+            } else {
+                pickerButton?.frame = CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38)
             }
         }
-    }
-
-    open override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        collectionView.reloadData()
-
-        scrollToLastAddedAssetAnimated(false)
-
-        // In case the application uses the old style for managing status bar appearance
-        UIApplication.shared.setStatusBarHidden(true, with: .slide)
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
@@ -479,11 +504,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         var flashPosition = flashButton.frame.origin
         var pickerPosition: CGPoint = pickerButton?.frame.origin ?? .zero
         if orientation == .landscapeLeft || orientation == .landscapeRight {
-            flashPosition = CGPoint(x: buttonMargin - (buttonMargin / 3), y: buttonMargin)
-            pickerPosition = pickerButton != nil ? CGPoint(x: view.bounds.width - (pickerButton!.bounds.size.width / 2 - buttonMargin), y: buttonMargin) : .zero
+            flashPosition = CGPoint(x: viewFrame.origin.x + buttonMargin - (buttonMargin / 3), y: viewFrame.origin.y + buttonMargin)
+            pickerPosition = pickerButton != nil ? CGPoint(x: viewFrame.origin.x + viewBounds.width - (pickerButton!.bounds.size.width / 2 - buttonMargin), y: viewFrame.origin.y + buttonMargin) : .zero
         } else if orientation == .portrait || orientation == .portraitUpsideDown {
-            pickerPosition = pickerButton != nil ? CGPoint(x: view.bounds.width - (pickerButton!.bounds.size.width + buttonMargin), y: buttonMargin) : .zero
-            flashPosition = CGPoint(x: buttonMargin, y: buttonMargin)
+            pickerPosition = pickerButton != nil ? CGPoint(x: viewFrame.origin.x + viewBounds.width - (pickerButton!.bounds.size.width + buttonMargin), y: viewFrame.origin.y + buttonMargin) : .zero
+            flashPosition = CGPoint(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin)
         }
         let animations = {
             self.pickerButton?.rotateToCurrentDeviceOrientation()
