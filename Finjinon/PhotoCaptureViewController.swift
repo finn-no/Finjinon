@@ -45,20 +45,20 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     fileprivate let storage = PhotoStorage()
     fileprivate let captureManager = CaptureManager()
-    fileprivate var previewView: UIView!
-    fileprivate var captureButton: TriggerButton!
+    fileprivate var previewView = UIView()
+    fileprivate var captureButton = TriggerButton()
     fileprivate let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
-    fileprivate var containerView: UIView!
-    fileprivate var focusIndicatorView: UIView!
-    fileprivate var flashButton: UIButton!
+    fileprivate var containerView = UIView()
+    fileprivate var focusIndicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 64, height: 64))
+    fileprivate var flashButton = UIButton()
     fileprivate var pickerButton: UIButton?
-    fileprivate var closeButton: UIButton!
+    fileprivate var closeButton = UIButton()
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
 
-    private var viewFrame: CGRect!
-    private var viewBounds: CGRect!
-    private var subviewsCreated = false
+    private var viewFrame = CGRect.zero
+    private var viewBounds = CGRect.zero
+    private var subviewSetupDone = false
 
 
     deinit {
@@ -81,28 +81,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
     }
 
-    private func updateImagePickerButton() {
-        if imagePickerAdapter == nil {
-            if pickerButton != nil {
-                pickerButton?.removeFromSuperview()
-                pickerButton = nil
-            }
-        } else {
-            if pickerButton == nil {
-                let pickerButtonWidth: CGFloat = 114
-                pickerButton = UIButton(frame: CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38))
-                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos buttont itle"), for: UIControlState())
-                pickerButton!.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
-                pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
-                pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
-                pickerButton!.autoresizingMask = [.flexibleTopMargin]
-                pickerButton!.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-                roundifyButton(pickerButton!)
-                view.addSubview(pickerButton!)
-            }
-        }
-    }
-
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
@@ -120,7 +98,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             viewFrame = view.frame
             viewBounds = view.bounds
         }
-
         setupSubviews()
 
         collectionView.reloadData()
@@ -128,12 +105,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     }
 
     func setupSubviews() {
-        // Only create subviews once in the views lifecycle.
-        // Views need to be added during viewDidAppear for the iPhone X's safeAreas to be known.
-        if subviewsCreated { return }
-        subviewsCreated = true
+        // Subviews need to be added and framed during viewDidAppear for the iPhone X's safeAreas to be known.
+        if subviewSetupDone { return }
+        subviewSetupDone = true
 
-        previewView = UIView(frame: viewBounds)
+        previewView.frame = viewBounds
         previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(previewView)
         let previewLayer = captureManager.previewLayer
@@ -146,14 +122,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         previewLayer.frame = CGRect(x: 0, y: 0, width: viewFinderWidth, height: viewFinderHeight)
         previewView.layer.addSublayer(previewLayer)
 
-        focusIndicatorView = UIView(frame: CGRect(x: 0, y: 0, width: 64, height: 64))
         focusIndicatorView.backgroundColor = UIColor.clear
         focusIndicatorView.layer.borderColor = UIColor.orange.cgColor
         focusIndicatorView.layer.borderWidth = 1.0
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton = UIButton(frame: CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38))
+        flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
         flashButton.setImage(UIImage(named: "LightningIcon"), for: UIControlState())
         flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: UIControlState())
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
@@ -176,7 +151,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             containerFrame.size.height = containerHeight
             collectionViewHeight = containerHeight - cameraButtonHeight
         }
-        containerView = UIView(frame: containerFrame)
+        containerView.frame = containerFrame
         containerView.backgroundColor = UIColor(white: 0, alpha: 0.4)
         view.addSubview(containerView)
         collectionView.frame = CGRect(x: 0, y: 0, width: containerView.bounds.width, height: collectionViewHeight)
@@ -203,14 +178,14 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         collectionView.dataSource = self
         collectionView.delegate = self
 
-        captureButton = TriggerButton(frame: CGRect(x: (containerView.frame.width / 2) - cameraButtonHeight / 2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight))
+        captureButton.frame = CGRect(x: (containerView.frame.width / 2) - cameraButtonHeight / 2, y: containerView.frame.height - cameraButtonHeight - 4, width: cameraButtonHeight, height: cameraButtonHeight)
         captureButton.layer.cornerRadius = cameraButtonHeight / 2
         captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), for: .touchUpInside)
         containerView.addSubview(captureButton)
         captureButton.isEnabled = false
         captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
 
-        closeButton = UIButton(frame: CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44))
+        closeButton.frame = CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44)
         closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), for: .touchUpInside)
         closeButton.setTitle(NSLocalizedString("Done", comment: ""), for: UIControlState())
         closeButton.tintColor = UIColor.white
@@ -234,6 +209,31 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.captureButton.isEnabled = true
                 self.previewView.alpha = 1.0
             })
+        }
+    }
+
+    private func updateImagePickerButton() {
+        if imagePickerAdapter == nil {
+            if pickerButton != nil {
+                pickerButton?.removeFromSuperview()
+                pickerButton = nil
+            }
+        } else {
+            let pickerButtonWidth: CGFloat = 114
+
+            if pickerButton == nil {
+                pickerButton = UIButton(frame: CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38))
+                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: UIControlState())
+                pickerButton!.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
+                pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
+                pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.footnote)
+                pickerButton!.autoresizingMask = [.flexibleTopMargin]
+                pickerButton!.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                roundifyButton(pickerButton!)
+                view.addSubview(pickerButton!)
+            } else {
+                pickerButton?.frame = CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38)
+            }
         }
     }
 
