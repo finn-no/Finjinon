@@ -90,6 +90,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Setting subviews in viewDidAppear is not a great solution... It's a fix to respect Safe Areas (known after
+        // viewDidAppear) for iPhone X in particular. Setting positions constrained to Safe Area would allow for more
+        // flexibility with Auto Layout, and thus creating the subViews in viewDidLoad/viewWillAppear would be possible again.
+
         if #available(iOS 11.0, *) {
             view.insetsLayoutMarginsFromSafeArea = true
             viewFrame = view.convert(view.safeAreaLayoutGuide.layoutFrame, to: view.superview ?? view)
