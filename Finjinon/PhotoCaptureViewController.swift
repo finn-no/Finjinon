@@ -220,9 +220,10 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             }
         } else {
             let pickerButtonWidth: CGFloat = 114
+            let buttonRect = CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38)
 
             if pickerButton == nil {
-                pickerButton = UIButton(frame: CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38))
+                pickerButton = UIButton(frame: buttonRect)
                 pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: UIControlState())
                 pickerButton!.setImage(UIImage(named: "PhotosIcon"), for: UIControlState())
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
@@ -232,8 +233,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 roundifyButton(pickerButton!)
                 view.addSubview(pickerButton!)
             } else {
-                pickerButton?.frame = CGRect(x: viewFrame.width - pickerButtonWidth - buttonMargin, y: viewFrame.origin.y + buttonMargin, width: pickerButtonWidth, height: 38)
+                pickerButton!.frame = buttonRect
             }
+            view.bringSubview(toFront: pickerButton!)
         }
     }
 
