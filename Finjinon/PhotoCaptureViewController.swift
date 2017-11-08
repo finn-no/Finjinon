@@ -146,7 +146,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         previewView.addGestureRecognizer(tapper)
 
         var collectionViewHeight: CGFloat = min(viewFrame.size.height / 6, 120)
-        let collectionViewBottomMargin: CGFloat = 0 //70
+        let collectionViewBottomMargin: CGFloat = 70
         let cameraButtonHeight: CGFloat = 66
 
         var containerFrame = CGRect(x: viewFrame.origin.x, y: viewFrame.origin.y + viewBounds.height - collectionViewBottomMargin - collectionViewHeight, width: viewBounds.width, height: collectionViewBottomMargin + collectionViewHeight)
