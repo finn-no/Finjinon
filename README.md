@@ -22,7 +22,7 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 it, simply add the following line to your Cartfile:
 
 ```ruby
-github 'finn-no/Finjinon' 
+github "finn-no/Finjinon"
 ```
 
 ## Usage
