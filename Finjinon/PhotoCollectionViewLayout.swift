@@ -32,14 +32,14 @@ public protocol PhotoCollectionViewLayoutDelegate: NSObjectProtocol {
     func photoCollectionViewLayout(_ layout: UICollectionViewLayout, canMoveItemAtIndexPath indexPath: IndexPath) -> Bool
 }
 
-internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
-    internal var didReorderHandler: (_ fromIndexPath: IndexPath, _ toIndexPath: IndexPath) -> Void = { _, _ in }
+class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizerDelegate {
+    var didReorderHandler: (_ fromIndexPath: IndexPath, _ toIndexPath: IndexPath) -> Void = { _, _ in }
     fileprivate var insertedIndexPaths: [IndexPath] = []
     fileprivate var deletedIndexPaths: [IndexPath] = []
     fileprivate var longPressGestureRecognizer = UILongPressGestureRecognizer()
     fileprivate var panGestureRecognizer = UIPanGestureRecognizer()
     fileprivate var dragProxy: DraggingProxy?
-    internal weak var delegate: PhotoCollectionViewLayoutDelegate?
+    weak var delegate: PhotoCollectionViewLayoutDelegate?
 
     override init() {
         super.init()
@@ -181,7 +181,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
 
     // MARK: -  Private methods
 
-    func handleLongPressGestureRecognized(_ recognizer: UILongPressGestureRecognizer) {
+    @objc func handleLongPressGestureRecognized(_ recognizer: UILongPressGestureRecognizer) {
         switch recognizer.state {
         case .began:
             let location = recognizer.location(in: collectionView)
@@ -226,7 +226,7 @@ internal class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureR
         }
     }
 
-    func handlePanGestureRecognized(_ recognizer: UIPanGestureRecognizer) {
+    @objc func handlePanGestureRecognized(_ recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translation(in: collectionView!)
         switch recognizer.state {
         case .changed:
