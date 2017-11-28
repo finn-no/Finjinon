@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Finjinon
 
 class ViewController: UITableViewController {
     var assets: [Asset] = []
@@ -10,6 +11,9 @@ class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPhotosTapped(_:)))
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "ItemCell")
 
         captureController.delegate = self
 
@@ -26,7 +30,7 @@ class ViewController: UITableViewController {
         tableView.reloadData()
     }
 
-    @IBAction func addPhotosTapped(_: AnyObject) {
+    @objc func addPhotosTapped(_: AnyObject) {
         present(captureController, animated: true, completion: nil)
     }
 
