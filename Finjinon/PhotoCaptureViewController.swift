@@ -348,7 +348,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     // MARK: - Actions
 
-    func flashButtonTapped(_: UIButton) {
+    @objc func flashButtonTapped(_: UIButton) {
         let mode = captureManager.nextAvailableFlashMode() ?? .off
         captureManager.changeFlashMode(mode) {
             switch mode {
@@ -362,7 +362,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
     }
 
-    func presentImagePickerTapped(_: AnyObject) {
+    @objc func presentImagePickerTapped(_: AnyObject) {
         if libraryAuthorizationStatus() == .denied || libraryAuthorizationStatus() == .restricted {
             let error = NSError(domain: FinjinonLibraryAccessErrorDomain, code: 0, userInfo: nil)
             delegate?.photoCaptureViewController(self, didFailWithError: error)
@@ -423,7 +423,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         present(controller, animated: true, completion: nil)
     }
 
-    func capturePhotoTapped(_ sender: UIButton) {
+    @objc func capturePhotoTapped(_ sender: UIButton) {
         sender.isEnabled = false
         UIView.animate(withDuration: 0.1, animations: { self.previewView.alpha = 0.0 }, completion: { _ in
             UIView.animate(withDuration: 0.1, animations: { self.previewView.alpha = 1.0 })
@@ -463,13 +463,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
     }
 
-    func doneButtonTapped(_: UIButton) {
+    @objc func doneButtonTapped(_: UIButton) {
         delegate?.photoCaptureViewControllerDidFinish(self)
 
         dismiss(animated: true, completion: nil)
     }
 
-    func focusTapGestureRecognized(_ gestureRecognizer: UITapGestureRecognizer) {
+    @objc func focusTapGestureRecognized(_ gestureRecognizer: UITapGestureRecognizer) {
         if gestureRecognizer.state == .ended {
             let point = gestureRecognizer.location(in: gestureRecognizer.view)
 

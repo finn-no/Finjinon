@@ -5,7 +5,7 @@
 import Foundation
 import Photos
 
-internal struct AssetResolver {
+struct AssetResolver {
     let queue = DispatchQueue(label: "com.finjinon.asset-resolvement", attributes: [])
     var defaultTargetSize = CGSize(width: 720, height: 1280)
 

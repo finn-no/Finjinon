@@ -12,7 +12,7 @@ enum CaptureManagerViewfinderMode {
 
 class CaptureManager: NSObject {
     let previewLayer: AVCaptureVideoPreviewLayer
-    var flashMode: AVCaptureFlashMode {
+    var flashMode: AVCaptureDevice.FlashMode {
         return cameraDevice?.flashMode ?? .off
     }
 
@@ -20,9 +20,9 @@ class CaptureManager: NSObject {
         return cameraDevice?.hasFlash ?? false && cameraDevice?.isFlashAvailable ?? false
     }
 
-    var supportedFlashModes: [AVCaptureFlashMode] {
-        var modes: [AVCaptureFlashMode] = []
-        for mode in [AVCaptureFlashMode.off, AVCaptureFlashMode.auto, AVCaptureFlashMode.on] {
+    var supportedFlashModes: [AVCaptureDevice.FlashMode] {
+        var modes: [AVCaptureDevice.FlashMode] = []
+        for mode in [AVCaptureDevice.FlashMode.off, AVCaptureDevice.FlashMode.auto, AVCaptureDevice.FlashMode.on] {
             if let cameraDevice = cameraDevice, cameraDevice.isFlashModeSupported(mode) {
                 modes.append(mode)
             }
@@ -39,7 +39,7 @@ class CaptureManager: NSObject {
     fileprivate var orientation = AVCaptureVideoOrientation.portrait
 
     override init() {
-        session.sessionPreset = AVCaptureSessionPresetPhoto
+        session.sessionPreset = AVCaptureSession.Preset.photo
         var viewfinderMode: CaptureManagerViewfinderMode {
             let screenBounds = UIScreen.main.nativeBounds
             let ratio = screenBounds.height / screenBounds.width
@@ -48,7 +48,7 @@ class CaptureManager: NSObject {
         self.viewfinderMode = viewfinderMode
 
         previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.videoGravity = self.viewfinderMode == .fullScreen ? AVLayerVideoGravityResizeAspectFill : AVLayerVideoGravityResize
+        previewLayer.videoGravity = self.viewfinderMode == .fullScreen ? AVLayerVideoGravity.resizeAspectFill : AVLayerVideoGravity.resize
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(changedOrientationNotification(_:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
         changedOrientationNotification(nil)
@@ -61,7 +61,7 @@ class CaptureManager: NSObject {
     // MARK: - API
 
     func authorizationStatus() -> AVAuthorizationStatus {
-        return AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
+        return AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
     }
 
     // Prepares the capture session, possibly asking the user for camera access.
@@ -70,7 +70,7 @@ class CaptureManager: NSObject {
         case .authorized:
             configure(completion)
         case .notDetermined:
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo, completionHandler: { granted in
+            AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: { granted in
                 if granted {
                     self.configure(completion)
                 } else {
@@ -95,7 +95,7 @@ class CaptureManager: NSObject {
 
     func captureImage(_ completion: @escaping (Data, NSDictionary) -> Void) {
         captureQueue.async {
-            guard let connection = self.stillImageOutput?.connection(withMediaType: AVMediaTypeVideo) else {
+            guard let connection = self.stillImageOutput?.connection(with: AVMediaType.video) else {
                 return
             }
             connection.videoOrientation = self.orientation
@@ -119,7 +119,7 @@ class CaptureManager: NSObject {
     }
 
     func lockFocusAtPointOfInterest(_ pointInLayer: CGPoint) {
-        let pointInCamera = previewLayer.captureDevicePointOfInterest(for: pointInLayer)
+        let pointInCamera = previewLayer.captureDevicePointConverted(fromLayerPoint: pointInLayer)
         lockCurrentCameraDeviceForConfiguration { cameraDevice in
             if let cameraDevice = self.cameraDevice, cameraDevice.isFocusPointOfInterestSupported {
                 cameraDevice.focusPointOfInterest = pointInCamera
@@ -128,7 +128,7 @@ class CaptureManager: NSObject {
         }
     }
 
-    func changeFlashMode(_ newMode: AVCaptureFlashMode, completion: @escaping () -> Void) {
+    func changeFlashMode(_ newMode: AVCaptureDevice.FlashMode, completion: @escaping () -> Void) {
         lockCurrentCameraDeviceForConfiguration { device in
             if let device = device {
                 device.flashMode = newMode
@@ -138,7 +138,7 @@ class CaptureManager: NSObject {
     }
 
     // Next available flash mode, or nil if flash is unsupported
-    func nextAvailableFlashMode() -> AVCaptureFlashMode? {
+    func nextAvailableFlashMode() -> AVCaptureDevice.FlashMode? {
         if !hasFlash {
             return nil
         }
@@ -156,7 +156,7 @@ class CaptureManager: NSObject {
 
     // Orientation change function required because we've locked the interface in portrait
     // and DeviceOrientation does not map 1:1 with AVCaptureVideoOrientation
-    func changedOrientationNotification(_: Notification?) {
+    @objc func changedOrientationNotification(_: Notification?) {
         let currentDeviceOrientation = UIDevice.current.orientation
         switch currentDeviceOrientation {
         case .faceDown, .faceUp, .unknown:
@@ -197,7 +197,7 @@ class CaptureManager: NSObject {
             var error: NSError?
 
             do {
-                let input = try AVCaptureDeviceInput(device: self.cameraDevice)
+                let input = try AVCaptureDeviceInput(device: self.cameraDevice!)
                 if self.session.canAddInput(input) {
                     self.session.addInput(input)
                 } else {
@@ -214,8 +214,8 @@ class CaptureManager: NSObject {
                 AVVideoQualityKey: 0.9,
             ]
 
-            if self.session.canAddOutput(self.stillImageOutput) {
-                self.session.addOutput(self.stillImageOutput)
+            if self.session.canAddOutput(self.stillImageOutput!) {
+                self.session.addOutput(self.stillImageOutput!)
             }
 
             if let cameraDevice = self.cameraDevice {
@@ -241,15 +241,14 @@ class CaptureManager: NSObject {
         }
     }
 
-    fileprivate func cameraDeviceWithPosition(_ position: AVCaptureDevicePosition) -> AVCaptureDevice? {
-        if let availableCameraDevices = AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo) as? [AVCaptureDevice] {
-            for device in availableCameraDevices {
-                if device.position == position {
-                    return device
-                }
+    fileprivate func cameraDeviceWithPosition(_ position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+        let availableCameraDevices = AVCaptureDevice.devices(for: AVMediaType.video)
+        for device in availableCameraDevices {
+            if device.position == position {
+                return device
             }
         }
 
-        return AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
+        return AVCaptureDevice.default(for: AVMediaType.video)
     }
 }

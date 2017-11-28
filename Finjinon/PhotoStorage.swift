@@ -23,12 +23,12 @@ public struct Asset: Equatable, CustomStringConvertible {
         return remoteReference?.url
     }
 
-    internal init(storage: PhotoStorage, imageURL: URL, originalDimensions: CGSize) {
+    init(storage: PhotoStorage, imageURL: URL, originalDimensions: CGSize) {
         self.storage = storage
         remoteReference = Remote(url: imageURL, originalDimensions: originalDimensions)
     }
 
-    internal init(storage: PhotoStorage) {
+    init(storage: PhotoStorage) {
         self.storage = storage
         remoteReference = nil
     }

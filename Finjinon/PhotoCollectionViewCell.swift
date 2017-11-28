@@ -4,7 +4,7 @@
 
 import UIKit
 
-internal protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
+protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
     func collectionViewCellDidTapDelete(_ cell: PhotoCollectionViewCell)
 }
 
@@ -15,7 +15,7 @@ open class PhotoCollectionViewCell: UICollectionViewCell {
     open let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     open internal(set) var asset: Asset?
 
-    internal weak var delegate: PhotoCollectionViewCellDelegate?
+    weak var delegate: PhotoCollectionViewCellDelegate?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -42,11 +42,11 @@ open class PhotoCollectionViewCell: UICollectionViewCell {
         asset = nil
     }
 
-    internal func closeButtonTapped(_: UIButton) {
+    @objc func closeButtonTapped(_: UIButton) {
         delegate?.collectionViewCellDidTapDelete(self)
     }
 
-    internal func proxy() -> UIView {
+    func proxy() -> UIView {
         var wrapperFrame = self.imageView.bounds
         wrapperFrame.origin.x = (bounds.size.width - wrapperFrame.size.width) / 2
         wrapperFrame.origin.y = (bounds.size.height - wrapperFrame.size.height) / 2
