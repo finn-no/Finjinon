@@ -12,7 +12,6 @@ class ViewController: UITableViewController {
         super.viewDidLoad()
 
         captureController.delegate = self
-        captureController.imagePickerAdapter = nil
 
         for i in 0 ..< 6 {
             captureController.createAssetFromImage(UIImage(named: "hoff.jpeg")!) { asset in
