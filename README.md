@@ -18,11 +18,11 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 
 ## Installation
 
-**Finjinon** is available through [CocoaPods](http://cocoapods.org). To install
+**Finjinon** is available through [Carthage](https://github.com/Carthage/Carthage). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'Finjinon'
+github 'finn-no/Finjinon' 
 ```
 
 ## Usage
