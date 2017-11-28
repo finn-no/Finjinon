@@ -19,7 +19,7 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 ## Installation
 
 **Finjinon** is available through [Carthage](https://github.com/Carthage/Carthage). To install
-it, simply add the following line to your Podfile:
+it, simply add the following line to your Cartfile:
 
 ```ruby
 github 'finn-no/Finjinon' 
