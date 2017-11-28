@@ -40,3 +40,6 @@ atlassian-ide-plugin.xml
 
 #Rbenv
 .ruby-version
+
+#Carthage
+Finjinon.framework.zip
