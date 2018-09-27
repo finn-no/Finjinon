@@ -169,7 +169,7 @@ class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizer
             }
         }
 
-        let states: [UIGestureRecognizerState] = [.possible, .failed]
+        let states: [UIGestureRecognizer.State] = [.possible, .failed]
         if gestureRecognizer == longPressGestureRecognizer && !states.contains(collectionView!.panGestureRecognizer.state) {
             return false
         } else if gestureRecognizer == panGestureRecognizer && states.contains(longPressGestureRecognizer.state) {

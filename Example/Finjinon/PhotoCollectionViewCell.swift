@@ -11,8 +11,8 @@ protocol PhotoCollectionViewCellDelegate: NSObjectProtocol {
 open class PhotoCollectionViewCell: UICollectionViewCell {
     open class func cellIdentifier() -> String { return "PhotoCell" }
 
-    open let imageView = UIImageView(frame: CGRect.zero)
-    open let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
+    public let imageView = UIImageView(frame: CGRect.zero)
+    public let closeButton: UIButton = CloseButton(frame: CGRect(x: 0, y: 0, width: 22, height: 22))
     open internal(set) var asset: Asset?
 
     weak var delegate: PhotoCollectionViewCellDelegate?

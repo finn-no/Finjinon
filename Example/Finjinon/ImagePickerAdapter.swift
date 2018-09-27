@@ -31,8 +31,11 @@ open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePi
         return picker
     }
 
-    open func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [String: Any]) {
-        guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL else {
+    open func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+// Local variable inserted by Swift 4.2 migrator.
+let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
+
+        guard let referenceURL = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.referenceURL)] as? URL else {
             completionHandler(true)
             return
         }
@@ -50,4 +53,14 @@ open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePi
     open func imagePickerControllerDidCancel(_: UIImagePickerController) {
         completionHandler(true)
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKey(_ input: UIImagePickerController.InfoKey) -> String {
+	return input.rawValue
 }
