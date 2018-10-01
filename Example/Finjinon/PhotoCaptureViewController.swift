@@ -136,10 +136,10 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
 
         let icon = UIImage(named: "LightningIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
-        flashButton.setImage(icon, for: UIControl.State())
-        flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: UIControl.State())
+        flashButton.setImage(icon, for: .normal)
+        flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: .normal)
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
-        flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.footnote)
+        flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
         flashButton.tintColor = UIColor.white
         flashButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         roundifyButton(flashButton, inset: 14)
@@ -194,7 +194,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         closeButton.frame = CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44)
         closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), for: .touchUpInside)
-        closeButton.setTitle(NSLocalizedString("Done", comment: ""), for: UIControl.State())
+        closeButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
         closeButton.tintColor = UIColor.white
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
@@ -231,11 +231,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
             if pickerButton == nil {
                 pickerButton = UIButton(frame: buttonRect)
-                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: UIControl.State())
+                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: .normal)
                 let icon = UIImage(named: "PhotosIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
-                pickerButton!.setImage(icon, for: UIControl.State())
+                pickerButton!.setImage(icon, for: .normal)
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
-                pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.footnote)
+                pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
                 pickerButton!.autoresizingMask = [.flexibleTopMargin]
                 pickerButton!.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
                 roundifyButton(pickerButton!)
@@ -356,11 +356,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureManager.changeFlashMode(mode) {
             switch mode {
             case .off:
-                self.flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: UIControl.State())
+                self.flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: .normal)
             case .on:
-                self.flashButton.setTitle(NSLocalizedString("On", comment: "flash on"), for: UIControl.State())
+                self.flashButton.setTitle(NSLocalizedString("On", comment: "flash on"), for: .normal)
             case .auto:
-                self.flashButton.setTitle(NSLocalizedString("Auto", comment: "flash Auto"), for: UIControl.State())
+                self.flashButton.setTitle(NSLocalizedString("Auto", comment: "flash Auto"), for: .normal)
             }
         }
     }
