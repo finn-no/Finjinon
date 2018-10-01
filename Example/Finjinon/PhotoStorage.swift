@@ -119,7 +119,7 @@ open class PhotoStorage {
     }
 
     func createAssetFromImage(_ image: UIImage, completion: @escaping (Asset) -> Void) {
-        let data = UIImageJPEGRepresentation(image, 1.0)!
+        let data = image.jpegData(compressionQuality: 1.0)!
         createAssetFromImageData(data, completion: completion)
     }
 

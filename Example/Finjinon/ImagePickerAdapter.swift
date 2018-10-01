@@ -31,8 +31,8 @@ open class ImagePickerControllerAdapter: NSObject, ImagePickerAdapter, UIImagePi
         return picker
     }
 
-    open func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [String: Any]) {
-        guard let referenceURL = info[UIImagePickerControllerReferenceURL] as? URL else {
+    open func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        guard let referenceURL = info[.referenceURL] as? URL else {
             completionHandler(true)
             return
         }
