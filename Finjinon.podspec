@@ -10,7 +10,7 @@ Finjinon is a custom AVFoundation based camera UI, focused on quickly adding sev
   s.screenshots  = "https://raw.githubusercontent.com/finn-no/Finjinon/master/Screenshots/screenshot.png"
   s.license      = "MIT"
   s.social_media_url  = "http://twitter.com/finn_tech"
-  s.platform          = :ios, '9.0'
+  s.platform          = :ios, '10.0'
   s.swift_version     = '4.2'
   s.source            = { :git => "https://github.com/finn-no/Finjinon.git", :tag => s.version }
   s.requires_arc      = true
