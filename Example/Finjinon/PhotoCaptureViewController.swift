@@ -56,6 +56,17 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
 
+    private lazy var messageTextView: UITextView = {
+        let textView = UITextView()
+        textView.isScrollEnabled = false
+        textView.backgroundColor = UIColor.black.withAlphaComponent(0.9)
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        textView.textColor = .white
+        textView.text = "Testing..."
+        return textView
+    }()
+
     private var viewFrame = CGRect.zero
     private var viewBounds = CGRect.zero
     private var subviewSetupDone = false
@@ -199,6 +210,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
 
+
+        view.addSubview(messageTextView)
+        NSLayoutConstraint.activate([
+            messageTextView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            messageTextView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        ])
+
         updateImagePickerButton()
 
         previewView.alpha = 0.0
@@ -217,6 +235,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.previewView.alpha = 1.0
             })
         }
+
+        captureManager.lowLightDetectorDelegate = self
     }
 
     private func updateImagePickerButton() {
@@ -565,6 +585,15 @@ extension PhotoCaptureViewController: UICollectionViewDataSource, PhotoCollectio
 extension PhotoCaptureViewController: UICollectionViewDelegate {
     public func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         delegate?.photoCaptureViewController(self, didSelectAssetAtIndexPath: indexPath)
+    }
+}
+
+extension PhotoCaptureViewController: LowLightDetectorDelegate {
+    func lowLightDetector(_ detector: LowLightDetector, didDetectLuminosity luminosity: Double) {
+        DispatchQueue.main.async { [weak self] in
+            self?.messageTextView.text = "Luminosity: \(luminosity)"
+            self?.messageTextView.sizeToFit()
+        }
     }
 }
 

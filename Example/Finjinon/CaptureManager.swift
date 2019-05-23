@@ -4,6 +4,7 @@
 
 import UIKit
 import AVFoundation
+import Vision
 
 enum CaptureManagerViewfinderMode {
     case fullScreen
@@ -37,6 +38,16 @@ class CaptureManager: NSObject {
     fileprivate var cameraDevice: AVCaptureDevice?
     fileprivate var stillImageOutput: AVCaptureStillImageOutput?
     fileprivate var orientation = AVCaptureVideoOrientation.portrait
+    private var lastVideoCaptureTime = CMTime()
+
+    private lazy var lowLightDetector = LowLightDetector()
+    weak var lowLightDetectorDelegate: LowLightDetectorDelegate? {
+        didSet {
+            lowLightDetector.delegate = lowLightDetectorDelegate
+        }
+    }
+
+    /// Array of vision requests
 
     override init() {
         session.sessionPreset = AVCaptureSession.Preset.photo
@@ -218,6 +229,12 @@ class CaptureManager: NSObject {
                 self.session.addOutput(self.stillImageOutput!)
             }
 
+            let videoOutput = self.makeVideoDataOutput()
+
+            if self.session.canAddOutput(videoOutput) {
+                self.session.addOutput(videoOutput)
+            }
+
             if let cameraDevice = self.cameraDevice {
                 if cameraDevice.isFocusModeSupported(.continuousAutoFocus) {
                     do {
@@ -250,5 +267,132 @@ class CaptureManager: NSObject {
         }
 
         return AVCaptureDevice.default(for: AVMediaType.video)
+    }
+
+    private func makeVideoDataOutput() -> AVCaptureVideoDataOutput {
+        let output = AVCaptureVideoDataOutput()
+        output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+        output.alwaysDiscardsLateVideoFrames = true
+        output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "no.finn.finjinon-sample-buffer"))
+        return output
+    }
+}
+
+extension CaptureManager: AVCaptureVideoDataOutputSampleBufferDelegate {
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        let time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+        let fps: Int32 = 1 // Create pixel buffer and call the delegate 1 times per second
+
+        guard (time - lastVideoCaptureTime) >= CMTime.init(value: 1, timescale: fps) else {
+            return
+        }
+
+        lastVideoCaptureTime = time
+        lowLightDetector.check(sampleBuffer: sampleBuffer)
+
+
+        //let brightness = getBrightness(sampleBuffer: sampleBuffer)
+        //print("Brightness: \(brightness)")
+    }
+}
+
+protocol LowLightDetectorDelegate: AnyObject {
+    // exposure value
+    func lowLightDetector(_ detector: LowLightDetector, didDetectLuminosity: Double)
+}
+
+final class LowLightDetector {
+    enum ClassificationResult: String {
+        case low = "Low"
+        case normal = "Normal"
+    }
+
+    weak var delegate: LowLightDetectorDelegate?
+    private var visionRequest: Any?
+    private var lastLuminosity: Double?
+
+    init() {
+        if #available(iOS 11.0, *) {
+            //setupVision()
+        }
+    }
+
+    func check(sampleBuffer: CMSampleBuffer) {
+        let luminosity = getLuminosity(from: sampleBuffer)
+        delegate?.lowLightDetector(self, didDetectLuminosity: luminosity)
+    }
+
+//    func classify(sampleBuffer: CMSampleBuffer) {
+//        let luminosity = getLuminosity(from: sampleBuffer)
+//        lastLuminosity = luminosity
+//
+//        if #available(iOS 11.0, *) {
+//            guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer), let request = visionRequest as? VNRequest else {
+//                delegate?.lowLightDetector(self, didDetectLuminosity: luminosity, classificationResult: nil)
+//                return
+//            }
+//
+//            var requestOptions = [VNImageOption: Any]()
+//
+//            let attachment = CMGetAttachment(
+//                sampleBuffer,
+//                key: kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix,
+//                attachmentModeOut: nil
+//            )
+//
+//            if let cameraIntrinsicData = attachment {
+//                requestOptions = [.cameraIntrinsics: cameraIntrinsicData]
+//            }
+//
+//            do {
+//                let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: requestOptions)
+//                try imageRequestHandler.perform([request])
+//            } catch {
+//                delegate?.lowLightDetector(self, didDetectLuminosity: luminosity, classificationResult: nil)
+//            }
+//        }
+//    }
+//
+//    @available(iOS 11.0, *)
+//    private func setupVision() {
+//        do {
+//            let model = try VNCoreMLModel(for: ImageClassifier().model)
+//            let request = VNCoreMLRequest(model: model, completionHandler: handleClassification)
+//            request.imageCropAndScaleOption = VNImageCropAndScaleOption.centerCrop
+//            visionRequest = request
+//        } catch {}
+//    }
+//
+//    @available(iOS 11.0, *)
+//    @objc private func handleClassification(request: VNRequest, error: Error?) {
+//        guard let observations = request.results as? [VNClassificationObservation] else {
+//            return
+//        }
+//
+//        let result = observations.first(where: { $0.confidence > 0.9 }).flatMap({
+//            ClassificationResult(rawValue: $0.identifier)
+//        })
+//
+//
+//        if let luminosity = lastLuminosity {
+//            delegate?.lowLightDetector(self, didDetectLuminosity: luminosity, classificationResult: result?.rawValue)
+//        }
+//    }
+
+    private func getLuminosity(from sampleBuffer: CMSampleBuffer) -> Double {
+        let rawMetadata = CMCopyDictionaryOfAttachments(
+            allocator: nil,
+            target: sampleBuffer,
+            attachmentMode: CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)
+        )
+        let metadata = CFDictionaryCreateMutableCopy(nil, 0, rawMetadata) as NSMutableDictionary
+        let exifData = metadata.value(forKey: "{Exif}") as? NSMutableDictionary
+
+        let fNumber : Double = exifData?[kCGImagePropertyExifFNumber] as! Double
+        let exposureTime : Double = exifData?[kCGImagePropertyExifExposureTime] as! Double
+        let isoSpeedRatingsArray = exifData![kCGImagePropertyExifISOSpeedRatings] as? NSArray
+        let isoSpeedRating : Double = isoSpeedRatingsArray![0] as! Double
+
+        return log2((100 * fNumber * fNumber) / (exposureTime * isoSpeedRating))
     }
 }

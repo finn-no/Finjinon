@@ -25,6 +25,7 @@
 		1499FCA61FCE03BB0067EDF2 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499FC9E1FCE03BB0067EDF2 /* ImagePickerAdapter.swift */; };
 		1499FCA71FCE03BB0067EDF2 /* AssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */; };
 		1499FCA91FCE04380067EDF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1499FCA81FCE04380067EDF2 /* Assets.xcassets */; };
+		CF9B325D2296B48F00CCB8F9 /* ImageClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = CF9B325B2296B2DE00CCB8F9 /* ImageClassifier.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 		1499FC9E1FCE03BB0067EDF2 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerAdapter.swift; sourceTree = "<group>"; };
 		1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResolver.swift; sourceTree = "<group>"; };
 		1499FCA81FCE04380067EDF2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CF9B325B2296B2DE00CCB8F9 /* ImageClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = ImageClassifier.mlmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 		1499FC7C1FCE03530067EDF2 /* Finjinon */ = {
 			isa = PBXGroup;
 			children = (
+				CF9B325B2296B2DE00CCB8F9 /* ImageClassifier.mlmodel */,
 				1499FC7D1FCE03530067EDF2 /* Finjinon.h */,
 				1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */,
 				1499FC991FCE03BA0067EDF2 /* Buttons.swift */,
@@ -340,6 +343,7 @@
 				1499FCA01FCE03BB0067EDF2 /* PhotoCollectionViewCell.swift in Sources */,
 				1499FCA31FCE03BB0067EDF2 /* CaptureManager.swift in Sources */,
 				1499FCA11FCE03BB0067EDF2 /* Buttons.swift in Sources */,
+				CF9B325D2296B48F00CCB8F9 /* ImageClassifier.mlmodel in Sources */,
 				1499FCA61FCE03BB0067EDF2 /* ImagePickerAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
