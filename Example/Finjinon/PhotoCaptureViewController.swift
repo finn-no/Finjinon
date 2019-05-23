@@ -236,7 +236,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             })
         }
 
-        captureManager.lowLightDetectorDelegate = self
+        captureManager.delegate = self
     }
 
     private func updateImagePickerButton() {
@@ -588,11 +588,15 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
     }
 }
 
-extension PhotoCaptureViewController: LowLightDetectorDelegate {
-    func lowLightDetector(_ detector: LowLightDetector, didDetectLuminosity luminosity: Double) {
-        DispatchQueue.main.async { [weak self] in
-            self?.messageTextView.text = "Luminosity: \(luminosity)"
-            self?.messageTextView.sizeToFit()
+extension PhotoCaptureViewController: CaptureManagerDelegate {
+    func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
+        if lightingCondition == .low {
+            messageTextView.text = "Your image seems a bit too dark.\nTurn on the light or go outside."
+            messageTextView.sizeToFit()
+            messageTextView.isHidden = false
+        } else {
+            messageTextView.text = nil
+            messageTextView.isHidden = true
         }
     }
 }

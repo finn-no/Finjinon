@@ -11,6 +11,12 @@ enum CaptureManagerViewfinderMode {
     case window
 }
 
+protocol CaptureManagerDelegate: AnyObject {
+    // exposure value
+    func captureManager(_ manager: CaptureManager, didDetectLightingCondition: LightingCondition)
+}
+
+
 class CaptureManager: NSObject {
     let previewLayer: AVCaptureVideoPreviewLayer
     var flashMode: AVCaptureDevice.FlashMode {
@@ -40,12 +46,7 @@ class CaptureManager: NSObject {
     fileprivate var orientation = AVCaptureVideoOrientation.portrait
     private var lastVideoCaptureTime = CMTime()
 
-    private lazy var lowLightDetector = LowLightDetector()
-    weak var lowLightDetectorDelegate: LowLightDetectorDelegate? {
-        didSet {
-            lowLightDetector.delegate = lowLightDetectorDelegate
-        }
-    }
+    weak var delegate: CaptureManagerDelegate?
 
     /// Array of vision requests
 
@@ -278,6 +279,8 @@ class CaptureManager: NSObject {
     }
 }
 
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+
 extension CaptureManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         let time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
@@ -288,98 +291,15 @@ extension CaptureManager: AVCaptureVideoDataOutputSampleBufferDelegate {
         }
 
         lastVideoCaptureTime = time
-        lowLightDetector.check(sampleBuffer: sampleBuffer)
+        let explosureValue = getExplosureValue(from: sampleBuffer)
 
-
-        //let brightness = getBrightness(sampleBuffer: sampleBuffer)
-        //print("Brightness: \(brightness)")
-    }
-}
-
-protocol LowLightDetectorDelegate: AnyObject {
-    // exposure value
-    func lowLightDetector(_ detector: LowLightDetector, didDetectLuminosity: Double)
-}
-
-final class LowLightDetector {
-    enum ClassificationResult: String {
-        case low = "Low"
-        case normal = "Normal"
-    }
-
-    weak var delegate: LowLightDetectorDelegate?
-    private var visionRequest: Any?
-    private var lastLuminosity: Double?
-
-    init() {
-        if #available(iOS 11.0, *) {
-            //setupVision()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.captureManager(self, didDetectLightingCondition: LightingCondition(value: explosureValue))
         }
     }
 
-    func check(sampleBuffer: CMSampleBuffer) {
-        let luminosity = getLuminosity(from: sampleBuffer)
-        delegate?.lowLightDetector(self, didDetectLuminosity: luminosity)
-    }
-
-//    func classify(sampleBuffer: CMSampleBuffer) {
-//        let luminosity = getLuminosity(from: sampleBuffer)
-//        lastLuminosity = luminosity
-//
-//        if #available(iOS 11.0, *) {
-//            guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer), let request = visionRequest as? VNRequest else {
-//                delegate?.lowLightDetector(self, didDetectLuminosity: luminosity, classificationResult: nil)
-//                return
-//            }
-//
-//            var requestOptions = [VNImageOption: Any]()
-//
-//            let attachment = CMGetAttachment(
-//                sampleBuffer,
-//                key: kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix,
-//                attachmentModeOut: nil
-//            )
-//
-//            if let cameraIntrinsicData = attachment {
-//                requestOptions = [.cameraIntrinsics: cameraIntrinsicData]
-//            }
-//
-//            do {
-//                let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: requestOptions)
-//                try imageRequestHandler.perform([request])
-//            } catch {
-//                delegate?.lowLightDetector(self, didDetectLuminosity: luminosity, classificationResult: nil)
-//            }
-//        }
-//    }
-//
-//    @available(iOS 11.0, *)
-//    private func setupVision() {
-//        do {
-//            let model = try VNCoreMLModel(for: ImageClassifier().model)
-//            let request = VNCoreMLRequest(model: model, completionHandler: handleClassification)
-//            request.imageCropAndScaleOption = VNImageCropAndScaleOption.centerCrop
-//            visionRequest = request
-//        } catch {}
-//    }
-//
-//    @available(iOS 11.0, *)
-//    @objc private func handleClassification(request: VNRequest, error: Error?) {
-//        guard let observations = request.results as? [VNClassificationObservation] else {
-//            return
-//        }
-//
-//        let result = observations.first(where: { $0.confidence > 0.9 }).flatMap({
-//            ClassificationResult(rawValue: $0.identifier)
-//        })
-//
-//
-//        if let luminosity = lastLuminosity {
-//            delegate?.lowLightDetector(self, didDetectLuminosity: luminosity, classificationResult: result?.rawValue)
-//        }
-//    }
-
-    private func getLuminosity(from sampleBuffer: CMSampleBuffer) -> Double {
+    private func getExplosureValue(from sampleBuffer: CMSampleBuffer) -> Double {
         let rawMetadata = CMCopyDictionaryOfAttachments(
             allocator: nil,
             target: sampleBuffer,
@@ -387,12 +307,28 @@ final class LowLightDetector {
         )
         let metadata = CFDictionaryCreateMutableCopy(nil, 0, rawMetadata) as NSMutableDictionary
         let exifData = metadata.value(forKey: "{Exif}") as? NSMutableDictionary
-
         let fNumber : Double = exifData?[kCGImagePropertyExifFNumber] as! Double
         let exposureTime : Double = exifData?[kCGImagePropertyExifExposureTime] as! Double
         let isoSpeedRatingsArray = exifData![kCGImagePropertyExifISOSpeedRatings] as? NSArray
         let isoSpeedRating : Double = isoSpeedRatingsArray![0] as! Double
 
         return log2((100 * fNumber * fNumber) / (exposureTime * isoSpeedRating))
+    }
+}
+
+enum LightingCondition: String {
+    case low
+    case normal
+    case high
+
+    init(value: Double) {
+        switch Int(round(value)) {
+        case Int.min..<5:
+            self = .low
+        case 14...Int.max:
+            self = .high
+        default:
+            self = .normal
+        }
     }
 }
