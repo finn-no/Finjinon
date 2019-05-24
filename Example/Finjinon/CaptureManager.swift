@@ -45,6 +45,7 @@ class CaptureManager: NSObject {
     fileprivate var stillImageOutput: AVCaptureStillImageOutput?
     fileprivate var orientation = AVCaptureVideoOrientation.portrait
     private var lastVideoCaptureTime = CMTime()
+    private let lowLightService = LowLightService()
 
     weak var delegate: CaptureManagerDelegate?
 
@@ -284,51 +285,19 @@ class CaptureManager: NSObject {
 extension CaptureManager: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         let time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-        let fps: Int32 = 1 // Create pixel buffer and call the delegate 1 times per second
+        let fps: Int32 = 1 // Create pixel buffer and call the delegate 1 time per second
 
         guard (time - lastVideoCaptureTime) >= CMTime.init(value: 1, timescale: fps) else {
             return
         }
 
         lastVideoCaptureTime = time
-        let explosureValue = getExplosureValue(from: sampleBuffer)
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.delegate?.captureManager(self, didDetectLightingCondition: LightingCondition(value: explosureValue))
-        }
-    }
-
-    private func getExplosureValue(from sampleBuffer: CMSampleBuffer) -> Double {
-        let rawMetadata = CMCopyDictionaryOfAttachments(
-            allocator: nil,
-            target: sampleBuffer,
-            attachmentMode: CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)
-        )
-        let metadata = CFDictionaryCreateMutableCopy(nil, 0, rawMetadata) as NSMutableDictionary
-        let exifData = metadata.value(forKey: "{Exif}") as? NSMutableDictionary
-        let fNumber : Double = exifData?[kCGImagePropertyExifFNumber] as! Double
-        let exposureTime : Double = exifData?[kCGImagePropertyExifExposureTime] as! Double
-        let isoSpeedRatingsArray = exifData![kCGImagePropertyExifISOSpeedRatings] as? NSArray
-        let isoSpeedRating : Double = isoSpeedRatingsArray![0] as! Double
-
-        return log2((100 * fNumber * fNumber) / (exposureTime * isoSpeedRating))
-    }
-}
-
-enum LightingCondition: String {
-    case low
-    case normal
-    case high
-
-    init(value: Double) {
-        switch Int(round(value)) {
-        case Int.min..<5:
-            self = .low
-        case 14...Int.max:
-            self = .high
-        default:
-            self = .normal
+        if let lightningCondition = lowLightService.getLightningCondition(from: sampleBuffer) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.captureManager(self, didDetectLightingCondition: lightningCondition)
+            }
         }
     }
 }

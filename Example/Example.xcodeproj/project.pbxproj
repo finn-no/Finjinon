@@ -25,6 +25,9 @@
 		1499FCA61FCE03BB0067EDF2 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499FC9E1FCE03BB0067EDF2 /* ImagePickerAdapter.swift */; };
 		1499FCA71FCE03BB0067EDF2 /* AssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */; };
 		1499FCA91FCE04380067EDF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1499FCA81FCE04380067EDF2 /* Assets.xcassets */; };
+		CF9B325F229740F000CCB8F9 /* LowLightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B325E229740F000CCB8F9 /* LowLightView.swift */; };
+		CF9B3262229805BE00CCB8F9 /* LowLightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3261229805BE00CCB8F9 /* LowLightService.swift */; };
+		CF9B3264229805CB00CCB8F9 /* LightingCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3263229805CB00CCB8F9 /* LightingCondition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +90,9 @@
 		1499FC9E1FCE03BB0067EDF2 /* ImagePickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerAdapter.swift; sourceTree = "<group>"; };
 		1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResolver.swift; sourceTree = "<group>"; };
 		1499FCA81FCE04380067EDF2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CF9B325E229740F000CCB8F9 /* LowLightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowLightView.swift; sourceTree = "<group>"; };
+		CF9B3261229805BE00CCB8F9 /* LowLightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowLightService.swift; sourceTree = "<group>"; };
+		CF9B3263229805CB00CCB8F9 /* LightingCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightingCondition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +157,7 @@
 		1499FC7C1FCE03530067EDF2 /* Finjinon */ = {
 			isa = PBXGroup;
 			children = (
+				CF9B3260229805B200CCB8F9 /* LowLight */,
 				1499FC7D1FCE03530067EDF2 /* Finjinon.h */,
 				1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */,
 				1499FC991FCE03BA0067EDF2 /* Buttons.swift */,
@@ -162,6 +169,7 @@
 				1499FC9D1FCE03BB0067EDF2 /* PhotoStorage.swift */,
 				1499FC7E1FCE03530067EDF2 /* Info.plist */,
 				1499FCA81FCE04380067EDF2 /* Assets.xcassets */,
+				CF9B325E229740F000CCB8F9 /* LowLightView.swift */,
 			);
 			path = Finjinon;
 			sourceTree = "<group>";
@@ -173,6 +181,15 @@
 				1499FC8C1FCE03530067EDF2 /* Info.plist */,
 			);
 			path = FinjinonTests;
+			sourceTree = "<group>";
+		};
+		CF9B3260229805B200CCB8F9 /* LowLight */ = {
+			isa = PBXGroup;
+			children = (
+				CF9B3261229805BE00CCB8F9 /* LowLightService.swift */,
+				CF9B3263229805CB00CCB8F9 /* LightingCondition.swift */,
+			);
+			path = LowLight;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -333,8 +350,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF9B325F229740F000CCB8F9 /* LowLightView.swift in Sources */,
 				1499FCA71FCE03BB0067EDF2 /* AssetResolver.swift in Sources */,
 				1499FCA51FCE03BB0067EDF2 /* PhotoStorage.swift in Sources */,
+				CF9B3262229805BE00CCB8F9 /* LowLightService.swift in Sources */,
+				CF9B3264229805CB00CCB8F9 /* LightingCondition.swift in Sources */,
 				1499FCA21FCE03BB0067EDF2 /* PhotoCollectionViewLayout.swift in Sources */,
 				1499FCA41FCE03BB0067EDF2 /* PhotoCaptureViewController.swift in Sources */,
 				1499FCA01FCE03BB0067EDF2 /* PhotoCollectionViewCell.swift in Sources */,

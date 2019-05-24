@@ -56,15 +56,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
 
-    private lazy var messageTextView: UITextView = {
-        let textView = UITextView()
-        textView.isScrollEnabled = false
-        textView.backgroundColor = UIColor.black.withAlphaComponent(0.9)
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        textView.textColor = .white
-        textView.text = "Testing..."
-        return textView
+    private lazy var lowLightView: LowLightView = {
+        let view = LowLightView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
+        return view
     }()
 
     private var viewFrame = CGRect.zero
@@ -210,11 +206,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
 
-
-        view.addSubview(messageTextView)
+        view.addSubview(lowLightView)
         NSLayoutConstraint.activate([
-            messageTextView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
-            messageTextView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
         ])
 
         updateImagePickerButton()
@@ -591,12 +587,11 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 extension PhotoCaptureViewController: CaptureManagerDelegate {
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
         if lightingCondition == .low {
-            messageTextView.text = "Your image seems a bit too dark.\nTurn on the light or go outside."
-            messageTextView.sizeToFit()
-            messageTextView.isHidden = false
+            lowLightView.text = "Your image seems a bit too dark.\nTurn on the light or go outside."
+            lowLightView.isHidden = false
         } else {
-            messageTextView.text = nil
-            messageTextView.isHidden = true
+            lowLightView.text = nil
+            lowLightView.isHidden = true
         }
     }
 }
