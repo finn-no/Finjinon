@@ -28,6 +28,7 @@
 		CF9B325F229740F000CCB8F9 /* LowLightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B325E229740F000CCB8F9 /* LowLightView.swift */; };
 		CF9B3262229805BE00CCB8F9 /* LowLightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3261229805BE00CCB8F9 /* LowLightService.swift */; };
 		CF9B3264229805CB00CCB8F9 /* LightingCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3263229805CB00CCB8F9 /* LightingCondition.swift */; };
+		CF9B326D22980D8C00CCB8F9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CF9B326F22980D8C00CCB8F9 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 		CF9B325E229740F000CCB8F9 /* LowLightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowLightView.swift; sourceTree = "<group>"; };
 		CF9B3261229805BE00CCB8F9 /* LowLightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowLightService.swift; sourceTree = "<group>"; };
 		CF9B3263229805CB00CCB8F9 /* LightingCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightingCondition.swift; sourceTree = "<group>"; };
+		CF9B326E22980D8C00CCB8F9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +159,7 @@
 		1499FC7C1FCE03530067EDF2 /* Finjinon */ = {
 			isa = PBXGroup;
 			children = (
+				CF9B326A22980D4500CCB8F9 /* Resources */,
 				CF9B3260229805B200CCB8F9 /* LowLight */,
 				1499FC7D1FCE03530067EDF2 /* Finjinon.h */,
 				1499FC9F1FCE03BB0067EDF2 /* AssetResolver.swift */,
@@ -190,6 +193,14 @@
 				CF9B3263229805CB00CCB8F9 /* LightingCondition.swift */,
 			);
 			path = LowLight;
+			sourceTree = "<group>";
+		};
+		CF9B326A22980D4500CCB8F9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CF9B326F22980D8C00CCB8F9 /* Localizable.strings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -324,6 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1499FCA91FCE04380067EDF2 /* Assets.xcassets in Resources */,
+				CF9B326D22980D8C00CCB8F9 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,6 +411,14 @@
 				1499FC4B1FCDED890067EDF2 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		CF9B326F22980D8C00CCB8F9 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CF9B326E22980D8C00CCB8F9 /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

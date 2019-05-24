@@ -587,7 +587,7 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 extension PhotoCaptureViewController: CaptureManagerDelegate {
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
         if lightingCondition == .low {
-            lowLightView.text = "Your image seems a bit too dark.\nTurn on the light or go outside."
+            lowLightView.text = "lowLightMessage".localized()
             lowLightView.isHidden = false
         } else {
             lowLightView.text = nil
@@ -615,3 +615,9 @@ extension UIView {
     }
 }
 
+private extension String {
+    func localized() -> String {
+        let bundle = Bundle(for: PhotoCaptureViewController.self)
+        return NSLocalizedString(self, tableName: nil, bundle: bundle, value: "", comment: "")
+    }
+}
