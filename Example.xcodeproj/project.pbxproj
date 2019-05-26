@@ -17,20 +17,17 @@
 		CF9B3281229829AD00CCB8F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF9B3278229829AD00CCB8F9 /* Assets.xcassets */; };
 		CF9B3282229829AD00CCB8F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF9B3279229829AD00CCB8F9 /* LaunchScreen.storyboard */; };
 		CF9B3283229829AD00CCB8F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B327B229829AD00CCB8F9 /* AppDelegate.swift */; };
-		CF9B3284229829AD00CCB8F9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF9B327C229829AD00CCB8F9 /* Info.plist */; };
 		CF9B3291229829E900CCB8F9 /* PhotoCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3286229829E900CCB8F9 /* PhotoCollectionViewLayout.swift */; };
 		CF9B3292229829E900CCB8F9 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3287229829E900CCB8F9 /* Buttons.swift */; };
 		CF9B3293229829E900CCB8F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF9B3288229829E900CCB8F9 /* Assets.xcassets */; };
 		CF9B3294229829E900CCB8F9 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3289229829E900CCB8F9 /* CaptureManager.swift */; };
-		CF9B3295229829E900CCB8F9 /* Finjinon.h in Headers */ = {isa = PBXBuildFile; fileRef = CF9B328A229829E900CCB8F9 /* Finjinon.h */; };
+		CF9B3295229829E900CCB8F9 /* Finjinon.h in Headers */ = {isa = PBXBuildFile; fileRef = CF9B328A229829E900CCB8F9 /* Finjinon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF9B3296229829E900CCB8F9 /* PhotoCaptureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B328B229829E900CCB8F9 /* PhotoCaptureViewController.swift */; };
 		CF9B3297229829E900CCB8F9 /* AssetResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B328C229829E900CCB8F9 /* AssetResolver.swift */; };
 		CF9B3298229829E900CCB8F9 /* ImagePickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B328D229829E900CCB8F9 /* ImagePickerAdapter.swift */; };
 		CF9B3299229829E900CCB8F9 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B328E229829E900CCB8F9 /* PhotoCollectionViewCell.swift */; };
 		CF9B329A229829E900CCB8F9 /* PhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B328F229829E900CCB8F9 /* PhotoStorage.swift */; };
-		CF9B329B229829E900CCB8F9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF9B3290229829E900CCB8F9 /* Info.plist */; };
 		CF9B329F229829FC00CCB8F9 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B329D229829FC00CCB8F9 /* FinjinonTests.swift */; };
-		CF9B32A0229829FC00CCB8F9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF9B329E229829FC00CCB8F9 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,7 +69,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1499FC3E1FCDED890067EDF2 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1499FC3E1FCDED890067EDF2 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1499FC7B1FCE03520067EDF2 /* Finjinon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Finjinon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1499FC831FCE03530067EDF2 /* FinjinonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinjinonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF9B3271229829AD00CCB8F9 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -138,7 +135,7 @@
 		1499FC3F1FCDED890067EDF2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1499FC3E1FCDED890067EDF2 /* Example.app */,
+				1499FC3E1FCDED890067EDF2 /* Demo.app */,
 				1499FC7B1FCE03520067EDF2 /* Finjinon.framework */,
 				1499FC831FCE03530067EDF2 /* FinjinonTests.xctest */,
 			);
@@ -201,9 +198,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		1499FC3D1FCDED890067EDF2 /* Example */ = {
+		1499FC3D1FCDED890067EDF2 /* Demo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1499FC501FCDED890067EDF2 /* Build configuration list for PBXNativeTarget "Example" */;
+			buildConfigurationList = 1499FC501FCDED890067EDF2 /* Build configuration list for PBXNativeTarget "Demo" */;
 			buildPhases = (
 				1499FC3A1FCDED890067EDF2 /* Sources */,
 				1499FC3B1FCDED890067EDF2 /* Frameworks */,
@@ -215,9 +212,9 @@
 			dependencies = (
 				1499FC8F1FCE03530067EDF2 /* PBXTargetDependency */,
 			);
-			name = Example;
+			name = Demo;
 			productName = Example;
-			productReference = 1499FC3E1FCDED890067EDF2 /* Example.app */;
+			productReference = 1499FC3E1FCDED890067EDF2 /* Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		1499FC7A1FCE03520067EDF2 /* Finjinon */ = {
@@ -298,7 +295,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1499FC3D1FCDED890067EDF2 /* Example */,
+				1499FC3D1FCDED890067EDF2 /* Demo */,
 				1499FC7A1FCE03520067EDF2 /* Finjinon */,
 				1499FC821FCE03530067EDF2 /* FinjinonTests */,
 			);
@@ -312,7 +309,6 @@
 			files = (
 				CF9B327E229829AD00CCB8F9 /* LaunchScreen.strings in Resources */,
 				CF9B3280229829AD00CCB8F9 /* Localizable.strings in Resources */,
-				CF9B3284229829AD00CCB8F9 /* Info.plist in Resources */,
 				CF9B3281229829AD00CCB8F9 /* Assets.xcassets in Resources */,
 				CF9B3282229829AD00CCB8F9 /* LaunchScreen.storyboard in Resources */,
 				CF9B327F229829AD00CCB8F9 /* Main.strings in Resources */,
@@ -323,7 +319,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF9B329B229829E900CCB8F9 /* Info.plist in Resources */,
 				CF9B3293229829E900CCB8F9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -332,7 +327,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF9B32A0229829FC00CCB8F9 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,7 +375,7 @@
 		};
 		1499FC881FCE03530067EDF2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1499FC3D1FCDED890067EDF2 /* Example */;
+			target = 1499FC3D1FCDED890067EDF2 /* Demo */;
 			targetProxy = 1499FC871FCE03530067EDF2 /* PBXContainerItemProxy */;
 		};
 		1499FC8F1FCE03530067EDF2 /* PBXTargetDependency */ = {
@@ -545,7 +539,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D34XZHQLE3;
-				INFOPLIST_FILE = Example/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.Example;
@@ -562,7 +556,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D34XZHQLE3;
-				INFOPLIST_FILE = Example/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.Example;
@@ -583,7 +577,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Finjinon/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -609,7 +603,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Finjinon/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Sources/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -629,7 +623,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = FinjinonTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.FinjinonTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -645,7 +639,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = FinjinonTests/Info.plist;
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.FinjinonTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -667,7 +661,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1499FC501FCDED890067EDF2 /* Build configuration list for PBXNativeTarget "Example" */ = {
+		1499FC501FCDED890067EDF2 /* Build configuration list for PBXNativeTarget "Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1499FC511FCDED890067EDF2 /* Debug */,
