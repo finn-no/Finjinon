@@ -289,7 +289,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1499FC391FCDED890067EDF2 /* Build configuration list for PBXProject "Example" */;
+			buildConfigurationList = 1499FC391FCDED890067EDF2 /* Build configuration list for PBXProject "Finjinon" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -550,7 +550,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.Demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -567,7 +567,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = no.finn.finjinon.Demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -660,7 +660,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1499FC391FCDED890067EDF2 /* Build configuration list for PBXProject "Example" */ = {
+		1499FC391FCDED890067EDF2 /* Build configuration list for PBXProject "Finjinon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1499FC4E1FCDED890067EDF2 /* Debug */,
