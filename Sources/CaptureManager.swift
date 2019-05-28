@@ -181,7 +181,7 @@ class CaptureManager: NSObject {
     // MARK: - Private methods
 
     fileprivate func accessDeniedError(_ code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
-        let info = [NSLocalizedDescriptionKey: NSLocalizedString("Camera access denied, please enable it in the Settings app to continue", comment: "")]
+        let info = [NSLocalizedDescriptionKey: "finjinon.cameraAccessDenied".localized()]
         return NSError(domain: FinjinonCameraAccessErrorDomain, code: code, userInfo: info)
     }
 

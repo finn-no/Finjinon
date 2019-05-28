@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings
+  Finjinon
+  Copyright © 2019 FINN.no. All rights reserved.
+*/
+
+"finjinon.cameraAccessDenied" = "Camera access denied, please enable it in the Settings app to continue";
+"finjinon.done" = "Done";
+"finjinon.photos" = "Photos";
+"finjinon.on" = "On";
+"finjinon.off" = "Off";
+"finjinon.auto" = "Auto";
+"finjinon.captureButton" = "Take a picture";
+"finjinon.lowLightMessage" = "Your image seems a bit too dark.\nTurn on the light or go outside.";

@@ -144,7 +144,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         let icon = UIImage(named: "LightningIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
-        flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: .normal)
+        flashButton.setTitle("finjinon.off".localized(), for: .normal)
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
         flashButton.tintColor = UIColor.white
@@ -197,11 +197,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), for: .touchUpInside)
         containerView.addSubview(captureButton)
         captureButton.isEnabled = false
-        captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
+        captureButton.accessibilityLabel = "finjinon.captureButton".localized()
 
         closeButton.frame = CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44)
         closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), for: .touchUpInside)
-        closeButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
+        closeButton.setTitle("finjinon.done".localized(), for: .normal)
         closeButton.tintColor = UIColor.white
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
@@ -247,7 +247,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
             if pickerButton == nil {
                 pickerButton = UIButton(frame: buttonRect)
-                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: .normal)
+                pickerButton!.setTitle("finjinon.photos".localized(), for: .normal)
                 let icon = UIImage(named: "PhotosIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
                 pickerButton!.setImage(icon, for: .normal)
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
@@ -372,11 +372,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureManager.changeFlashMode(mode) {
             switch mode {
             case .off:
-                self.flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: .normal)
+                self.flashButton.setTitle("finjinon.off".localized(), for: .normal)
             case .on:
-                self.flashButton.setTitle(NSLocalizedString("On", comment: "flash on"), for: .normal)
+                self.flashButton.setTitle("finjinon.on".localized(), for: .normal)
             case .auto:
-                self.flashButton.setTitle(NSLocalizedString("Auto", comment: "flash Auto"), for: .normal)
+                self.flashButton.setTitle("finjinon.auto".localized(), for: .normal)
             }
         }
     }
@@ -587,7 +587,7 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 extension PhotoCaptureViewController: CaptureManagerDelegate {
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
         if lightingCondition == .low {
-            lowLightView.text = "lowLightMessage".localized()
+            lowLightView.text = "finjinon.lowLightMessage".localized()
             lowLightView.isHidden = false
         } else {
             lowLightView.text = nil
@@ -612,12 +612,5 @@ extension UIView {
         case .portrait, .portraitUpsideDown:
             transform = CGAffineTransform(rotationAngle: 0)
         }
-    }
-}
-
-private extension String {
-    func localized() -> String {
-        let bundle = Bundle(for: PhotoCaptureViewController.self)
-        return NSLocalizedString(self, tableName: nil, bundle: bundle, value: "", comment: "")
     }
 }
