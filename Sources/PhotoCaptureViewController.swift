@@ -211,7 +211,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
             lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
-            ])
+        ])
 
         updateImagePickerButton()
 

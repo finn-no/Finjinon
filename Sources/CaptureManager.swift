@@ -11,7 +11,6 @@ enum CaptureManagerViewfinderMode {
 }
 
 protocol CaptureManagerDelegate: AnyObject {
-    // exposure value
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition: LightingCondition)
 }
 
