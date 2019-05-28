@@ -10,7 +10,15 @@ enum CaptureManagerViewfinderMode {
     case window
 }
 
+protocol CaptureManagerDelegate: AnyObject {
+    // exposure value
+    func captureManager(_ manager: CaptureManager, didDetectLightingCondition: LightingCondition)
+}
+
+
 class CaptureManager: NSObject {
+    weak var delegate: CaptureManagerDelegate?
+
     let previewLayer: AVCaptureVideoPreviewLayer
     var flashMode: AVCaptureDevice.FlashMode {
         return cameraDevice?.flashMode ?? .off
@@ -37,6 +45,10 @@ class CaptureManager: NSObject {
     fileprivate var cameraDevice: AVCaptureDevice?
     fileprivate var stillImageOutput: AVCaptureStillImageOutput?
     fileprivate var orientation = AVCaptureVideoOrientation.portrait
+    private var lastVideoCaptureTime = CMTime()
+    private let lowLightService = LowLightService()
+
+    /// Array of vision requests
 
     override init() {
         session.sessionPreset = AVCaptureSession.Preset.photo
@@ -218,6 +230,12 @@ class CaptureManager: NSObject {
                 self.session.addOutput(self.stillImageOutput!)
             }
 
+            let videoOutput = self.makeVideoDataOutput()
+
+            if self.session.canAddOutput(videoOutput) {
+                self.session.addOutput(videoOutput)
+            }
+
             if let cameraDevice = self.cameraDevice {
                 if cameraDevice.isFocusModeSupported(.continuousAutoFocus) {
                     do {
@@ -250,5 +268,35 @@ class CaptureManager: NSObject {
         }
 
         return AVCaptureDevice.default(for: AVMediaType.video)
+    }
+
+    private func makeVideoDataOutput() -> AVCaptureVideoDataOutput {
+        let output = AVCaptureVideoDataOutput()
+        output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+        output.alwaysDiscardsLateVideoFrames = true
+        output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "no.finn.finjinon-sample-buffer"))
+        return output
+    }
+}
+
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+
+extension CaptureManager: AVCaptureVideoDataOutputSampleBufferDelegate {
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        let time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+        let fps: Int32 = 1 // Create pixel buffer and call the delegate 1 time per second
+
+        guard (time - lastVideoCaptureTime) >= CMTime.init(value: 1, timescale: fps) else {
+            return
+        }
+
+        lastVideoCaptureTime = time
+
+        if let lightningCondition = lowLightService.getLightningCondition(from: sampleBuffer) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.captureManager(self, didDetectLightingCondition: lightningCondition)
+            }
+        }
     }
 }

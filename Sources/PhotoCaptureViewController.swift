@@ -31,8 +31,8 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
-    /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library. 
-    /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button. 
+    /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library.
+    /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button.
     open var imagePickerAdapter: ImagePickerAdapter? = ImagePickerControllerAdapter() {
         didSet {
             updateImagePickerButton()
@@ -55,6 +55,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     fileprivate var closeButton = UIButton()
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
+
+    private lazy var lowLightView: LowLightView = {
+        let view = LowLightView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
+        return view
+    }()
 
     private var viewFrame = CGRect.zero
     private var viewBounds = CGRect.zero
@@ -199,6 +206,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
 
+        view.addSubview(lowLightView)
+        NSLayoutConstraint.activate([
+            lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
+            ])
+
         updateImagePickerButton()
 
         previewView.alpha = 0.0
@@ -217,6 +231,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.previewView.alpha = 1.0
             })
         }
+
+        captureManager.delegate = self
     }
 
     private func updateImagePickerButton() {
@@ -568,6 +584,18 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
     }
 }
 
+extension PhotoCaptureViewController: CaptureManagerDelegate {
+    func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
+        if lightingCondition == .low {
+            lowLightView.text = "lowLightMessage".localized()
+            lowLightView.isHidden = false
+        } else {
+            lowLightView.text = nil
+            lowLightView.isHidden = true
+        }
+    }
+}
+
 extension UIView {
     public func rotateToCurrentDeviceOrientation() {
         rotateToDeviceOrientation(UIDevice.current.orientation)
@@ -587,3 +615,9 @@ extension UIView {
     }
 }
 
+private extension String {
+    func localized() -> String {
+        let bundle = Bundle(for: PhotoCaptureViewController.self)
+        return NSLocalizedString(self, tableName: nil, bundle: bundle, value: "", comment: "")
+    }
+}
