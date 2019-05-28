@@ -13,11 +13,11 @@ Finjinon is a custom AVFoundation based camera UI, focused on quickly adding sev
   s.platform          = :ios, '10.0'
   s.swift_version     = '4.2'
   s.source            = { :git => "https://github.com/finn-no/Finjinon.git", :tag => s.version }
-  s.resources         = 'Sources/Resources/*.xcassets'
+  s.resources         = 'Sources/Resources/*.{xcassets,lproj}'
   s.resource_bundles = {
-      'Finjinon' => ['Sources/Resources/*.xcassets']
+      'Finjinon' => ['Sources/Resources/*.xcassets', 'Sources/Resources/*.lproj']
   }
   s.requires_arc      = true
-  s.source_files      = "Sources/*.swift"
+  s.source_files      = "Sources/**/*.swift"
   s.frameworks        = "Foundation"
 end
