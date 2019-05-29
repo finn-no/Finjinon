@@ -31,8 +31,8 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var delegate: PhotoCaptureViewControllerDelegate?
-    /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library. 
-    /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button. 
+    /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library.
+    /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button.
     open var imagePickerAdapter: ImagePickerAdapter? = ImagePickerControllerAdapter() {
         didSet {
             updateImagePickerButton()
@@ -55,6 +55,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     fileprivate var closeButton = UIButton()
     fileprivate let buttonMargin: CGFloat = 12
     fileprivate var orientation: UIDeviceOrientation = .portrait
+
+    private lazy var lowLightView: LowLightView = {
+        let view = LowLightView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
+        return view
+    }()
 
     private var viewFrame = CGRect.zero
     private var viewBounds = CGRect.zero
@@ -137,7 +144,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         let icon = UIImage(named: "LightningIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
-        flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: .normal)
+        flashButton.setTitle("finjinon.off".localized(), for: .normal)
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
         flashButton.tintColor = UIColor.white
@@ -190,14 +197,21 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), for: .touchUpInside)
         containerView.addSubview(captureButton)
         captureButton.isEnabled = false
-        captureButton.accessibilityLabel = NSLocalizedString("Take a picture", comment: "")
+        captureButton.accessibilityLabel = "finjinon.captureButton".localized()
 
         closeButton.frame = CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44)
         closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), for: .touchUpInside)
-        closeButton.setTitle(NSLocalizedString("Done", comment: ""), for: .normal)
+        closeButton.setTitle("finjinon.done".localized(), for: .normal)
         closeButton.tintColor = UIColor.white
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
+
+        view.addSubview(lowLightView)
+        NSLayoutConstraint.activate([
+            lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
+        ])
 
         updateImagePickerButton()
 
@@ -217,6 +231,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.previewView.alpha = 1.0
             })
         }
+
+        captureManager.delegate = self
     }
 
     private func updateImagePickerButton() {
@@ -231,7 +247,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
             if pickerButton == nil {
                 pickerButton = UIButton(frame: buttonRect)
-                pickerButton!.setTitle(NSLocalizedString("Photos", comment: "Select from Photos button title"), for: .normal)
+                pickerButton!.setTitle("finjinon.photos".localized(), for: .normal)
                 let icon = UIImage(named: "PhotosIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
                 pickerButton!.setImage(icon, for: .normal)
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
@@ -356,11 +372,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureManager.changeFlashMode(mode) {
             switch mode {
             case .off:
-                self.flashButton.setTitle(NSLocalizedString("Off", comment: "flash off"), for: .normal)
+                self.flashButton.setTitle("finjinon.off".localized(), for: .normal)
             case .on:
-                self.flashButton.setTitle(NSLocalizedString("On", comment: "flash on"), for: .normal)
+                self.flashButton.setTitle("finjinon.on".localized(), for: .normal)
             case .auto:
-                self.flashButton.setTitle(NSLocalizedString("Auto", comment: "flash Auto"), for: .normal)
+                self.flashButton.setTitle("finjinon.auto".localized(), for: .normal)
             }
         }
     }
@@ -568,6 +584,18 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
     }
 }
 
+extension PhotoCaptureViewController: CaptureManagerDelegate {
+    func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
+        if lightingCondition == .low {
+            lowLightView.text = "finjinon.lowLightMessage".localized()
+            lowLightView.isHidden = false
+        } else {
+            lowLightView.text = nil
+            lowLightView.isHidden = true
+        }
+    }
+}
+
 extension UIView {
     public func rotateToCurrentDeviceOrientation() {
         rotateToDeviceOrientation(UIDevice.current.orientation)
@@ -586,4 +614,3 @@ extension UIView {
         }
     }
 }
-
