@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "Finjinon"
-  s.version      = "4.1.1"
+  s.version      = "4.1.2"
   s.summary      = "Custom iOS camera optimized for taking a sequence of photos quickly and/or selecting from an image picker"
   s.description  = <<-DESC
 Finjinon is a custom AVFoundation based camera UI, focused on quickly adding several photos. Selecting existing photos from the camera roll is supported through a pluggable interface, a default implementation using UIImagePickerController is provided.
