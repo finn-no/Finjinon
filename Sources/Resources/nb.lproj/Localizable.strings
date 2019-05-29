@@ -4,11 +4,11 @@
   Copyright © 2019 FINN.no. All rights reserved.
 */
 
-"finjinon.cameraAccessDenied" = "Denne appen har ikke tilgang til ditt kamera. Du kan gi appen tilgang i enhetens personvern instillinger";
+"finjinon.cameraAccessDenied" = "Denne appen har ikke tilgang til ditt kamera. Du kan gi appen tilgang i enhetens personvernsinnstillinger";
 "finjinon.done" = "Ferdig";
 "finjinon.photos" = "Bilder";
 "finjinon.on" = "På";
 "finjinon.off" = "Av";
 "finjinon.auto" = "Auto";
 "finjinon.captureButton" = "Ta et bilde";
-"finjinon.lowLightMessage" = "Your image seems a bit too dark.\nTurn on the light or go outside.";
+"finjinon.lowLightMessage" = "Det ser ut som at det er litt mørkt her.\nSkru på lyset eller ta bildet ute i dagslys.";
