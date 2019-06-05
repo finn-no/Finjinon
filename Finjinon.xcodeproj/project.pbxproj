@@ -17,7 +17,6 @@
 		CF9B3282229829AD00CCB8F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF9B3279229829AD00CCB8F9 /* LaunchScreen.storyboard */; };
 		CF9B3283229829AD00CCB8F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B327B229829AD00CCB8F9 /* AppDelegate.swift */; };
 		CF9B3291229829E900CCB8F9 /* PhotoCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3286229829E900CCB8F9 /* PhotoCollectionViewLayout.swift */; };
-		CF9B3292229829E900CCB8F9 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3287229829E900CCB8F9 /* Buttons.swift */; };
 		CF9B3293229829E900CCB8F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF9B3288229829E900CCB8F9 /* Assets.xcassets */; };
 		CF9B3294229829E900CCB8F9 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B3289229829E900CCB8F9 /* CaptureManager.swift */; };
 		CF9B3295229829E900CCB8F9 /* Finjinon.h in Headers */ = {isa = PBXBuildFile; fileRef = CF9B328A229829E900CCB8F9 /* Finjinon.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -29,9 +28,11 @@
 		CF9B329F229829FC00CCB8F9 /* FinjinonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B329D229829FC00CCB8F9 /* FinjinonTests.swift */; };
 		CFBD7133229D6499003B1BD9 /* LightingCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD7131229D6499003B1BD9 /* LightingCondition.swift */; };
 		CFBD7134229D6499003B1BD9 /* LowLightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD7132229D6499003B1BD9 /* LowLightService.swift */; };
-		CFBD7138229D66C0003B1BD9 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD7137229D66C0003B1BD9 /* StringExtensions.swift */; };
+		CFBD7138229D66C0003B1BD9 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD7137229D66C0003B1BD9 /* String+Extensions.swift */; };
 		CFBD7139229D6876003B1BD9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CFBD713B229D6876003B1BD9 /* Localizable.strings */; };
 		CFBD713E229D68FF003B1BD9 /* LowLightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBD713D229D68FF003B1BD9 /* LowLightView.swift */; };
+		F23C372F22A7D5F500ECC73C /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23C372D22A7D5A900ECC73C /* CloseButton.swift */; };
+		F23C373022A7D5F500ECC73C /* TriggerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23C372B22A7D3A200ECC73C /* TriggerButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,7 +85,6 @@
 		CF9B327B229829AD00CCB8F9 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CF9B327C229829AD00CCB8F9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF9B3286229829E900CCB8F9 /* PhotoCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewLayout.swift; sourceTree = "<group>"; };
-		CF9B3287229829E900CCB8F9 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		CF9B3288229829E900CCB8F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF9B3289229829E900CCB8F9 /* CaptureManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureManager.swift; sourceTree = "<group>"; };
 		CF9B328A229829E900CCB8F9 /* Finjinon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Finjinon.h; sourceTree = "<group>"; };
@@ -98,10 +98,12 @@
 		CF9B329E229829FC00CCB8F9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CFBD7131229D6499003B1BD9 /* LightingCondition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightingCondition.swift; sourceTree = "<group>"; };
 		CFBD7132229D6499003B1BD9 /* LowLightService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowLightService.swift; sourceTree = "<group>"; };
-		CFBD7137229D66C0003B1BD9 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		CFBD7137229D66C0003B1BD9 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		CFBD713A229D6876003B1BD9 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CFBD713C229D687C003B1BD9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CFBD713D229D68FF003B1BD9 /* LowLightView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowLightView.swift; sourceTree = "<group>"; };
+		F23C372B22A7D3A200ECC73C /* TriggerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerButton.swift; sourceTree = "<group>"; };
+		F23C372D22A7D5A900ECC73C /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,18 +179,11 @@
 		CF9B3285229829E900CCB8F9 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				CF9B328A229829E900CCB8F9 /* Finjinon.h */,
+				F23C372422A7D11C00ECC73C /* Shared */,
+				F23C372322A7D0FF00ECC73C /* PhotoCaptureViewController */,
+				F23C372622A7D16000ECC73C /* Data */,
+				F23C372822A7D20D00ECC73C /* Services */,
 				CF9B3290229829E900CCB8F9 /* Info.plist */,
-				CF9B328C229829E900CCB8F9 /* AssetResolver.swift */,
-				CF9B3287229829E900CCB8F9 /* Buttons.swift */,
-				CF9B3289229829E900CCB8F9 /* CaptureManager.swift */,
-				CF9B328D229829E900CCB8F9 /* ImagePickerAdapter.swift */,
-				CFBD713F229D690C003B1BD9 /* LowLight */,
-				CF9B328B229829E900CCB8F9 /* PhotoCaptureViewController.swift */,
-				CF9B328E229829E900CCB8F9 /* PhotoCollectionViewCell.swift */,
-				CF9B3286229829E900CCB8F9 /* PhotoCollectionViewLayout.swift */,
-				CF9B328F229829E900CCB8F9 /* PhotoStorage.swift */,
-				CFBD7137229D66C0003B1BD9 /* StringExtensions.swift */,
 				CF414C26229A9A91008980E0 /* Resources */,
 			);
 			path = Sources;
@@ -211,6 +206,70 @@
 				CFBD7131229D6499003B1BD9 /* LightingCondition.swift */,
 			);
 			path = LowLight;
+			sourceTree = "<group>";
+		};
+		F23C372322A7D0FF00ECC73C /* PhotoCaptureViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CF9B328B229829E900CCB8F9 /* PhotoCaptureViewController.swift */,
+				CF9B328E229829E900CCB8F9 /* PhotoCollectionViewCell.swift */,
+				CF9B3286229829E900CCB8F9 /* PhotoCollectionViewLayout.swift */,
+				CF9B3289229829E900CCB8F9 /* CaptureManager.swift */,
+				CF9B328D229829E900CCB8F9 /* ImagePickerAdapter.swift */,
+			);
+			path = PhotoCaptureViewController;
+			sourceTree = "<group>";
+		};
+		F23C372422A7D11C00ECC73C /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				F23C372722A7D1D100ECC73C /* Headers */,
+				F23C372922A7D33800ECC73C /* UIElements */,
+				F23C372522A7D12900ECC73C /* Extensions */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		F23C372522A7D12900ECC73C /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CFBD7137229D66C0003B1BD9 /* String+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		F23C372622A7D16000ECC73C /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				CF9B328F229829E900CCB8F9 /* PhotoStorage.swift */,
+				CF9B328C229829E900CCB8F9 /* AssetResolver.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		F23C372722A7D1D100ECC73C /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				CF9B328A229829E900CCB8F9 /* Finjinon.h */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
+		F23C372822A7D20D00ECC73C /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CFBD713F229D690C003B1BD9 /* LowLight */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F23C372922A7D33800ECC73C /* UIElements */ = {
+			isa = PBXGroup;
+			children = (
+				F23C372D22A7D5A900ECC73C /* CloseButton.swift */,
+				F23C372B22A7D3A200ECC73C /* TriggerButton.swift */,
+			);
+			path = UIElements;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -377,12 +436,13 @@
 			files = (
 				CF9B3296229829E900CCB8F9 /* PhotoCaptureViewController.swift in Sources */,
 				CF9B3291229829E900CCB8F9 /* PhotoCollectionViewLayout.swift in Sources */,
-				CF9B3292229829E900CCB8F9 /* Buttons.swift in Sources */,
 				CFBD7134229D6499003B1BD9 /* LowLightService.swift in Sources */,
 				CF9B3294229829E900CCB8F9 /* CaptureManager.swift in Sources */,
 				CF9B329A229829E900CCB8F9 /* PhotoStorage.swift in Sources */,
 				CFBD713E229D68FF003B1BD9 /* LowLightView.swift in Sources */,
-				CFBD7138229D66C0003B1BD9 /* StringExtensions.swift in Sources */,
+				F23C372F22A7D5F500ECC73C /* CloseButton.swift in Sources */,
+				F23C373022A7D5F500ECC73C /* TriggerButton.swift in Sources */,
+				CFBD7138229D66C0003B1BD9 /* String+Extensions.swift in Sources */,
 				CF9B3299229829E900CCB8F9 /* PhotoCollectionViewCell.swift in Sources */,
 				CF9B3297229829E900CCB8F9 /* AssetResolver.swift in Sources */,
 				CFBD7133229D6499003B1BD9 /* LightingCondition.swift in Sources */,
