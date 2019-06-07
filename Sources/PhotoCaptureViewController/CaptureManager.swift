@@ -11,17 +11,17 @@ enum CaptureManagerViewfinderMode {
 }
 
 protocol CaptureManagerDelegate: AnyObject {
+    func captureManager(_ manager: CaptureManager, didCaptureImage data: Data?, withMetadata metadata: NSDictionary?)
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition: LightingCondition)
 }
-
 
 class CaptureManager: NSObject {
     weak var delegate: CaptureManagerDelegate?
 
     let previewLayer: AVCaptureVideoPreviewLayer
-    var flashMode: AVCaptureDevice.FlashMode {
-        return cameraDevice?.flashMode ?? .off
-    }
+    let viewfinderMode: CaptureManagerViewfinderMode
+
+    var flashMode: AVCaptureDevice.FlashMode = .auto
 
     var hasFlash: Bool {
         return cameraDevice?.hasFlash ?? false && cameraDevice?.isFlashAvailable ?? false
@@ -30,22 +30,23 @@ class CaptureManager: NSObject {
     var supportedFlashModes: [AVCaptureDevice.FlashMode] {
         var modes: [AVCaptureDevice.FlashMode] = []
         for mode in [AVCaptureDevice.FlashMode.off, AVCaptureDevice.FlashMode.auto, AVCaptureDevice.FlashMode.on] {
-            if let cameraDevice = cameraDevice, cameraDevice.isFlashModeSupported(mode) {
+            if cameraOutput.supportedFlashModes.contains(mode) {
                 modes.append(mode)
             }
         }
         return modes
     }
 
-    let viewfinderMode: CaptureManagerViewfinderMode
-
-    fileprivate let session = AVCaptureSession()
-    fileprivate let captureQueue = DispatchQueue(label: "no.finn.finjinon-captures", attributes: [])
-    fileprivate var cameraDevice: AVCaptureDevice?
-    fileprivate var stillImageOutput: AVCaptureStillImageOutput?
-    fileprivate var orientation = AVCaptureVideoOrientation.portrait
+    private let session = AVCaptureSession()
+    private let captureQueue = DispatchQueue(label: "no.finn.finjinon-captures", attributes: [])
+    private var cameraDevice: AVCaptureDevice?
+    private var cameraOutput: AVCapturePhotoOutput
+    private var cameraSettings: AVCapturePhotoSettings?
+    private var orientation = AVCaptureVideoOrientation.portrait
     private var lastVideoCaptureTime = CMTime()
     private let lowLightService = LowLightService()
+
+    private var didCaptureImageCompletion: ((Data, NSDictionary) -> Void)?
 
     /// Array of vision requests
 
@@ -60,6 +61,7 @@ class CaptureManager: NSObject {
 
         previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.videoGravity = self.viewfinderMode == .fullScreen ? AVLayerVideoGravity.resizeAspectFill : AVLayerVideoGravity.resize
+        cameraOutput = AVCapturePhotoOutput()
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(changedOrientationNotification(_:)), name: UIDevice.orientationDidChangeNotification, object: nil)
         changedOrientationNotification(nil)
@@ -92,6 +94,8 @@ class CaptureManager: NSObject {
             })
         case .denied, .restricted:
             completion(accessDeniedError())
+        @unknown default:
+            return
         }
     }
 
@@ -104,28 +108,18 @@ class CaptureManager: NSObject {
         }
     }
 
+    @available(*, deprecated, message: "Conform to the CaptureManagerDelegate and handle it in captureManager(_ manager: CaptureManager, didCaptureImage data: Data?, withMetadata metadata: NSDictionary?)")
     func captureImage(_ completion: @escaping (Data, NSDictionary) -> Void) {
-        captureQueue.async {
-            guard let connection = self.stillImageOutput?.connection(with: AVMediaType.video) else {
-                return
-            }
-            connection.videoOrientation = self.orientation
+        didCaptureImageCompletion = completion
+        captureImage()
+    }
 
-            self.stillImageOutput?.captureStillImageAsynchronously(from: connection, completionHandler: { sampleBuffer, error in
-                if error == nil {
-                    if let sampleBuffer = sampleBuffer, let data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(sampleBuffer) {
-                        if let metadata = CMCopyDictionaryOfAttachments(allocator: nil, target: sampleBuffer, attachmentMode: CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
-                            DispatchQueue.main.async {
-                                completion(data, metadata)
-                            }
-                        } else {
-                            print("failed creating metadata")
-                        }
-                    }
-                } else {
-                    NSLog("Failed capturing still images: \(String(describing: error))")
-                }
-            })
+    func captureImage() {
+        captureQueue.async {
+            guard let connection = self.cameraOutput.connection(with: .video) else { return }
+            connection.videoOrientation = self.orientation
+            self.cameraSettings = self.createCapturePhotoSettingsObject()
+            self.cameraOutput.capturePhoto(with: self.cameraSettings!, delegate: self)
         }
     }
 
@@ -140,12 +134,9 @@ class CaptureManager: NSObject {
     }
 
     func changeFlashMode(_ newMode: AVCaptureDevice.FlashMode, completion: @escaping () -> Void) {
-        lockCurrentCameraDeviceForConfiguration { device in
-            if let device = device {
-                device.flashMode = newMode
-                DispatchQueue.main.async(execute: completion)
-            }
-        }
+        flashMode = newMode
+        cameraSettings = createCapturePhotoSettingsObject()
+        DispatchQueue.main.async(execute: completion)
     }
 
     // Next available flash mode, or nil if flash is unsupported
@@ -156,11 +147,13 @@ class CaptureManager: NSObject {
 
         // Find the next available mode, or wrap around
         var nextIndex = 0
-        if let idx = supportedFlashModes.index(of: flashMode) {
+        if let idx = supportedFlashModes.firstIndex(of: flashMode) {
             nextIndex = idx + 1
         }
+
         let startIndex = min(nextIndex, supportedFlashModes.count)
         let next = supportedFlashModes[startIndex ..< supportedFlashModes.count].first ?? supportedFlashModes.first
+        if let nextFlashMode = next { flashMode = nextFlashMode }
 
         return next
     }
@@ -174,17 +167,35 @@ class CaptureManager: NSObject {
             break
         case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
             orientation = AVCaptureVideoOrientation(rawValue: currentDeviceOrientation.rawValue) ?? .portrait
+        @unknown default:
+            return
         }
     }
+}
 
-    // MARK: - Private methods
+// MARK: - Private methods
 
-    fileprivate func accessDeniedError(_ code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
+private extension CaptureManager {
+    func createCapturePhotoSettingsObject() -> AVCapturePhotoSettings {
+        var newCameraSettings: AVCapturePhotoSettings
+
+        if let currentCameraSettings = self.cameraSettings {
+            newCameraSettings = AVCapturePhotoSettings(from: currentCameraSettings)
+            newCameraSettings.flashMode = flashMode
+        } else {
+            newCameraSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecJPEG, AVVideoCompressionPropertiesKey: [AVVideoQualityKey: 0.9]])
+            newCameraSettings.flashMode = flashMode
+        }
+
+        return newCameraSettings
+    }
+
+    func accessDeniedError(_ code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
         let info = [NSLocalizedDescriptionKey: "finjinon.cameraAccessDenied".localized()]
         return NSError(domain: FinjinonCameraAccessErrorDomain, code: code, userInfo: info)
     }
 
-    fileprivate func lockCurrentCameraDeviceForConfiguration(_ configurator: @escaping (AVCaptureDevice?) -> Void) {
+    func lockCurrentCameraDeviceForConfiguration(_ configurator: @escaping (AVCaptureDevice?) -> Void) {
         captureQueue.async {
             var error: NSError?
             do {
@@ -202,7 +213,7 @@ class CaptureManager: NSObject {
         }
     }
 
-    fileprivate func configure(_ completion: @escaping (NSError?) -> Void) {
+    func configure(_ completion: @escaping (NSError?) -> Void) {
         captureQueue.async {
             self.cameraDevice = self.cameraDeviceWithPosition(.back)
             var error: NSError?
@@ -212,25 +223,18 @@ class CaptureManager: NSObject {
                 if self.session.canAddInput(input) {
                     self.session.addInput(input)
                 } else {
-                    NSLog("failed to add input \(input) to session \(self.session)")
+                    NSLog("Failed to add input \(input) to session \(self.session)")
                 }
             } catch let error1 as NSError {
                 error = error1
-                NSLog("failed to create capture device input")
+                NSLog("Failed to create capture device input")
             }
 
-            self.stillImageOutput = AVCaptureStillImageOutput()
-            self.stillImageOutput?.outputSettings = [
-                AVVideoCodecKey: AVVideoCodecJPEG,
-                AVVideoQualityKey: 0.9,
-            ]
-
-            if self.session.canAddOutput(self.stillImageOutput!) {
-                self.session.addOutput(self.stillImageOutput!)
+            if self.session.canAddOutput(self.cameraOutput) {
+                self.session.addOutput(self.cameraOutput)
             }
 
             let videoOutput = self.makeVideoDataOutput()
-
             if self.session.canAddOutput(videoOutput) {
                 self.session.addOutput(videoOutput)
             }
@@ -258,8 +262,18 @@ class CaptureManager: NSObject {
         }
     }
 
-    fileprivate func cameraDeviceWithPosition(_ position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-        let availableCameraDevices = AVCaptureDevice.devices(for: AVMediaType.video)
+    func cameraDeviceWithPosition(_ position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+        var discoverySession: AVCaptureDevice.DiscoverySession
+
+        if #available(iOS 11.2, *) {
+            discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInDualCamera, .builtInWideAngleCamera], mediaType: .video, position: .unspecified)
+        } else {
+            discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .unspecified)
+        }
+
+        let availableCameraDevices = discoverySession.devices
+        guard availableCameraDevices.isEmpty == false else { fatalError("No camera devices found") }
+
         for device in availableCameraDevices {
             if device.position == position {
                 return device
@@ -269,12 +283,42 @@ class CaptureManager: NSObject {
         return AVCaptureDevice.default(for: AVMediaType.video)
     }
 
-    private func makeVideoDataOutput() -> AVCaptureVideoDataOutput {
+    func makeVideoDataOutput() -> AVCaptureVideoDataOutput {
         let output = AVCaptureVideoDataOutput()
         output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
         output.alwaysDiscardsLateVideoFrames = true
         output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "no.finn.finjinon-sample-buffer"))
         return output
+    }
+}
+
+// MARK: - AVCapturePhotoCaptureDelegate
+
+extension CaptureManager: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
+
+        // We either call the delegate or the completion block
+        if didCaptureImageCompletion != nil && delegate != nil {
+            didCaptureImageCompletion = nil
+        }
+
+        if error == nil {
+            if let sampleBuffer = photoSampleBuffer, let data = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: sampleBuffer, previewPhotoSampleBuffer: nil) {
+                if let metadata = CMCopyDictionaryOfAttachments(allocator: nil, target: sampleBuffer, attachmentMode: CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
+                    DispatchQueue.main.async {
+                        if self.didCaptureImageCompletion == nil {
+                            self.delegate?.captureManager(self, didCaptureImage: data, withMetadata: metadata)
+                        } else {
+                            self.didCaptureImageCompletion!(data, metadata)
+                        }
+                    }
+                } else {
+                    print("Failed creating metadata")
+                }
+            }
+        } else {
+            NSLog("Failed capturing still images: \(String(describing: error))")
+        }
     }
 }
 

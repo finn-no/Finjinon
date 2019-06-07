@@ -179,7 +179,7 @@ class PhotoCollectionViewLayout: UICollectionViewFlowLayout, UIGestureRecognizer
         return true
     }
 
-    // MARK: -  Private methods
+    // MARK: - Private methods
 
     @objc func handleLongPressGestureRecognized(_ recognizer: UILongPressGestureRecognizer) {
         switch recognizer.state {
