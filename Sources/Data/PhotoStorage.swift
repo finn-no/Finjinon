@@ -64,7 +64,7 @@ public func ==(lhs: Asset, rhs: Asset) -> Bool {
 open class PhotoStorage {
     private let baseURL: URL
     private let queue = DispatchQueue(label: "no.finn.finjonon.disk-cache-writes", attributes: [])
-    private let resizeQueue = DispatchQueue(label: "no.finn.finjonon.disk-cache-resizes", attributes: DispatchQueue.Attributes.concurrent)
+    private let resizeQueue = DispatchQueue(label: "no.finn.finjonon.disk-cache-resizes", attributes: .concurrent)
     private let fileManager = FileManager()
     private var cache: [String: Asset] = [:]
 

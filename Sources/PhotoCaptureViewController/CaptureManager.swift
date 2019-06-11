@@ -263,15 +263,17 @@ private extension CaptureManager {
     }
 
     func cameraDeviceWithPosition(_ position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-        var discoverySession: AVCaptureDevice.DiscoverySession
+        let deviceTypes: [AVCaptureDevice.DeviceType]
 
         if #available(iOS 11.2, *) {
-            discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInDualCamera, .builtInWideAngleCamera], mediaType: .video, position: .unspecified)
+            deviceTypes = [.builtInTrueDepthCamera, .builtInDualCamera, .builtInWideAngleCamera]
         } else {
-            discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .unspecified)
+            deviceTypes = [.builtInWideAngleCamera]
         }
 
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes, mediaType: .video, position: .unspecified)
         let availableCameraDevices = discoverySession.devices
+
         guard availableCameraDevices.isEmpty == false else { fatalError("No camera devices found") }
 
         for device in availableCameraDevices {
@@ -297,24 +299,28 @@ private extension CaptureManager {
 extension CaptureManager: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
 
-        // We either call the delegate or the completion block
+        // We either call the delegate or the completion block not both.
         if didCaptureImageCompletion != nil && delegate != nil {
             didCaptureImageCompletion = nil
         }
 
-        if error == nil {
-            if let sampleBuffer = photoSampleBuffer, let data = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: sampleBuffer, previewPhotoSampleBuffer: nil) {
-                if let metadata = CMCopyDictionaryOfAttachments(allocator: nil, target: sampleBuffer, attachmentMode: CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
-                    DispatchQueue.main.async {
-                        if self.didCaptureImageCompletion == nil {
-                            self.delegate?.captureManager(self, didCaptureImage: data, withMetadata: metadata)
-                        } else {
-                            self.didCaptureImageCompletion!(data, metadata)
-                        }
+        guard error == nil else {
+            NSLog("Failed capturing still images: \(String(describing: error))")
+            return
+        }
+
+        if let sampleBuffer = photoSampleBuffer, let data = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: sampleBuffer, previewPhotoSampleBuffer: nil) {
+            if let metadata = CMCopyDictionaryOfAttachments(allocator: nil, target: sampleBuffer, attachmentMode: CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as NSDictionary? {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    if let completion = self.didCaptureImageCompletion {
+                        completion(data, metadata)
+                    } else {
+                        self.delegate?.captureManager(self, didCaptureImage: data, withMetadata: metadata)
                     }
-                } else {
-                    print("Failed creating metadata")
                 }
+            } else {
+                print("Failed creating metadata")
             }
         } else {
             NSLog("Failed capturing still images: \(String(describing: error))")
