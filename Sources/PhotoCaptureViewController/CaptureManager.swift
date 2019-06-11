@@ -11,7 +11,7 @@ enum CaptureManagerViewfinderMode {
 }
 
 protocol CaptureManagerDelegate: AnyObject {
-    func captureManager(_ manager: CaptureManager, didCaptureImage data: Data?, withMetadata metadata: NSDictionary?)
+    func captureManager(_ manager: CaptureManager, didCaptureImageData data: Data?, withMetadata metadata: NSDictionary?)
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition: LightingCondition)
 }
 
@@ -115,11 +115,15 @@ class CaptureManager: NSObject {
     }
 
     func captureImage() {
-        captureQueue.async {
+        captureQueue.async { [weak self] in
+            guard let self = self else { return }
             guard let connection = self.cameraOutput.connection(with: .video) else { return }
+
             connection.videoOrientation = self.orientation
             self.cameraSettings = self.createCapturePhotoSettingsObject()
-            self.cameraOutput.capturePhoto(with: self.cameraSettings!, delegate: self)
+
+            guard let cameraSettings = self.cameraSettings else { return }
+            self.cameraOutput.capturePhoto(with: cameraSettings, delegate: self)
         }
     }
 
@@ -179,7 +183,7 @@ private extension CaptureManager {
     func createCapturePhotoSettingsObject() -> AVCapturePhotoSettings {
         var newCameraSettings: AVCapturePhotoSettings
 
-        if let currentCameraSettings = self.cameraSettings {
+        if let currentCameraSettings = cameraSettings {
             newCameraSettings = AVCapturePhotoSettings(from: currentCameraSettings)
             newCameraSettings.flashMode = flashMode
         } else {
@@ -214,7 +218,9 @@ private extension CaptureManager {
     }
 
     func configure(_ completion: @escaping (NSError?) -> Void) {
-        captureQueue.async {
+        captureQueue.async { [weak self] in
+            guard let self = self else { return }
+
             self.cameraDevice = self.cameraDeviceWithPosition(.back)
             var error: NSError?
 
@@ -274,7 +280,10 @@ private extension CaptureManager {
         let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes, mediaType: .video, position: .unspecified)
         let availableCameraDevices = discoverySession.devices
 
-        guard availableCameraDevices.isEmpty == false else { fatalError("No camera devices found") }
+        guard availableCameraDevices.isEmpty == false else {
+            print("Error no camera devices found")
+            return nil
+        }
 
         for device in availableCameraDevices {
             if device.position == position {
@@ -316,7 +325,7 @@ extension CaptureManager: AVCapturePhotoCaptureDelegate {
                     if let completion = self.didCaptureImageCompletion {
                         completion(data, metadata)
                     } else {
-                        self.delegate?.captureManager(self, didCaptureImage: data, withMetadata: metadata)
+                        self.delegate?.captureManager(self, didCaptureImageData: data, withMetadata: metadata)
                     }
                 }
             } else {

@@ -563,12 +563,13 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 }
 
 extension PhotoCaptureViewController: CaptureManagerDelegate {
-    func captureManager(_ manager: CaptureManager, didCaptureImage data: Data?, withMetadata metadata: NSDictionary?) {
+    func captureManager(_ manager: CaptureManager, didCaptureImageData data: Data?, withMetadata metadata: NSDictionary?) {
         guard let data = data else { return }
 
         captureButton.isEnabled = true
 
-        createAssetFromImageData(data as Data, completion: { (asset: Asset) in
+        createAssetFromImageData(data as Data, completion: { [weak self] (asset: Asset) in
+            guard let self = self else { return }
             var mutableAsset = asset
             mutableAsset.imageDataSourceType = .camera
             self.didAddAsset(mutableAsset)

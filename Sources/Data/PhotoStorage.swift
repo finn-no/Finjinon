@@ -129,7 +129,8 @@ open class PhotoStorage {
             imageRequestOptions.version = .original
             imageRequestOptions.isSynchronous = true
 
-            imageManager.requestImageData(for: asset, options: imageRequestOptions) { (imageData, _, _, _) in
+            imageManager.requestImageData(for: asset, options: imageRequestOptions) { [weak self] (imageData, _, _, _) in
+                guard let self = self else { return }
                 guard let imageData = imageData else { return }
                 self.createAssetFromImageData(imageData as Data, completion: completion)
             }
