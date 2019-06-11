@@ -89,7 +89,9 @@ open class PhotoStorage {
     // MARK: - API
 
     func createAssetFromImageData(_ data: Data, completion: @escaping (Asset) -> Void) {
-        queue.async {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+
             let asset = Asset(storage: self)
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
@@ -108,7 +110,9 @@ open class PhotoStorage {
     }
 
     func createAssetFromImageURL(_ imageURL: URL, dimensions: CGSize, completion: @escaping (Asset) -> Void) {
-        queue.async {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+
             let asset = Asset(storage: self, imageURL: imageURL, originalDimensions: dimensions)
 
             DispatchQueue.main.async {
@@ -161,7 +165,9 @@ open class PhotoStorage {
     }
 
     func deleteAsset(_ asset: Asset, completion: @escaping () -> Void) {
-        queue.async {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+
             let cacheURL = self.cacheURLForAsset(asset)
             var error: NSError?
             do {
@@ -196,9 +202,11 @@ open class PhotoStorage {
 
 private extension PhotoStorage {
     func imageForAsset(_ asset: Asset, completion: @escaping (UIImage) -> Void) {
-        queue.async {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+
             let path = self.cacheURLForAsset(asset).path
-            let image = UIImage(contentsOfFile: path)!
+            guard let image = UIImage(contentsOfFile: path) else { return }
             DispatchQueue.main.async {
                 completion(image)
             }
@@ -206,7 +214,9 @@ private extension PhotoStorage {
     }
 
     func thumbnailForAsset(_ asset: Asset, forWidth width: CGFloat, completion: @escaping (UIImage) -> Void) {
-        resizeQueue.async {
+        resizeQueue.async { [weak self] in
+            guard let self = self else { return }
+
             let imageURL = self.cacheURLForAsset(asset)
             if let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, nil) {
                 let options = [

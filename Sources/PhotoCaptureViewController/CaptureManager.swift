@@ -100,7 +100,9 @@ class CaptureManager: NSObject {
     }
 
     func stop(_ completion: (() -> Void)?) {
-        captureQueue.async {
+        captureQueue.async { [weak self] in
+            guard let self = self else { return }
+
             if self.session.isRunning {
                 self.session.stopRunning()
             }
@@ -200,7 +202,9 @@ private extension CaptureManager {
     }
 
     func lockCurrentCameraDeviceForConfiguration(_ configurator: @escaping (AVCaptureDevice?) -> Void) {
-        captureQueue.async {
+        captureQueue.async { [weak self] in
+            guard let self = self else { return }
+
             var error: NSError?
             do {
                 try self.cameraDevice?.lockForConfiguration()
