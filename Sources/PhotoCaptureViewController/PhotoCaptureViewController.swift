@@ -67,7 +67,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     private var viewBounds = CGRect.zero
     private var subviewSetupDone = false
 
-
     deinit {
         captureManager.stop(nil)
     }
@@ -86,13 +85,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.updateWidgetsToOrientation()
             }
         }
-    }
-
-    open override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        // In case the application uses the old style for managing status bar appearance
-        UIApplication.shared.setStatusBarHidden(true, with: .slide)
     }
 
     open override func viewDidAppear(_ animated: Bool) {
@@ -144,7 +136,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         let icon = UIImage(named: "LightningIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
-        flashButton.setTitle("finjinon.off".localized(), for: .normal)
+        flashButton.setTitle("finjinon.auto".localized(), for: .normal)
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
         flashButton.tintColor = UIColor.white
@@ -261,12 +253,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             }
             view.bringSubviewToFront(pickerButton!)
         }
-    }
-
-    open override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        UIApplication.shared.setStatusBarHidden(false, with: .slide)
     }
 
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
@@ -448,15 +434,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             UIView.animate(withDuration: 0.1, animations: { self.previewView.alpha = 1.0 })
         })
 
-        captureManager.captureImage { data, _ in
-            sender.isEnabled = true
-
-            self.createAssetFromImageData(data as Data, completion: { (asset: Asset) in
-                var mutableAsset = asset
-                mutableAsset.imageDataSourceType = .camera
-                self.didAddAsset(mutableAsset)
-            })
-        }
+        captureManager.captureImage()
     }
 
     fileprivate func didAddAsset(_ asset: Asset) {
@@ -585,6 +563,19 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 }
 
 extension PhotoCaptureViewController: CaptureManagerDelegate {
+    func captureManager(_ manager: CaptureManager, didCaptureImageData data: Data?, withMetadata metadata: NSDictionary?) {
+        guard let data = data else { return }
+
+        captureButton.isEnabled = true
+
+        createAssetFromImageData(data as Data, completion: { [weak self] (asset: Asset) in
+            guard let self = self else { return }
+            var mutableAsset = asset
+            mutableAsset.imageDataSourceType = .camera
+            self.didAddAsset(mutableAsset)
+        })
+    }
+
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
         if lightingCondition == .low {
             lowLightView.text = "finjinon.lowLightMessage".localized()
@@ -593,6 +584,10 @@ extension PhotoCaptureViewController: CaptureManagerDelegate {
             lowLightView.text = nil
             lowLightView.isHidden = true
         }
+    }
+    
+    func captureManager(_ manager: CaptureManager, didFailWithError error: NSError) {
+        print("Failure: \(error)")
     }
 }
 
@@ -611,6 +606,8 @@ extension UIView {
             transform = CGAffineTransform(rotationAngle: CGFloat(-Double.pi / 2))
         case .portrait, .portraitUpsideDown:
             transform = CGAffineTransform(rotationAngle: 0)
+        @unknown default:
+            return
         }
     }
 }
