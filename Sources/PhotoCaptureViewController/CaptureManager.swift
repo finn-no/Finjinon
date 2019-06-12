@@ -13,6 +13,11 @@ enum CaptureManagerViewfinderMode {
 protocol CaptureManagerDelegate: AnyObject {
     func captureManager(_ manager: CaptureManager, didCaptureImageData data: Data?, withMetadata metadata: NSDictionary?)
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition: LightingCondition)
+    func captureManager(_ manager: CaptureManager, didFailWithError error: NSError)
+}
+
+extension CaptureManagerDelegate {
+    func captureManager(_ manager: CaptureManager, didFailWithError error: NSError) {}
 }
 
 class CaptureManager: NSObject {
@@ -205,12 +210,10 @@ private extension CaptureManager {
         captureQueue.async { [weak self] in
             guard let self = self else { return }
 
-            var error: NSError?
             do {
                 try self.cameraDevice?.lockForConfiguration()
-            } catch let error1 as NSError {
-                error = error1
-                NSLog("Failed to lock camera device for configuration: \(String(describing: error))")
+            } catch let error as NSError {
+                self.delegate?.captureManager(self, didFailWithError: error)
             } catch {
                 fatalError()
             }
@@ -237,7 +240,7 @@ private extension CaptureManager {
                 }
             } catch let error1 as NSError {
                 error = error1
-                NSLog("Failed to create capture device input")
+                self.delegate?.captureManager(self, didFailWithError: error1)
             }
 
             if self.session.canAddOutput(self.cameraOutput) {
@@ -253,8 +256,9 @@ private extension CaptureManager {
                 if cameraDevice.isFocusModeSupported(.continuousAutoFocus) {
                     do {
                         try cameraDevice.lockForConfiguration()
-                    } catch let error2 as NSError {
-                        error = error2
+                    } catch let error1 as NSError {
+                        error = error1
+                        self.delegate?.captureManager(self, didFailWithError: error1)
                     }
                     cameraDevice.focusMode = .continuousAutoFocus
                     if cameraDevice.isSmoothAutoFocusSupported {
@@ -318,7 +322,7 @@ extension CaptureManager: AVCapturePhotoCaptureDelegate {
         }
 
         guard error == nil else {
-            NSLog("Failed capturing still images: \(String(describing: error))")
+            if let error = error { delegate?.captureManager(self, didFailWithError: error as NSError) }
             return
         }
 
@@ -333,10 +337,10 @@ extension CaptureManager: AVCapturePhotoCaptureDelegate {
                     }
                 }
             } else {
-                print("Failed creating metadata")
+                if let error = error { delegate?.captureManager(self, didFailWithError: error as NSError) }
             }
         } else {
-            NSLog("Failed capturing still images: \(String(describing: error))")
+            if let error = error { delegate?.captureManager(self, didFailWithError: error as NSError) }
         }
     }
 }

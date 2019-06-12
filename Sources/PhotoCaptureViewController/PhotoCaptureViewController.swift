@@ -585,6 +585,10 @@ extension PhotoCaptureViewController: CaptureManagerDelegate {
             lowLightView.isHidden = true
         }
     }
+    
+    func captureManager(_ manager: CaptureManager, didFailWithError error: NSError) {
+        print("Failure: \(error)")
+    }
 }
 
 extension UIView {
