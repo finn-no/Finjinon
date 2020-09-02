@@ -130,6 +130,9 @@ class CaptureManager: NSObject {
             self.cameraSettings = self.createCapturePhotoSettingsObject()
 
             guard let cameraSettings = self.cameraSettings else { return }
+            if !self.cameraOutput.supportedFlashModes.contains(cameraSettings.flashMode) {
+                cameraSettings.flashMode = .off
+            }
             self.cameraOutput.capturePhoto(with: cameraSettings, delegate: self)
         }
     }
