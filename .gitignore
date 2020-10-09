@@ -41,5 +41,10 @@ atlassian-ide-plugin.xml
 #Rbenv
 .ruby-version
 
-#Carthage
-Finjinon.framework.zip
+# Bundler
+bin/
+bundler/
+
+# Fastlane
+fastlane/report.xml
+.env
