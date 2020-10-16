@@ -358,11 +358,13 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     @objc private func handleOrientationChange() {
         switch UIDevice.current.orientation {
-        case .faceDown, .faceUp, .unknown:
-            ()
         case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
             self.orientation = UIDevice.current.orientation
             self.updateWidgetsToOrientation()
+        case .faceDown, .faceUp, .unknown:
+            break
+        @unknown default:
+            break
         }
     }
 
@@ -376,6 +378,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.flashButton.setTitle("finjinon.on".localized(), for: .normal)
             case .auto:
                 self.flashButton.setTitle("finjinon.auto".localized(), for: .normal)
+            @unknown default:
+                break
             }
         }
     }
