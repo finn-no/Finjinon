@@ -76,15 +76,12 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         view.backgroundColor = UIColor.black
 
-        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: nil) { (_) -> Void in
-            switch UIDevice.current.orientation {
-            case .faceDown, .faceUp, .unknown:
-                ()
-            case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
-                self.orientation = UIDevice.current.orientation
-                self.updateWidgetsToOrientation()
-            }
-        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOrientationChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
     }
 
     open override func viewDidAppear(_ animated: Bool) {
@@ -106,6 +103,12 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         collectionView.reloadData()
         scrollToLastAddedAssetAnimated(false)
+    }
+
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        NotificationCenter.default.removeObserver(self)
     }
 
     func setupSubviews() {
@@ -352,6 +355,16 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     }
 
     // MARK: - Actions
+
+    @objc private func handleOrientationChange() {
+        switch UIDevice.current.orientation {
+        case .faceDown, .faceUp, .unknown:
+            ()
+        case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
+            self.orientation = UIDevice.current.orientation
+            self.updateWidgetsToOrientation()
+        }
+    }
 
     @objc func flashButtonTapped(_: UIButton) {
         let mode = captureManager.nextAvailableFlashMode() ?? .off
