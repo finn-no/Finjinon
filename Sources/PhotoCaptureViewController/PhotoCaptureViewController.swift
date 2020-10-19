@@ -69,6 +69,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     deinit {
         captureManager.stop(nil)
+        NotificationCenter.default.removeObserver(self)
     }
 
     open override func viewDidLoad() {
@@ -103,12 +104,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         collectionView.reloadData()
         scrollToLastAddedAssetAnimated(false)
-    }
-
-    open override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-
-        NotificationCenter.default.removeObserver(self)
     }
 
     func setupSubviews() {
