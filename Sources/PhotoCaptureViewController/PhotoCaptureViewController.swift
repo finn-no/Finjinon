@@ -69,6 +69,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     deinit {
         captureManager.stop(nil)
+        NotificationCenter.default.removeObserver(self)
     }
 
     open override func viewDidLoad() {
@@ -76,15 +77,12 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         view.backgroundColor = UIColor.black
 
-        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: nil) { (_) -> Void in
-            switch UIDevice.current.orientation {
-            case .faceDown, .faceUp, .unknown:
-                ()
-            case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
-                self.orientation = UIDevice.current.orientation
-                self.updateWidgetsToOrientation()
-            }
-        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOrientationChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
     }
 
     open override func viewDidAppear(_ animated: Bool) {
@@ -353,6 +351,18 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     // MARK: - Actions
 
+    @objc private func handleOrientationChange() {
+        switch UIDevice.current.orientation {
+        case .landscapeLeft, .landscapeRight, .portrait, .portraitUpsideDown:
+            self.orientation = UIDevice.current.orientation
+            self.updateWidgetsToOrientation()
+        case .faceDown, .faceUp, .unknown:
+            break
+        @unknown default:
+            break
+        }
+    }
+
     @objc func flashButtonTapped(_: UIButton) {
         let mode = captureManager.nextAvailableFlashMode() ?? .off
         captureManager.changeFlashMode(mode) {
@@ -363,6 +373,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
                 self.flashButton.setTitle("finjinon.on".localized(), for: .normal)
             case .auto:
                 self.flashButton.setTitle("finjinon.auto".localized(), for: .normal)
+            @unknown default:
+                break
             }
         }
     }
