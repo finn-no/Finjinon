@@ -39,10 +39,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
     }
 
-    /// Optional view to display when returning from imagePicker not finished retrieving data.
-    /// Use constraints to position elements dynamically, as the view will be rotated and sized with the device.
-    open var imagePickerWaitingForImageDataView: UIView?
-
     fileprivate let storage = PhotoStorage()
     fileprivate let captureManager = CaptureManager()
     fileprivate var previewView = UIView()
@@ -386,52 +382,23 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             return
         }
 
-        guard let controller = imagePickerAdapter?.viewControllerForImageSelection({ assets in
-            if let waitView = self.imagePickerWaitingForImageDataView, assets.count > 0 {
-                waitView.translatesAutoresizingMaskIntoConstraints = false
-                self.view.addSubview(waitView)
-
-                waitView.removeConstraints(waitView.constraints.filter({ (constraint: NSLayoutConstraint) -> Bool in
-                    constraint.secondItem as? UIView == self.view
-                }))
-                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1, constant: 0))
-                self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .centerY, relatedBy: .equal, toItem: self.view, attribute: .centerY, multiplier: 1, constant: 0))
-
-                switch UIDevice.current.orientation {
-                case .landscapeRight:
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
-
-                case .landscapeLeft:
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
-
-                default:
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .height, relatedBy: .equal, toItem: self.view, attribute: .height, multiplier: 1, constant: 0))
-                    self.view.addConstraint(NSLayoutConstraint(item: waitView, attribute: .width, relatedBy: .equal, toItem: self.view, attribute: .width, multiplier: 1, constant: 0))
-                }
-                waitView.rotateToCurrentDeviceOrientation()
-            }
-
+        guard let controller = imagePickerAdapter?.viewControllerForImageSelection({ [weak self] assets in
             let resolver = AssetResolver()
             var count = assets.count
             assets.forEach { asset in
                 resolver.enqueueResolve(asset, completion: { image in
-                    self.createAssetFromImage(image, completion: { (asset: Asset) in
+                    self?.createAssetFromImage(image, completion: { (asset: Asset) in
                         var mutableAsset = asset
                         mutableAsset.imageDataSourceType = .library
-                        self.didAddAsset(mutableAsset)
+                        self?.didAddAsset(mutableAsset)
 
                         count -= 1
-                        if count == 0 {
-                            self.imagePickerWaitingForImageDataView?.removeFromSuperview()
-                        }
                     })
                 })
             }
-        }, completion: { _ in
+        }, completion: { [weak self] _ in
             DispatchQueue.main.async {
-                self.dismiss(animated: true, completion: nil)
+                self?.dismiss(animated: true, completion: nil)
             }
         }) else {
             return
@@ -474,7 +441,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     @objc func doneButtonTapped(_: UIButton) {
         delegate?.photoCaptureViewControllerDidFinish(self)
-
         dismiss(animated: true, completion: nil)
     }
 
