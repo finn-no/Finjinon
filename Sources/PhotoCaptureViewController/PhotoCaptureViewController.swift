@@ -474,6 +474,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
     @objc func doneButtonTapped(_: UIButton) {
         delegate?.photoCaptureViewControllerDidFinish(self)
+        imagePickerAdapter = nil
 
         dismiss(animated: true, completion: nil)
     }
