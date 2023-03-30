@@ -1,6 +1,7 @@
 //
 //  Copyright (c) 2019 FINN.no AS. All rights reserved.
 //
+import Foundation
 
 enum LightingCondition: String {
     case low

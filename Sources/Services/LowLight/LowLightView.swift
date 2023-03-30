@@ -10,7 +10,7 @@ final class LowLightView: UIView {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(
             named: "LowLightIcon",
-            in: Bundle(for: LowLightView.self),
+            in: Bundle.finjinon,
             compatibleWith: nil
         )
         return imageView

@@ -132,7 +132,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
 
-        let icon = UIImage(named: "LightningIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
+        let icon = UIImage(named: "LightningIcon", in: Bundle.finjinon, compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
         flashButton.setTitle("finjinon.auto".localized(), for: .normal)
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
@@ -238,7 +238,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             if pickerButton == nil {
                 pickerButton = UIButton(frame: buttonRect)
                 pickerButton!.setTitle("finjinon.photos".localized(), for: .normal)
-                let icon = UIImage(named: "PhotosIcon", in: Bundle(for: PhotoCaptureViewController.self), compatibleWith: nil)
+                let icon = UIImage(named: "PhotosIcon", in: Bundle.finjinon, compatibleWith: nil)
                 pickerButton!.setImage(icon, for: .normal)
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
                 pickerButton!.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)

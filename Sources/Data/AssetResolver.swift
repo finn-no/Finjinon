@@ -4,6 +4,7 @@
 
 import Foundation
 import Photos
+import UIKit
 
 struct AssetResolver {
     let queue = DispatchQueue(label: "com.finjinon.asset-resolvement", attributes: [])
