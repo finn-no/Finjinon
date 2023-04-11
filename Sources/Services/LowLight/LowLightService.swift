@@ -3,6 +3,8 @@
 //
 
 import CoreMedia
+import Foundation
+import UIKit
 
 final class LowLightService {
     private let maxNumberOfResults = 3
