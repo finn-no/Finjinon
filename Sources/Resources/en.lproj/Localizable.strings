@@ -4,11 +4,11 @@
   Copyright © 2019 FINN.no. All rights reserved.
 */
 
-"finjinon.cameraAccessDenied" = "Camera access denied, please enable it in the Settings app to continue";
+"finjinon.cameraAccessDenied" = "This app does not have access to your camera. You can give the app access in your device's privacy settings";
 "finjinon.done" = "Done";
-"finjinon.photos" = "Photos";
+"finjinon.photos" = "Images";
 "finjinon.on" = "On";
 "finjinon.off" = "Off";
 "finjinon.auto" = "Auto";
-"finjinon.captureButton" = "Take a picture";
-"finjinon.lowLightMessage" = "Your image seems a bit too dark.\nTurn on the light or go outside.";
+"finjinon.captureButton" = "Take a photo";
+"finjinon.lowLightMessage" = "Looks like it's a little dark in here. Turn on the light or take the picture outside in daylight.";
