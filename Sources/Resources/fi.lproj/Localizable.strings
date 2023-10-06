@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings
+  Finjinon
+  Copyright © FINN.no. All rights reserved.
+*/
+
+"finjinon.cameraAccessDenied" = "Tällä sovelluksella ei ole oikeutta käyttää kameraa. Voit muuttaa käyttöoikeuksia laitteesi yksityisyysasetuksissa";
+"finjinon.done" = "Valmis";
+"finjinon.photos" = "Kuvat";
+"finjinon.on" = "Päällä";
+"finjinon.off" = "Pois";
+"finjinon.auto" = "Automaattinen";
+"finjinon.captureButton" = "Ota kuva";
+"finjinon.lowLightMessage" = "Täällä näyttäisi olevan liian hämärää. Laita valo päälle tai ota kuva ulkona päivänvalossa.";
