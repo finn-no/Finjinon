@@ -130,7 +130,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
+        flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 130, height: 38)
 
         let icon = UIImage(named: "LightningIcon", in: Bundle.finjinon, compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
