@@ -130,7 +130,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         focusIndicatorView.alpha = 0.0
         previewView.addSubview(focusIndicatorView)
 
-        flashButton.frame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
+        var buttonFrame = CGRect(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin, width: 70, height: 38)
+        flashButton.frame = buttonFrame
 
         let icon = UIImage(named: "LightningIcon", in: Bundle.finjinon, compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
@@ -140,6 +141,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         flashButton.tintColor = UIColor.white
         flashButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         roundifyButton(flashButton, inset: 14)
+        flashButton.sizeToFit()
+        buttonFrame.size.width = max(flashButton.frame.size.width + 35, 70)
+        flashButton.frame = buttonFrame
 
         let tapper = UITapGestureRecognizer(target: self, action: #selector(focusTapGestureRecognized(_:)))
         previewView.addGestureRecognizer(tapper)
