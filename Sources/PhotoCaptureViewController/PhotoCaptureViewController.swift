@@ -6,6 +6,7 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 import Photos
+import Combine
 
 public let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 public let FinjinonCameraAccessErrorDeniedCode = 1
@@ -62,10 +63,21 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         view.isHidden = true
         return view
     }()
+    
+    private lazy var hintTextView: HintView = {
+        let view = HintView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = false
+        view.text = "Hint!"
+        return view
+    }()
 
+    private var hintService = HintService()
     private var viewFrame = CGRect.zero
     private var viewBounds = CGRect.zero
     private var subviewSetupDone = false
+    
+    var cancellable = Set<AnyCancellable>()
 
     deinit {
         captureManager.stop(nil)
@@ -100,8 +112,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             viewFrame = view.frame
             viewBounds = view.bounds
         }
+        
+     
         setupSubviews()
-
+        
+        
         collectionView.reloadData()
         scrollToLastAddedAssetAnimated(false)
     }
@@ -200,12 +215,14 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
 
-        view.addSubview(lowLightView)
-        NSLayoutConstraint.activate([
-            lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
-            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
-        ])
+//        view.addSubview(lowLightView)
+//        NSLayoutConstraint.activate([
+//            lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+//            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
+//        ])
+        
+        setupHintsView()
 
         updateImagePickerButton()
 
@@ -227,6 +244,35 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
 
         captureManager.delegate = self
+
+        self.hintService.$hintText.sink { value in
+            UIView.transition(
+                with: self.hintTextView,
+                duration: 0.25,
+                options: .transitionCrossDissolve,
+                animations: { [weak self] in
+                    self?.hintTextView.text = value
+                }, completion: nil)
+           
+        }
+        .store(in: &cancellable)
+        
+        Task {
+            do {
+                try await self.hintService.runTips()
+            } catch {
+                
+            }
+        }
+    }
+    
+    private func setupHintsView() {
+        view.addSubview(hintTextView)
+        NSLayoutConstraint.activate([
+            hintTextView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            hintTextView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            hintTextView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
+        ])
     }
 
     private func updateImagePickerButton() {
@@ -594,13 +640,13 @@ extension PhotoCaptureViewController: CaptureManagerDelegate {
     }
 
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
-        if lightingCondition == .low {
-            lowLightView.text = "finjinon.lowLightMessage".localized()
-            lowLightView.isHidden = false
-        } else {
-            lowLightView.text = nil
-            lowLightView.isHidden = true
-        }
+//        if lightingCondition == .low {
+//            lowLightView.text = "finjinon.lowLightMessage".localized()
+//            lowLightView.isHidden = false
+//        } else {
+//            lowLightView.text = nil
+//            lowLightView.isHidden = true
+//        }
     }
     
     func captureManager(_ manager: CaptureManager, didFailWithError error: NSError) {
