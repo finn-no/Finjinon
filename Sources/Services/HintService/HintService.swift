@@ -11,33 +11,73 @@ import Combine
 
 class HintService {
     
-    private var messageArray: [String] = [
-        "1. Ta bilde av hele produktet.",
-        "2. Knips fra flere vinkler.",
-        "3. Vis ekstra funksjoner."
+    @Published var messageArray: [String] = [
+        "Ta bilde av hele produktet.",
+        "Knips fra flere vinkler.",
+        "Vis ekstra funksjoner."
     ]
+    
     @Published var hintText: String?
+    @Published var hasEnabledHint: Bool = false
     
     private var timer: Timer?
     
     var shouldContinue = true
+    var index = 0
+    
+    var predictionClient: PredictionClient?
     
     init() {
-        self.hintText = messageArray.first ?? ""
+        
     }
     
-    func runTips() async throws {
-        var index = 0 // Initialize index to start from the first element
+    func runTips(_ isActive: Bool) async throws {
+        self.shouldContinue = isActive
+        self.hasEnabledHint = isActive
         
+        self.hintText = messageArray.first ?? ""
+
         while shouldContinue {
-             // Create a task that waits for a delay
-             try await Task.sleep(nanoseconds: 2 * 1_000_000_000) // 2 seconds in nanoseconds
-             index = (index + 1) % messageArray.count
-             // Increment index and wrap around if needed, update hintText
-             DispatchQueue.main.async {
-                 self.hintText = self.messageArray[index]
-             }
+            do {
+                // Create a task that waits for a delay
+                try await Task.sleep(nanoseconds: 3 * 1_000_000_000) // 2 seconds in nanoseconds
+                index = (index + 1) % messageArray.count
+                // Increment index and wrap around if needed, update hintText
+                DispatchQueue.main.async {
+                    self.hintText = self.messageArray[self.index]
+                }
+            } catch {
+                self.shouldContinue = false
+            }
+            
+            if !shouldContinue {
+                self.hintText = nil
+            }
          }
+    }
+    
+    func getItemAndTips(_ photoData: Data) {
+        if hasEnabledHint {
+            let boundary = UUID().uuidString
+            if let imageData = UIImage(data: photoData)?.resized(withPercentage: 0.15)?.jpegData(compressionQuality: 0.8) {
+                predictionClient?.uploadImageAndGetTips(imageData: imageData, bodyBoundary: boundary) { response in
+                    switch response.result {
+                    case .success(let response):
+                        print(response)
+                        self.messageArray = response.tips ?? []
+                        break
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                        break
+                    }
+                }
+            } else {
+                print("Image not found")
+                return
+            }
+        } else {
+            print("Hints is disabled")
+        }
     }
 }
 

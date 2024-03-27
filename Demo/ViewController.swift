@@ -7,7 +7,7 @@ import Finjinon
 
 class ViewController: UITableViewController {
     var assets: [Asset] = []
-    let captureController = PhotoCaptureViewController()
+    let captureController = PhotoCaptureViewController(client: nil)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +23,8 @@ class ViewController: UITableViewController {
                 self.tableView.insertRows(at: [IndexPath(row: i, section: 0)], with: .automatic)
             }
         }
+        
+        present(captureController, animated: true, completion: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {

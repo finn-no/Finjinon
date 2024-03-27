@@ -7,6 +7,9 @@ import AVFoundation
 import MobileCoreServices
 import Photos
 import Combine
+import FINNClient
+
+import UIKit
 
 public let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
 public let FinjinonCameraAccessErrorDeniedCode = 1
@@ -31,6 +34,8 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 }
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
+    open weak var client: Networking?
+    
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library.
     /// The default implementation will present a UIImagePickerController. Setting this to nil, will remove the library-button.
@@ -73,6 +78,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     }()
 
     private var hintService = HintService()
+    
+    let tipButton = ToggleButton(frame: .zero)
+    
     private var viewFrame = CGRect.zero
     private var viewBounds = CGRect.zero
     private var subviewSetupDone = false
@@ -83,7 +91,16 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureManager.stop(nil)
         NotificationCenter.default.removeObserver(self)
     }
-
+    
+    public init(client: Networking?) {
+        self.hintService.predictionClient = client
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -113,9 +130,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             viewBounds = view.bounds
         }
         
-     
         setupSubviews()
-        
         
         collectionView.reloadData()
         scrollToLastAddedAssetAnimated(false)
@@ -214,19 +229,20 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         closeButton.tintColor = UIColor.white
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
-
-//        view.addSubview(lowLightView)
-//        NSLayoutConstraint.activate([
-//            lowLightView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
-//            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
-//        ])
         
         setupHintsView()
+        view.addSubview(lowLightView)
+        
+        NSLayoutConstraint.activate([
+            lowLightView.bottomAnchor.constraint(equalTo: hintTextView.topAnchor, constant: -16),
+            lowLightView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lowLightView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
+        ])
 
         updateImagePickerButton()
 
         previewView.alpha = 0.0
+        
         captureManager.prepare { error in
             if let error = error {
                 self.delegate?.photoCaptureViewController(self, didFailWithError: error)
@@ -244,34 +260,57 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
 
         captureManager.delegate = self
-
         self.hintService.$hintText.sink { value in
             UIView.transition(
                 with: self.hintTextView,
                 duration: 0.25,
                 options: .transitionCrossDissolve,
                 animations: { [weak self] in
-                    self?.hintTextView.text = value
+                    DispatchQueue.main.async {
+                        self?.hintTextView.text = value
+                    }
                 }, completion: nil)
            
         }
         .store(in: &cancellable)
+    }
+    
+    
+    @objc private func toggleHints(_: AnyObject) {
         
+        let isActive = tipButton.toggleState()
+        
+        self.hintTextView.isHidden = !isActive
         Task {
             do {
-                try await self.hintService.runTips()
+                try await self.hintService.runTips(isActive)
             } catch {
-                
+
             }
         }
     }
     
     private func setupHintsView() {
+        
+        view.addSubview(tipButton)
+        tipButton.translatesAutoresizingMaskIntoConstraints = false
+        tipButton.addTarget(self, action: #selector(toggleHints(_:)), for: .touchUpInside)
+        
         view.addSubview(hintTextView)
+        
         NSLayoutConstraint.activate([
-            hintTextView.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            hintTextView.bottomAnchor.constraint(equalTo: tipButton.topAnchor, constant: -16),
             hintTextView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            hintTextView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8)
+            hintTextView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.8),
+            hintTextView.heightAnchor.constraint(lessThanOrEqualToConstant: 66),
+
+        ])
+        
+        NSLayoutConstraint.activate([
+            tipButton.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -16),
+            tipButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tipButton.heightAnchor.constraint(equalToConstant: 66),
+            tipButton.widthAnchor.constraint(equalToConstant: 66)
         ])
     }
 
@@ -344,7 +383,6 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         if let selection = collectionView.indexPathsForSelectedItems {
             return selection.first
         }
-
         return nil
     }
 
@@ -369,6 +407,9 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     }
 
     open func createAssetFromImage(_ image: UIImage, completion: @escaping (Asset) -> Void) {
+        DispatchQueue.main.async {
+            self.hintService.getItemAndTips(image.jpegData(compressionQuality: 1)!)
+        }
         storage.createAssetFromImage(image, completion: completion)
     }
 
@@ -628,7 +669,11 @@ extension PhotoCaptureViewController: UICollectionViewDelegate {
 extension PhotoCaptureViewController: CaptureManagerDelegate {
     func captureManager(_ manager: CaptureManager, didCaptureImageData data: Data?, withMetadata metadata: NSDictionary?) {
         guard let data = data else { return }
-
+        
+        DispatchQueue.main.async {
+            self.hintService.getItemAndTips(data)
+        }
+        
         captureButton.isEnabled = true
 
         createAssetFromImageData(data as Data, completion: { [weak self] (asset: Asset) in
@@ -640,13 +685,13 @@ extension PhotoCaptureViewController: CaptureManagerDelegate {
     }
 
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
-//        if lightingCondition == .low {
-//            lowLightView.text = "finjinon.lowLightMessage".localized()
-//            lowLightView.isHidden = false
-//        } else {
-//            lowLightView.text = nil
-//            lowLightView.isHidden = true
-//        }
+        if lightingCondition == .low {
+            lowLightView.text = "finjinon.lowLightMessage".localized()
+            lowLightView.isHidden = false
+        } else {
+            lowLightView.text = nil
+            lowLightView.isHidden = true
+        }
     }
     
     func captureManager(_ manager: CaptureManager, didFailWithError error: NSError) {
