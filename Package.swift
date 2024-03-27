@@ -13,10 +13,17 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(
+            url: "git@github.schibsted.io:finn/finn-client-ios.git",
+            "152.0.0"..."999.0.0"
+        )
     ],
     targets: [
         .target(
             name: "Finjinon",
+            dependencies: [
+                .product(name: "FINNClient", package: "finn-client-ios")
+            ],
             path: "Sources",
             resources: [
                 .process("Resources"),
