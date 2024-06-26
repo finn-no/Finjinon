@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Finjinon",
     defaultLocalization: "nb",
-    platforms: [.iOS(.v14)],
+    platforms: [.iOS(.v15)],
     products: [
         .library(
             name: "Finjinon",
@@ -15,14 +15,16 @@ let package = Package(
     dependencies: [
         .package(
             url: "git@github.schibsted.io:finn/finn-client-ios.git",
-            "152.0.0"..."999.0.0"
-        )
+            "164.1.0"..."999.0.0"
+        ),
+        .package(url: "https://github.com/finn-no/FinniversKit.git", exact: "139.2.0")
     ],
     targets: [
         .target(
             name: "Finjinon",
             dependencies: [
-                .product(name: "FINNClient", package: "finn-client-ios")
+                .product(name: "FINNClient", package: "finn-client-ios"),
+                "FinniversKit"
             ],
             path: "Sources",
             resources: [

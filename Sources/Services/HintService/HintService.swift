@@ -8,26 +8,29 @@
 import Foundation
 import UIKit
 import Combine
+import FinniversKit
 
-class HintService {
+public class HintService {
     
     @Published var messageArray: [String] = [
-        "Ta bilde av hele produktet.",
-        "Knips fra flere vinkler.",
-        "Vis ekstra funksjoner."
+        "Ta et bilde for å få geniale tips 📸"
     ]
     
     @Published var hintText: String?
     @Published var hasEnabledHint: Bool = false
+    
+    @Published var predictedCategory: CategoryGroup?
+    
+    @Published var itemTitle: String = ""
     
     private var timer: Timer?
     
     var shouldContinue = true
     var index = 0
     
-    var predictionClient: PredictionClient?
+    public var predictionClient: PredictionClient?
     
-    init() {
+    public init() {
         
     }
     
@@ -56,7 +59,7 @@ class HintService {
          }
     }
     
-    func getItemAndTips(_ photoData: Data) {
+    public func getItemAndTips(_ photoData: Data) {
         if hasEnabledHint {
             let boundary = UUID().uuidString
             if let imageData = UIImage(data: photoData)?.resized(withPercentage: 0.15)?.jpegData(compressionQuality: 0.8) {
@@ -65,6 +68,20 @@ class HintService {
                     case .success(let response):
                         print(response)
                         self.messageArray = response.tips ?? []
+                        self.itemTitle = response.item ?? ""
+                        LoadingView.hide()
+                        break
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                        break
+                    }
+                }
+                
+                predictionClient?.uploadImageAndGetCategory(imageData: imageData, bodyBoundary: boundary) { response in
+                    switch response.result {
+                    case .success(let response):
+                        print(response)
+                        self.predictedCategory = response
                         break
                     case .failure(let error):
                         print(error.localizedDescription)

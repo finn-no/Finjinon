@@ -8,7 +8,7 @@ import MobileCoreServices
 import Photos
 import Combine
 import FINNClient
-
+import FinniversKit
 import UIKit
 
 public let FinjinonCameraAccessErrorDomain = "FinjinonCameraAccessErrorDomain"
@@ -25,7 +25,7 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
     func photoCaptureViewController(_ controller: PhotoCaptureViewController, didMoveItemFromIndexPath fromIndexPath: IndexPath, toIndexPath: IndexPath)
 
     func photoCaptureViewControllerNumberOfAssets(_ controller: PhotoCaptureViewController) -> Int
-    func photoCaptureViewController(_ controller: PhotoCaptureViewController, assetForIndexPath indexPath: IndexPath) -> Asset
+    func photoCaptureViewController(_ controller: PhotoCaptureViewController, assetForIndexPath indexPath: IndexPath) -> Asset?
     // delegate is responsible for updating own data structure to include new asset at the tip when one is added,
     // eg photoCaptureViewControllerNumberOfAssets should be +1 after didAddAsset is called
     func photoCaptureViewController(_ controller: PhotoCaptureViewController, didAddAsset asset: Asset)
@@ -35,6 +35,9 @@ public protocol PhotoCaptureViewControllerDelegate: NSObjectProtocol {
 
 open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayoutDelegate {
     open weak var client: Networking?
+
+    public var didGetPredictedCategory: (CategoryGroup?) -> () = { _ in }
+    public var didGetCameraTips: (String?) -> () = { _ in }
     
     open weak var delegate: PhotoCaptureViewControllerDelegate?
     /// Optional instance confirming to the ImagePickerAdapter-protocol to allow selecting an image from the library.
@@ -69,16 +72,43 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         return view
     }()
     
+    private lazy var calloutView: CalloutView = {
+        let calloutView = CalloutView(
+            direction: .down,
+            arrowAlignment: .center
+        )
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.hideCallout(_:)))
+        calloutView.addGestureRecognizer(tapGesture)
+        calloutView.translatesAutoresizingMaskIntoConstraints = false
+
+        return calloutView
+    }()
+    
     private lazy var hintTextView: HintView = {
         let view = HintView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.isHidden = false
+        view.isHidden = true
         view.text = "Hint!"
         return view
     }()
+    
+    
+    
+    @objc private func hideCallout(_ recognizer: UITapGestureRecognizer) {
+        hideCalloutFromView()
+    }
+    private var shouldShowCallout: Bool = true
+
+    func hideCalloutFromView() {
+        if shouldShowCallout {
+            shouldShowCallout = false
+            calloutView.hide()
+        }
+    }
 
     private var hintService = HintService()
-    
+        
     let tipButton = ToggleButton(frame: .zero)
     
     private var viewFrame = CGRect.zero
@@ -103,6 +133,8 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
     
     open override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "finjinon.done".localized(), style: .done, target: self, action: #selector(doneButtonTapped(_:)))
 
         view.backgroundColor = UIColor.black
 
@@ -134,6 +166,10 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         
         collectionView.reloadData()
         scrollToLastAddedAssetAnimated(false)
+        
+        
+        calloutView.show(withText: "Trykk her for å få tips generert med AI 🤖")
+        
     }
 
     func setupSubviews() {
@@ -260,6 +296,12 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         }
 
         captureManager.delegate = self
+        
+        self.hintService.$itemTitle.sink { title in
+            self.didGetCameraTips(title)
+        }
+        .store(in: &cancellable)
+        
         self.hintService.$hintText.sink { value in
             UIView.transition(
                 with: self.hintTextView,
@@ -273,12 +315,19 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
            
         }
         .store(in: &cancellable)
+        
+        self.hintService.$predictedCategory.sink { predictedCategory in
+            self.didGetPredictedCategory(predictedCategory)
+        }
+        .store(in: &cancellable)
     }
     
     
     @objc private func toggleHints(_: AnyObject) {
         
         let isActive = tipButton.toggleState()
+        
+        self.calloutView.isHidden = isActive
         
         self.hintTextView.isHidden = !isActive
         Task {
@@ -295,6 +344,14 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         view.addSubview(tipButton)
         tipButton.translatesAutoresizingMaskIntoConstraints = false
         tipButton.addTarget(self, action: #selector(toggleHints(_:)), for: .touchUpInside)
+        
+        tipButton.addSubview(calloutView)
+        tipButton.bringSubviewToFront(calloutView)
+
+        NSLayoutConstraint.activate([
+            calloutView.centerXAnchor.constraint(equalTo: tipButton.centerXAnchor),
+            calloutView.bottomAnchor.constraint(equalTo: tipButton.topAnchor),
+        ])
         
         view.addSubview(hintTextView)
         
@@ -567,7 +624,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         delegate?.photoCaptureViewControllerDidFinish(self)
         imagePickerAdapter = nil
 
-        dismiss(animated: true, completion: nil)
+        //dismiss(animated: true, completion: nil)
     }
 
     @objc func focusTapGestureRecognized(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -615,7 +672,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
             flashPosition = CGPoint(x: viewFrame.origin.x + buttonMargin - (buttonMargin / 3), y: viewFrame.origin.y + buttonMargin)
             pickerPosition = pickerButton != nil ? CGPoint(x: viewFrame.origin.x + viewBounds.width - (pickerButton!.bounds.size.width / 2 - buttonMargin), y: viewFrame.origin.y + buttonMargin) : .zero
         } else if orientation == .portrait || orientation == .portraitUpsideDown {
-            pickerPosition = pickerButton != nil ? CGPoint(x: viewFrame.origin.x + viewBounds.width - (pickerButton!.bounds.size.width + buttonMargin), y: viewFrame.origin.y + buttonMargin) : .zero
+            pickerPosition = pickerButton != nil ? CGPoint(x: viewFrame.origin.x + viewBounds.width - (pickerButton!.bounds.size.width), y: viewFrame.origin.y + buttonMargin) : .zero
             flashPosition = CGPoint(x: viewFrame.origin.x + buttonMargin, y: viewFrame.origin.y + buttonMargin)
         }
         let animations = {
