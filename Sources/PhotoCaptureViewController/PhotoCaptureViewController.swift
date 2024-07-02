@@ -135,7 +135,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
         let icon = UIImage(named: "LightningIcon", in: Bundle.finjinon, compatibleWith: nil)
         flashButton.setImage(icon, for: .normal)
-        flashButton.setTitle("finjinon.auto".localized(), for: .normal)
+        flashButton.setTitle(Finjinon.configuration.texts.auto, for: .normal)
         flashButton.addTarget(self, action: #selector(flashButtonTapped(_:)), for: .touchUpInside)
         flashButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .footnote)
         flashButton.tintColor = UIColor.white
@@ -191,11 +191,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureButton.addTarget(self, action: #selector(capturePhotoTapped(_:)), for: .touchUpInside)
         containerView.addSubview(captureButton)
         captureButton.isEnabled = false
-        captureButton.accessibilityLabel = "finjinon.captureButton".localized()
+        captureButton.accessibilityLabel = Finjinon.configuration.texts.captureButton
 
         closeButton.frame = CGRect(x: captureButton.frame.maxX, y: captureButton.frame.midY - 22, width: viewBounds.width - captureButton.frame.maxX, height: 44)
         closeButton.addTarget(self, action: #selector(doneButtonTapped(_:)), for: .touchUpInside)
-        closeButton.setTitle("finjinon.done".localized(), for: .normal)
+        closeButton.setTitle(Finjinon.configuration.texts.done, for: .normal)
         closeButton.tintColor = UIColor.white
         closeButton.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         containerView.addSubview(closeButton)
@@ -241,7 +241,7 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
 
             if pickerButton == nil {
                 pickerButton = UIButton(frame: buttonRect)
-                pickerButton!.setTitle("finjinon.photos".localized(), for: .normal)
+                pickerButton!.setTitle(Finjinon.configuration.texts.photos, for: .normal)
                 let icon = UIImage(named: "PhotosIcon", in: Bundle.finjinon, compatibleWith: nil)
                 pickerButton!.setImage(icon, for: .normal)
                 pickerButton!.addTarget(self, action: #selector(presentImagePickerTapped(_:)), for: .touchUpInside)
@@ -372,11 +372,11 @@ open class PhotoCaptureViewController: UIViewController, PhotoCollectionViewLayo
         captureManager.changeFlashMode(mode) {
             switch mode {
             case .off:
-                self.flashButton.setTitle("finjinon.off".localized(), for: .normal)
+                self.flashButton.setTitle(Finjinon.configuration.texts.off, for: .normal)
             case .on:
-                self.flashButton.setTitle("finjinon.on".localized(), for: .normal)
+                self.flashButton.setTitle(Finjinon.configuration.texts.on, for: .normal)
             case .auto:
-                self.flashButton.setTitle("finjinon.auto".localized(), for: .normal)
+                self.flashButton.setTitle(Finjinon.configuration.texts.auto, for: .normal)
             @unknown default:
                 break
             }
@@ -595,7 +595,7 @@ extension PhotoCaptureViewController: CaptureManagerDelegate {
 
     func captureManager(_ manager: CaptureManager, didDetectLightingCondition lightingCondition: LightingCondition) {
         if lightingCondition == .low {
-            lowLightView.text = "finjinon.lowLightMessage".localized()
+            lowLightView.text = Finjinon.configuration.texts.lowLightMessage
             lowLightView.isHidden = false
         } else {
             lowLightView.text = nil

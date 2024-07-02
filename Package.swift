@@ -4,8 +4,8 @@ import PackageDescription
 
 let package = Package(
     name: "Finjinon",
-    defaultLocalization: "nb",
-    platforms: [.iOS(.v14)],
+    defaultLocalization: "en",
+    platforms: [.iOS(.v15)],
     products: [
         .library(
             name: "Finjinon",
