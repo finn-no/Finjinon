@@ -13,21 +13,16 @@ Captured images are provided as an `Asset` which can retrieve image data asynchr
 
 ## Requirements
 
-* iOS 9.0
-* Swift 4.0
+* iOS 15.0
+* Swift 5.7
 
 ## Installation
 
-**Finjinon** is available through [Carthage](https://github.com/Carthage/Carthage). To install
-it, simply add the following line to your Cartfile:
-
-```ruby
-github "finn-no/Finjinon"
-```
+**Finjinon** is available through Swift Package Manager. 
 
 ## Usage
 
-See the included Example project for usage.
+See the included Example project for usage. You must call `Finjinon.setup(...)` before using it.
 
 ## License
 

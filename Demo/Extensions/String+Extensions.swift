@@ -6,7 +6,7 @@ import Foundation
 
 extension String {
     func localized() -> String {
-        let bundle = Bundle.finjinon
+        let bundle = Bundle(for: ViewController.self)
         return NSLocalizedString(self, tableName: nil, bundle: bundle, value: "", comment: "")
     }
 }

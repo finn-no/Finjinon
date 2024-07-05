@@ -209,7 +209,7 @@ private extension CaptureManager {
     }
 
     func accessDeniedError(_ code: Int = FinjinonCameraAccessErrorDeniedCode) -> NSError {
-        let info = [NSLocalizedDescriptionKey: "finjinon.cameraAccessDenied".localized()]
+        let info = [NSLocalizedDescriptionKey: Finjinon.configuration.texts.cameraAccessDenied]
         return NSError(domain: FinjinonCameraAccessErrorDomain, code: code, userInfo: info)
     }
 
