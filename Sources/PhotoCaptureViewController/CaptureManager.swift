@@ -275,6 +275,16 @@ private extension CaptureManager {
                     }
                     cameraDevice.unlockForConfiguration()
                 }
+
+                // Set zoomFactor to get default camera functionality
+                do {
+                    try cameraDevice.lockForConfiguration()
+                } catch let error1 as NSError {
+                    error = error1
+                    self.delegate?.captureManager(self, didFailWithError: error1)
+                }
+                cameraDevice.videoZoomFactor = 2.0
+                cameraDevice.unlockForConfiguration()
             }
 
             self.session.startRunning()
@@ -286,16 +296,21 @@ private extension CaptureManager {
     }
 
     func cameraDeviceWithPosition(_ position: AVCaptureDevice.Position) -> AVCaptureDevice? {
-        let deviceTypes: [AVCaptureDevice.DeviceType]
 
-        if #available(iOS 11.2, *) {
-            deviceTypes = [.builtInTrueDepthCamera, .builtInDualCamera, .builtInWideAngleCamera]
-        } else {
-            deviceTypes = [.builtInWideAngleCamera]
-        }
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [
+                .builtInTripleCamera,
+                .builtInDualCamera,
+                .builtInTrueDepthCamera,
+                .builtInDualWideCamera,
+                .builtInWideAngleCamera
+            ],
+            mediaType: .video,
+            position: .back
+        ).devices
 
-        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes, mediaType: .video, position: .unspecified)
-        let availableCameraDevices = discoverySession.devices
+        let availableCameraDevices = discoverySession
+            .filter { $0.isConnected && !$0.isSuspended }
 
         guard availableCameraDevices.isEmpty == false else {
             print("Error no camera devices found")
